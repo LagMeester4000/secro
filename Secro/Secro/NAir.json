@@ -1,0 +1,58 @@
+{
+    "value0": {
+        "amountOfHitboxes": 1,
+        "duration": 1,
+        "landingLag": 0.05000000074505806,
+        "frames": [
+            {
+                "time": 0,
+                "changes": [
+                    {
+                        "cereal_class_version": 0,
+                        "index": 0,
+                        "position": {
+                            "x": 0,
+                            "y": 0
+                        },
+                        "isActive": true,
+                        "isHitbox": true,
+                        "hitNumber": 0,
+                        "width": 1,
+                        "height": 1,
+                        "relativePriority": 0,
+                        "absolutePriority": 0,
+                        "damage": 100,
+                        "knockbackAngle": -45,
+                        "knockbackPowerBase": 100,
+                        "knockbackPowerGrowth": 100,
+                        "hitstunAdjustment": 0
+                    }
+                ]
+            },
+            {
+                "time": 0.11299999803304672,
+                "changes": [
+                    {
+                        "index": 0,
+                        "position": {
+                            "x": 0,
+                            "y": 0
+                        },
+                        "isActive": true,
+                        "isHitbox": true,
+                        "hitNumber": 0,
+                        "width": 1,
+                        "height": 1,
+                        "relativePriority": 0,
+                        "absolutePriority": 0,
+                        "damage": 100,
+                        "knockbackAngle": -45,
+                        "knockbackPowerBase": 100,
+                        "knockbackPowerGrowth": 1,
+                        "hitstunAdjustment": 0
+                    }
+                ]
+            }
+        ]
+    }
+}

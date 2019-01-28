@@ -1,0 +1,34 @@
+{
+    "value0": {
+        "amountOfHitboxes": 1,
+        "duration": 0,
+        "landingLag": 0,
+        "frames": [
+            {
+                "time": 0,
+                "changes": [
+                    {
+                        "cereal_class_version": 0,
+                        "index": 0,
+                        "position": {
+                            "x": 0,
+                            "y": -0.20000000298023224
+                        },
+                        "isActive": true,
+                        "isHitbox": false,
+                        "hitNumber": 0,
+                        "width": 1,
+                        "height": 1,
+                        "relativePriority": 0,
+                        "absolutePriority": 0,
+                        "damage": 1,
+                        "knockbackAngle": -45,
+                        "knockbackPowerBase": 1,
+                        "knockbackPowerGrowth": 1,
+                        "hitstunAdjustment": 0
+                    }
+                ]
+            }
+        ]
+    }
+}

@@ -1,0 +1,76 @@
+{
+    "value0": {
+        "amountOfHitboxes": 1,
+        "duration": 2,
+        "landingLag": 0,
+        "frames": [
+            {
+                "time": 0.21600000560283661,
+                "changes": [
+                    {
+                        "cereal_class_version": 0,
+                        "index": 0,
+                        "position": {
+                            "x": 0,
+                            "y": 0
+                        },
+                        "isActive": true,
+                        "hitNumber": 0,
+                        "width": 1,
+                        "height": 0,
+                        "relativePriority": 0,
+                        "absolutePriority": 0,
+                        "knockbackAngle": 0,
+                        "knockbackPowerBase": 0,
+                        "knockbackPowerGrowth": 0,
+                        "hitstunAdjustment": 0
+                    }
+                ]
+            },
+            {
+                "time": 0.51499998569488525,
+                "changes": [
+                    {
+                        "index": 0,
+                        "position": {
+                            "x": 1,
+                            "y": 0
+                        },
+                        "isActive": false,
+                        "hitNumber": 0,
+                        "width": 1,
+                        "height": 0,
+                        "relativePriority": 0,
+                        "absolutePriority": 0,
+                        "knockbackAngle": 0,
+                        "knockbackPowerBase": 0,
+                        "knockbackPowerGrowth": 0,
+                        "hitstunAdjustment": 0
+                    }
+                ]
+            },
+            {
+                "time": 1,
+                "changes": [
+                    {
+                        "index": 0,
+                        "position": {
+                            "x": 0,
+                            "y": 0
+                        },
+                        "isActive": false,
+                        "hitNumber": 0,
+                        "width": 0,
+                        "height": 0,
+                        "relativePriority": 0,
+                        "absolutePriority": 0,
+                        "knockbackAngle": 0,
+                        "knockbackPowerBase": 0,
+                        "knockbackPowerGrowth": 0,
+                        "hitstunAdjustment": 0
+                    }
+                ]
+            }
+        ]
+    }
+}

@@ -1,0 +1,54 @@
+{
+    "value0": {
+        "amountOfHitboxes": 1,
+        "duration": 2,
+        "landingLag": 0,
+        "frames": [
+            {
+                "time": 0.26800000667572021,
+                "changes": [
+                    {
+                        "cereal_class_version": 0,
+                        "change.index": 0,
+                        "change.position": {
+                            "x": 0,
+                            "y": 0
+                        },
+                        "change.isActive": true,
+                        "change.hitNumber": 0,
+                        "change.width": 1,
+                        "change.height": 0,
+                        "change.relativePriority": 0,
+                        "change.absolutePriority": 0,
+                        "change.knockbackAngle": 0,
+                        "change.knockbackPowerBase": 0,
+                        "change.knockbackPowerGrowth": 0,
+                        "change.hitstunAdjustment": 0
+                    }
+                ]
+            },
+            {
+                "time": 0.60799998044967651,
+                "changes": [
+                    {
+                        "change.index": 0,
+                        "change.position": {
+                            "x": 1,
+                            "y": 0
+                        },
+                        "change.isActive": true,
+                        "change.hitNumber": 0,
+                        "change.width": 1,
+                        "change.height": 0,
+                        "change.relativePriority": 0,
+                        "change.absolutePriority": 0,
+                        "change.knockbackAngle": 0,
+                        "change.knockbackPowerBase": 0,
+                        "change.knockbackPowerGrowth": 0,
+                        "change.hitstunAdjustment": 0
+                    }
+                ]
+            }
+        ]
+    }
+}
