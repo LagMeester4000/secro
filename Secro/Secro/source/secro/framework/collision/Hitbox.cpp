@@ -28,6 +28,9 @@ void secro::Hitbox::knockbackPlayer(PlayerCharacter * player, FacingDirection di
 	float hitstun = GameplaySettings::calculateHitstun(damage, player->getDamageScalar(), knockbackDist, hitstunAdjustment);
 	b2Vec2 knockback = mul(directionFromAngle<b2Vec2>(knockbackAngle), knockbackDist);
 
+	if (direction == FacingDirection::Left)
+		knockback.x = -knockback.x;
+
 	player->addDamage(damage);
 	player->putInHitstun(hitstun);
 	player->knockBack(knockback);

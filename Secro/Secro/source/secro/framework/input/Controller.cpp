@@ -216,6 +216,7 @@ const Joystick & secro::Controller::getMovement() const
 
 Direction secro::Controller::getMovementDirection() const
 {
+	std::cout << current().leftStick.x << std::endl;
 	return getDirection(current().leftStick);
 }
 

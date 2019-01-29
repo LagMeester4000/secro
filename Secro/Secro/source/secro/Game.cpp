@@ -21,6 +21,9 @@ secro::Game::Game()
 	dummyPlayer->init();
 }
 
+//TEMP
+#include <SFML/Window.hpp>
+
 void secro::Game::update(float deltaTime)
 {
 	inputManager.update();
@@ -28,6 +31,12 @@ void secro::Game::update(float deltaTime)
 	dummyPlayer->update(deltaTime);
 	physicsManager.update(deltaTime);
 	hitboxManager.update(deltaTime);
+
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Z))
+	{
+		physicsManager.getPlayerBody(0)->SetTransform(b2Vec2(-5.f, -2.f), 0.f);
+		physicsManager.getPlayerBody(1)->SetTransform(b2Vec2(5.f, -2.f), 0.f);
+	}
 }
 
 void secro::Game::render(sf::RenderWindow & window)
