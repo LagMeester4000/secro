@@ -1,0 +1,444 @@
+{
+    "value0": {
+        "amountOfHitboxes": 3,
+        "duration": 0.5,
+        "landingLag": 0.059000000357627869,
+        "frames": [
+            {
+                "time": 0,
+                "changes": [
+                    {
+                        "cereal_class_version": 0,
+                        "index": 0,
+                        "position": {
+                            "x": 0,
+                            "y": 0
+                        },
+                        "isActive": false,
+                        "isHitbox": true,
+                        "hitNumber": 0,
+                        "width": 1,
+                        "height": 1,
+                        "relativePriority": 0,
+                        "absolutePriority": 0,
+                        "damage": 1,
+                        "knockbackAngle": -45,
+                        "knockbackPowerBase": 1,
+                        "knockbackPowerGrowth": 1,
+                        "hitstunAdjustment": 0
+                    },
+                    {
+                        "index": 0,
+                        "position": {
+                            "x": 0,
+                            "y": 0
+                        },
+                        "isActive": false,
+                        "isHitbox": true,
+                        "hitNumber": 1,
+                        "width": 1,
+                        "height": 1,
+                        "relativePriority": 0,
+                        "absolutePriority": 0,
+                        "damage": 1,
+                        "knockbackAngle": -45,
+                        "knockbackPowerBase": 1,
+                        "knockbackPowerGrowth": 1,
+                        "hitstunAdjustment": 0
+                    },
+                    {
+                        "index": 0,
+                        "position": {
+                            "x": 0,
+                            "y": 0
+                        },
+                        "isActive": false,
+                        "isHitbox": true,
+                        "hitNumber": 2,
+                        "width": 1,
+                        "height": 1,
+                        "relativePriority": 0,
+                        "absolutePriority": 0,
+                        "damage": 1,
+                        "knockbackAngle": -45,
+                        "knockbackPowerBase": 1,
+                        "knockbackPowerGrowth": 1,
+                        "hitstunAdjustment": 0
+                    }
+                ]
+            },
+            {
+                "time": 0.070000000298023224,
+                "changes": [
+                    {
+                        "index": 0,
+                        "position": {
+                            "x": -0.10000000149011612,
+                            "y": -0.10000000149011612
+                        },
+                        "isActive": true,
+                        "isHitbox": true,
+                        "hitNumber": 0,
+                        "width": 0.20000000298023224,
+                        "height": 1,
+                        "relativePriority": 2,
+                        "absolutePriority": 0,
+                        "damage": 10,
+                        "knockbackAngle": -50,
+                        "knockbackPowerBase": 15,
+                        "knockbackPowerGrowth": 10,
+                        "hitstunAdjustment": 0
+                    },
+                    {
+                        "index": 1,
+                        "position": {
+                            "x": -0.40000000596046448,
+                            "y": -0.40000000596046448
+                        },
+                        "isActive": true,
+                        "isHitbox": true,
+                        "hitNumber": 0,
+                        "width": 0.20000000298023224,
+                        "height": 1,
+                        "relativePriority": 1,
+                        "absolutePriority": 0,
+                        "damage": 10,
+                        "knockbackAngle": -50,
+                        "knockbackPowerBase": 15,
+                        "knockbackPowerGrowth": 10,
+                        "hitstunAdjustment": 0
+                    },
+                    {
+                        "index": 2,
+                        "position": {
+                            "x": -0.69999998807907104,
+                            "y": -0.69999998807907104
+                        },
+                        "isActive": true,
+                        "isHitbox": true,
+                        "hitNumber": 0,
+                        "width": 0.20000000298023224,
+                        "height": 1,
+                        "relativePriority": 0,
+                        "absolutePriority": 0,
+                        "damage": 15,
+                        "knockbackAngle": -85,
+                        "knockbackPowerBase": 15,
+                        "knockbackPowerGrowth": 10,
+                        "hitstunAdjustment": 0
+                    }
+                ]
+            },
+            {
+                "time": 0.10300000011920929,
+                "changes": [
+                    {
+                        "index": 0,
+                        "position": {
+                            "x": 0,
+                            "y": -0.10000000149011612
+                        },
+                        "isActive": true,
+                        "isHitbox": true,
+                        "hitNumber": 0,
+                        "width": 0.20000000298023224,
+                        "height": 1,
+                        "relativePriority": 2,
+                        "absolutePriority": 0,
+                        "damage": 10,
+                        "knockbackAngle": -50,
+                        "knockbackPowerBase": 15,
+                        "knockbackPowerGrowth": 10,
+                        "hitstunAdjustment": 0
+                    },
+                    {
+                        "index": 1,
+                        "position": {
+                            "x": 0,
+                            "y": -0.51999998092651367
+                        },
+                        "isActive": true,
+                        "isHitbox": true,
+                        "hitNumber": 0,
+                        "width": 0.20000000298023224,
+                        "height": 1,
+                        "relativePriority": 1,
+                        "absolutePriority": 0,
+                        "damage": 10,
+                        "knockbackAngle": -50,
+                        "knockbackPowerBase": 15,
+                        "knockbackPowerGrowth": 10,
+                        "hitstunAdjustment": 0
+                    },
+                    {
+                        "index": 2,
+                        "position": {
+                            "x": 0,
+                            "y": -0.93999999761581421
+                        },
+                        "isActive": true,
+                        "isHitbox": true,
+                        "hitNumber": 0,
+                        "width": 0.20000000298023224,
+                        "height": 1,
+                        "relativePriority": 0,
+                        "absolutePriority": 0,
+                        "damage": 15,
+                        "knockbackAngle": -85,
+                        "knockbackPowerBase": 15,
+                        "knockbackPowerGrowth": 10,
+                        "hitstunAdjustment": 0
+                    }
+                ]
+            },
+            {
+                "time": 0.13699999451637268,
+                "changes": [
+                    {
+                        "index": 0,
+                        "position": {
+                            "x": 0.10000000149011612,
+                            "y": -0.10000000149011612
+                        },
+                        "isActive": true,
+                        "isHitbox": true,
+                        "hitNumber": 0,
+                        "width": 0.20000000298023224,
+                        "height": 1,
+                        "relativePriority": 2,
+                        "absolutePriority": 0,
+                        "damage": 10,
+                        "knockbackAngle": -50,
+                        "knockbackPowerBase": 15,
+                        "knockbackPowerGrowth": 10,
+                        "hitstunAdjustment": 0
+                    },
+                    {
+                        "index": 1,
+                        "position": {
+                            "x": 0.40000000596046448,
+                            "y": -0.40000000596046448
+                        },
+                        "isActive": true,
+                        "isHitbox": true,
+                        "hitNumber": 0,
+                        "width": 0.20000000298023224,
+                        "height": 1,
+                        "relativePriority": 1,
+                        "absolutePriority": 0,
+                        "damage": 10,
+                        "knockbackAngle": -50,
+                        "knockbackPowerBase": 15,
+                        "knockbackPowerGrowth": 10,
+                        "hitstunAdjustment": 0
+                    },
+                    {
+                        "index": 2,
+                        "position": {
+                            "x": 0.69999998807907104,
+                            "y": -0.69999998807907104
+                        },
+                        "isActive": true,
+                        "isHitbox": true,
+                        "hitNumber": 0,
+                        "width": 0.20000000298023224,
+                        "height": 1,
+                        "relativePriority": 0,
+                        "absolutePriority": 0,
+                        "damage": 15,
+                        "knockbackAngle": -85,
+                        "knockbackPowerBase": 15,
+                        "knockbackPowerGrowth": 10,
+                        "hitstunAdjustment": 0
+                    }
+                ]
+            },
+            {
+                "time": 0.17499999701976776,
+                "changes": [
+                    {
+                        "index": 0,
+                        "position": {
+                            "x": 0.10000000149011612,
+                            "y": 0
+                        },
+                        "isActive": true,
+                        "isHitbox": true,
+                        "hitNumber": 0,
+                        "width": 0.20000000298023224,
+                        "height": 1,
+                        "relativePriority": 2,
+                        "absolutePriority": 0,
+                        "damage": 10,
+                        "knockbackAngle": -50,
+                        "knockbackPowerBase": 15,
+                        "knockbackPowerGrowth": 10,
+                        "hitstunAdjustment": 0
+                    },
+                    {
+                        "index": 1,
+                        "position": {
+                            "x": 0.51999998092651367,
+                            "y": 0
+                        },
+                        "isActive": true,
+                        "isHitbox": true,
+                        "hitNumber": 0,
+                        "width": 0.20000000298023224,
+                        "height": 1,
+                        "relativePriority": 1,
+                        "absolutePriority": 0,
+                        "damage": 10,
+                        "knockbackAngle": -50,
+                        "knockbackPowerBase": 15,
+                        "knockbackPowerGrowth": 10,
+                        "hitstunAdjustment": 0
+                    },
+                    {
+                        "index": 2,
+                        "position": {
+                            "x": 0.93999999761581421,
+                            "y": 0
+                        },
+                        "isActive": true,
+                        "isHitbox": true,
+                        "hitNumber": 0,
+                        "width": 0.20000000298023224,
+                        "height": 1,
+                        "relativePriority": 0,
+                        "absolutePriority": 0,
+                        "damage": 15,
+                        "knockbackAngle": -85,
+                        "knockbackPowerBase": 15,
+                        "knockbackPowerGrowth": 10,
+                        "hitstunAdjustment": 0
+                    }
+                ]
+            },
+            {
+                "time": 0.20399999618530273,
+                "changes": [
+                    {
+                        "index": 0,
+                        "position": {
+                            "x": 0.10000000149011612,
+                            "y": 0.10000000149011612
+                        },
+                        "isActive": true,
+                        "isHitbox": true,
+                        "hitNumber": 0,
+                        "width": 0.20000000298023224,
+                        "height": 1,
+                        "relativePriority": 2,
+                        "absolutePriority": 0,
+                        "damage": 10,
+                        "knockbackAngle": -50,
+                        "knockbackPowerBase": 15,
+                        "knockbackPowerGrowth": 10,
+                        "hitstunAdjustment": 0
+                    },
+                    {
+                        "index": 1,
+                        "position": {
+                            "x": 0.40000000596046448,
+                            "y": 0.40000000596046448
+                        },
+                        "isActive": true,
+                        "isHitbox": true,
+                        "hitNumber": 0,
+                        "width": 0.20000000298023224,
+                        "height": 1,
+                        "relativePriority": 1,
+                        "absolutePriority": 0,
+                        "damage": 10,
+                        "knockbackAngle": -50,
+                        "knockbackPowerBase": 15,
+                        "knockbackPowerGrowth": 10,
+                        "hitstunAdjustment": 0
+                    },
+                    {
+                        "index": 2,
+                        "position": {
+                            "x": 0.69999998807907104,
+                            "y": 0.69999998807907104
+                        },
+                        "isActive": true,
+                        "isHitbox": true,
+                        "hitNumber": 0,
+                        "width": 0.20000000298023224,
+                        "height": 1,
+                        "relativePriority": 0,
+                        "absolutePriority": 0,
+                        "damage": 15,
+                        "knockbackAngle": -85,
+                        "knockbackPowerBase": 15,
+                        "knockbackPowerGrowth": 10,
+                        "hitstunAdjustment": 0
+                    }
+                ]
+            },
+            {
+                "time": 0.23999999463558197,
+                "changes": [
+                    {
+                        "index": 0,
+                        "position": {
+                            "x": 0,
+                            "y": 0
+                        },
+                        "isActive": false,
+                        "isHitbox": true,
+                        "hitNumber": 0,
+                        "width": 1,
+                        "height": 1,
+                        "relativePriority": 0,
+                        "absolutePriority": 0,
+                        "damage": 1,
+                        "knockbackAngle": -45,
+                        "knockbackPowerBase": 1,
+                        "knockbackPowerGrowth": 1,
+                        "hitstunAdjustment": 0
+                    },
+                    {
+                        "index": 1,
+                        "position": {
+                            "x": 0,
+                            "y": 0
+                        },
+                        "isActive": false,
+                        "isHitbox": true,
+                        "hitNumber": 0,
+                        "width": 1,
+                        "height": 1,
+                        "relativePriority": 0,
+                        "absolutePriority": 0,
+                        "damage": 1,
+                        "knockbackAngle": -45,
+                        "knockbackPowerBase": 1,
+                        "knockbackPowerGrowth": 1,
+                        "hitstunAdjustment": 0
+                    },
+                    {
+                        "index": 2,
+                        "position": {
+                            "x": 0,
+                            "y": 0
+                        },
+                        "isActive": false,
+                        "isHitbox": true,
+                        "hitNumber": 0,
+                        "width": 1,
+                        "height": 1,
+                        "relativePriority": 0,
+                        "absolutePriority": 0,
+                        "damage": 1,
+                        "knockbackAngle": -45,
+                        "knockbackPowerBase": 1,
+                        "knockbackPowerGrowth": 1,
+                        "hitstunAdjustment": 0
+                    }
+                ]
+            }
+        ]
+    }
+}

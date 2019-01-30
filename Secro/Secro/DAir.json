@@ -1,7 +1,7 @@
 {
     "value0": {
         "amountOfHitboxes": 1,
-        "duration": 1,
+        "duration": 0.30000001192092896,
         "landingLag": 0.05000000074505806,
         "frames": [
             {
@@ -35,20 +35,20 @@
                     {
                         "index": 0,
                         "position": {
-                            "x": 0,
-                            "y": 0
+                            "x": 0.20000000298023224,
+                            "y": 1
                         },
                         "isActive": true,
                         "isHitbox": true,
                         "hitNumber": 0,
-                        "width": 1,
+                        "width": 0.60000002384185791,
                         "height": 1,
                         "relativePriority": 0,
                         "absolutePriority": 0,
                         "damage": 10,
-                        "knockbackAngle": -70,
-                        "knockbackPowerBase": 15,
-                        "knockbackPowerGrowth": 15,
+                        "knockbackAngle": 55,
+                        "knockbackPowerBase": 21,
+                        "knockbackPowerGrowth": 8,
                         "hitstunAdjustment": 0
                     }
                 ]
@@ -60,19 +60,19 @@
                         "index": 0,
                         "position": {
                             "x": 0,
-                            "y": 0
+                            "y": 0.80000001192092896
                         },
                         "isActive": true,
                         "isHitbox": true,
                         "hitNumber": 0,
-                        "width": 1,
+                        "width": 0.80000001192092896,
                         "height": 1,
                         "relativePriority": 0,
                         "absolutePriority": 0,
                         "damage": 10,
-                        "knockbackAngle": -70,
+                        "knockbackAngle": 55,
                         "knockbackPowerBase": 10,
-                        "knockbackPowerGrowth": 10,
+                        "knockbackPowerGrowth": 4,
                         "hitstunAdjustment": 0
                     }
                 ]

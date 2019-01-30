@@ -1,6 +1,6 @@
 {
     "value0": {
-        "amountOfHitboxes": 1,
+        "amountOfHitboxes": 3,
         "duration": 0,
         "landingLag": 0,
         "frames": [
@@ -12,12 +12,50 @@
                         "index": 0,
                         "position": {
                             "x": 0,
-                            "y": -0.20000000298023224
+                            "y": 0
                         },
                         "isActive": true,
                         "isHitbox": false,
                         "hitNumber": 0,
-                        "width": 1,
+                        "width": 0.60000002384185791,
+                        "height": 1,
+                        "relativePriority": 0,
+                        "absolutePriority": 0,
+                        "damage": 1,
+                        "knockbackAngle": -45,
+                        "knockbackPowerBase": 1,
+                        "knockbackPowerGrowth": 1,
+                        "hitstunAdjustment": 0
+                    },
+                    {
+                        "index": 1,
+                        "position": {
+                            "x": 0,
+                            "y": -0.40000000596046448
+                        },
+                        "isActive": true,
+                        "isHitbox": false,
+                        "hitNumber": 0,
+                        "width": 0.5,
+                        "height": 1,
+                        "relativePriority": 0,
+                        "absolutePriority": 0,
+                        "damage": 1,
+                        "knockbackAngle": -45,
+                        "knockbackPowerBase": 1,
+                        "knockbackPowerGrowth": 1,
+                        "hitstunAdjustment": 0
+                    },
+                    {
+                        "index": 2,
+                        "position": {
+                            "x": 0,
+                            "y": 0.40000000596046448
+                        },
+                        "isActive": true,
+                        "isHitbox": false,
+                        "hitNumber": 0,
+                        "width": 0.5,
                         "height": 1,
                         "relativePriority": 0,
                         "absolutePriority": 0,

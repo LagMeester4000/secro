@@ -50,6 +50,9 @@ std::vector<std::shared_ptr<Hitbox>> secro::HitboxCollection::collide(HitboxColl
 	{
 		for (auto& myHit : hitboxes)
 		{
+			if (!myHit->isActive || !otherHit->isActive)
+				continue;
+
 			if (myHit->collide(
 				*otherHit,
 				otherPos,
@@ -77,7 +80,8 @@ void secro::HitboxCollection::debugRender(sf::RenderWindow & window)
 {
 	for (auto& it : hitboxes)
 	{
-		it->render(window, owner->getPosition(), scale(owner));
+		if (it->isActive)
+			it->render(window, owner->getPosition(), scale(owner));
 	}
 }
 

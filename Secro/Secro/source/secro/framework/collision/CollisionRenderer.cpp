@@ -62,7 +62,8 @@ void secro::CollisionRenderer::render(sf::RenderWindow & window, FrameData & fra
 		if (change.index == selectedHitbox)
 			render(window, change, true);
 		else
-			render(window, change);
+			if (change.isActive)
+				render(window, change);
 	}
 }
 
@@ -73,6 +74,13 @@ static char filePath[32];
 #include <istream>
 #include <experimental/filesystem>
 #include <cereal/archives/json.hpp>
+std::string asFrames(float time)
+{
+	std::string frames = std::to_string((int)(time / 0.0166f));
+	std::string message = "that's this many frames: " + frames;
+	return message;
+}
+
 void secro::CollisionRenderer::renderFrameDataEditor(sf::RenderWindow & window)
 {
 	namespace fs = std::experimental::filesystem;
@@ -102,6 +110,12 @@ void secro::CollisionRenderer::renderFrameDataEditor(sf::RenderWindow & window)
 		{
 			if (fs::exists(filePath))
 			{
+				//sort the thingy
+				std::sort(frameData.frames.begin(), frameData.frames.end(), [](Frame& f1, Frame& f2)
+				{
+					return f1.time < f2.time;
+				});
+
 				std::ifstream file(filePath);
 				cereal::JSONInputArchive in(file);
 
@@ -116,12 +130,29 @@ void secro::CollisionRenderer::renderFrameDataEditor(sf::RenderWindow & window)
 		ImGui::Separator();
 
 		ImGui::InputFloat("LandingLag", &frameData.landingLag);
+		ImGui::Text(asFrames(frameData.landingLag).c_str());
 		ImGui::InputInt("AmountOfHitboxes", &frameData.amountOfHitboxes);
 		ImGui::InputFloat("MoveDuration", &frameData.duration);
+		ImGui::Text(asFrames(frameData.duration).c_str());
 		ImGui::SliderFloat("Time", &time, 0.f, frameData.duration);
+		ImGui::Text(asFrames(time).c_str());
 		if (ImGui::Button("Add New Frame"))
 		{
 			frameData.frames.push_back(Frame());
+		}
+		if (ImGui::Button("Remove Frame"))
+		{
+			if (frameData.frames.size() >= selectedFrame)
+			{
+				frameData.frames.erase(frameData.frames.begin() + selectedFrame);
+			}
+		}
+		if (ImGui::Button("Copy Selected Frame"))
+		{
+			if (frameData.frames.size() >= selectedFrame)
+			{
+				frameData.frames.insert(frameData.frames.begin() + selectedFrame, frameData.frames[selectedFrame]);
+			}
 		}
 		if (ImGui::Button("Sort"))
 		{
@@ -133,7 +164,7 @@ void secro::CollisionRenderer::renderFrameDataEditor(sf::RenderWindow & window)
 
 		ImGui::Separator();
 
-		for (size_t i = 0; i < frameData.frames.size(); ++i)
+		for (int i = 0; i < frameData.frames.size(); ++i)
 		{
 			bool disp = i == selectedFrame;
 			if (ImGui::Selectable(std::to_string(i).c_str(), &disp))
@@ -152,12 +183,20 @@ void secro::CollisionRenderer::renderFrameDataEditor(sf::RenderWindow & window)
 			auto& selectedF = frameData.frames[selectedFrame];
 
 			ImGui::SliderFloat("TimeFrame", &selectedF.time, 0.f, frameData.duration);
+			ImGui::Text(asFrames(selectedF.time).c_str());
 
-			if (ImGui::Button("Add New Frame"))
+			if (ImGui::Button("Add New Hitbox Change"))
 			{
 				selectedF.changes.push_back(HitboxChange());
-				
 			}
+			if (ImGui::Button("Remove Change"))
+			{
+				if (selectedF.changes.size() >= selectedChange)
+				{
+					selectedF.changes.erase(selectedF.changes.begin() + selectedChange);
+				}
+			}
+
 			if (ImGui::Button("Sort"))
 			{
 				std::sort(selectedF.changes.begin(), selectedF.changes.end(), [](HitboxChange& f1, HitboxChange& f2)
@@ -166,7 +205,7 @@ void secro::CollisionRenderer::renderFrameDataEditor(sf::RenderWindow & window)
 				});
 			}
 
-			for (size_t i = 0; i < selectedF.changes.size(); ++i)
+			for (int i = 0; i < selectedF.changes.size(); ++i)
 			{
 				bool disp = i == selectedChange;
 				if (ImGui::Selectable(std::to_string(i).c_str(), &disp))
@@ -219,7 +258,13 @@ void secro::CollisionRenderer::renderFrameDataEditor(sf::RenderWindow & window)
 		ImGui::End();
 	}
 
-
+	//render the center
+	{
+		sf::CircleShape c(0.1f);
+		c.setPosition(sf::Vector2f(0.f, 0.f));
+		c.setFillColor({ 0, 0, 255 });
+		window.draw(c);
+	}
 
 	render(window, frameData, time);
 }

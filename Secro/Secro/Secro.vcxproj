@@ -148,6 +148,7 @@
     <ClInclude Include="source\secro\framework\GameplaySettings.h" />
     <ClInclude Include="source\secro\framework\input\Controller.h" />
     <ClInclude Include="source\secro\framework\input\InputManager.h" />
+    <ClInclude Include="source\secro\framework\physics\Filters.h" />
     <ClInclude Include="source\secro\framework\physics\PhysicsManager.h" />
     <ClInclude Include="source\secro\framework\physics\PlayerCollision.h" />
     <ClInclude Include="source\secro\framework\physics\StageCollision.h" />

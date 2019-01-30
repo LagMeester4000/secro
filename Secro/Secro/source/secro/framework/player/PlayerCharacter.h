@@ -51,6 +51,9 @@ namespace secro {
 		//the body used for terrain collision
 		b2Body* physicsBody;
 		
+		//the amount of jumps that the player has left
+		int jumpsLeft;
+
 	private:
 		//movement switch functions
 		void stateStartJump();
@@ -124,6 +127,10 @@ namespace secro {
 		//damage value that goes from 0-100 and beyond
 		float damage;
 
+		//DEBUG
+		//the damage the player is reset to when killed
+		float debugDamage = 0.f;
+
 	public:
 		//get the damage of the character
 		float getDamage();
@@ -163,5 +170,22 @@ namespace secro {
 
 		//get last hit id
 		int& getLastHitId();
+
+	private: //hitlag
+		//update the hitlag variable
+		void updateHitlag(float deltaTime);
+
+		//the amount of hitlag that is left
+		float hitlag;
+
+		//the velocity before the hit
+		b2Vec2 hitlagVelocity;
+
+	public:
+		//check if the player is in hitlag
+		bool isInHitlag();
+
+		//put the player in hitlag
+		void putInHitlag(float duration);
 	};
 }

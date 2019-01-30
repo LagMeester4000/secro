@@ -40,9 +40,15 @@ void secro::HitboxManager::update(float deltaTime)
 						if (asPlayer->getLastHitId() == it->hitNumber + hit->getHitId())
 							continue;
 
+						//make sure the player doesnt get hit twice by the same attack
 						asPlayer->getLastHitId() = it->hitNumber + hit->getHitId();
 
+						//actual knockback
 						results[0]->knockbackPlayer(asPlayer, hit->getOwner()->getFacingDirection());
+
+						asPlayer->putInHitlag(0.12f);
+						if (auto* otherPlayer = dynamic_cast<PlayerCharacter*>(hit->getOwner()))
+							otherPlayer->putInHitlag(0.12f);
 					}
 				}
 
@@ -60,7 +66,7 @@ void secro::HitboxManager::render(sf::RenderWindow & window)
 
 	for (auto& it : hurtboxes)
 	{
-		it->debugRender(window);
+		//it->debugRender(window);
 	}
 }
 

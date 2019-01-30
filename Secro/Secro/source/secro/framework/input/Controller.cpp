@@ -1,5 +1,6 @@
 #include "Controller.h"
 #include <SFML/Window.hpp>
+#include <iostream>
 #include "../detail/PlainVectorMath.h"
 
 using namespace secro;
@@ -11,6 +12,12 @@ const Joystick & secro::Controller::getDirAttack() const
 
 Direction secro::Controller::getDirAttackDirection() const
 {
+	std::cout << current().rightStick.y << std::endl;
+	if (getDirection(current().rightStick) != Direction::Neutral)
+	{
+		int stop = 0;
+	}
+
 	return getDirection(current().rightStick);
 }
 
@@ -200,8 +207,8 @@ void secro::Controller::update()
 		i.leftStick.y = sf::Joystick::getAxisPosition(controllerIndex, sf::Joystick::Axis::Y);
 
 		//joysticks
-		i.rightStick.x = sf::Joystick::getAxisPosition(controllerIndex, sf::Joystick::Axis::Z);
-		i.rightStick.y = sf::Joystick::getAxisPosition(controllerIndex, sf::Joystick::Axis::R);
+		i.rightStick.x = sf::Joystick::getAxisPosition(controllerIndex, sf::Joystick::Axis::U);
+		i.rightStick.y = sf::Joystick::getAxisPosition(controllerIndex, sf::Joystick::Axis::V);
 	}
 	else
 	{
@@ -216,7 +223,6 @@ const Joystick & secro::Controller::getMovement() const
 
 Direction secro::Controller::getMovementDirection() const
 {
-	std::cout << current().leftStick.x << std::endl;
 	return getDirection(current().leftStick);
 }
 
@@ -274,10 +280,6 @@ DirectionPress secro::Controller::getMovementPushDirectionExt() const
 			ret.hardPush = true;
 		}
 	}
-
-	//test
-	if (length(newJ) > deadzone)
-		std::cout << ret.speed << std::endl;
 
 	return ret;
 }

@@ -1,6 +1,7 @@
 #include "PlayerCollision.h"
 #include <Box2D/Box2D.h>
 #include <SFML/Graphics.hpp>
+#include "Filters.h"
 
 secro::PlayerCollision::PlayerCollision(b2World & world, b2Vec2 pos)
 {
@@ -60,5 +61,10 @@ void secro::PlayerCollision::setupPlayerBody(b2World & world, b2Vec2 pos)
 
 	//make the body
 	playerBody = world.CreateBody(&def);
-	playerBody->CreateFixture(&diamond, 1.f);
+	playerFixture = playerBody->CreateFixture(&diamond, 1.f);
+
+	//make the filter
+	b2Filter f;
+	f.groupIndex = GROUP_PLAYER;
+	playerFixture->SetFilterData(f);
 }

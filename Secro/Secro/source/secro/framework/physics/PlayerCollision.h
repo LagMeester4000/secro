@@ -8,6 +8,7 @@ namespace sf {
 //box2d
 class b2Body;
 class b2World;
+class b2Fixture;
 
 namespace secro {
 	class PlayerCollision {
@@ -24,5 +25,6 @@ namespace secro {
 
 	public:
 		b2Body* playerBody;
+		b2Fixture* playerFixture;
 	};
 }

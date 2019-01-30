@@ -4,7 +4,7 @@
 #include <imgui.h>
 #include "Game.h"
 
-const bool useVsync = false;
+const bool useVsync = true;
 const float FPS = 60.0f; //The desired FPS. (The number of updates each second).
 
 int main()

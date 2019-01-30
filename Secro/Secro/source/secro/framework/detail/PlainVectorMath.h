@@ -69,6 +69,7 @@ namespace secro {
 	template<typename T>
 	T directionFromAngle(float angle)
 	{
+		angle = angle / 180.f * 3.14159265359f;
 		T ret;
 		ret.x = cos(angle);
 		ret.y = sin(angle);

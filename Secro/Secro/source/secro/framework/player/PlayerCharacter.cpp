@@ -5,6 +5,8 @@
 #include "../input/Controller.h"
 #include "../collision/HitboxCollection.h"
 #include "../collision/HitboxManager.h"
+#include "../physics/Filters.h"
+#include "../detail/PlainVectorMath.h"
 
 using namespace secro;
 
@@ -28,15 +30,15 @@ void secro::PlayerCharacter::init()
 	a.airDeceleration = 1.f;
 	a.airMaxSpeed = 10.f;
 	a.dashDuration = 0.3f;
-	a.dashInitialSpeed = 13.f;
-	a.doubleJumpSpeed = 10.f;
+	a.dashInitialSpeed = 10.f;
+	a.doubleJumpSpeed = 20.f;
 	a.fallSpeed = 3000.f;
 	a.fastfallSpeed = 10.f;
 	a.groundDeceleration = 3000.f;
 	a.jumpAmount = 1;
 	a.jumpFullSpeed = 17.f;
 	a.jumpShortSpeed = 10.f;
-	a.jumpSquatDuration = 0.05;
+	a.jumpSquatDuration = 0.05f;
 	a.runAcceleration = 1000.f;
 	a.runMaxSpeed = 8.f;
 	a.walkMaxSpeed = 3.f;
@@ -49,20 +51,25 @@ void secro::PlayerCharacter::init()
 
 	//setup the attacks
 	setupAttacks(attackCollection);
+
+
+	//temp
+	auto hurt = attackCollection.loadRaw("Hurt.json");
+	hitboxManager->addHurtbox(this, hurt);
 }
 
 void secro::PlayerCharacter::setupStates(StateMachine & sm)
 {
 	//jumping
-	sm.addCondition(PlayerState::Jump, PlayerState::Stand, [&](float t) 
+	sm.addCondition(PlayerState::Jump, PlayerState::Stand, [&](float t)
 	{
 		if (getMovementState() == MovementState::OnGround)
 			return true;
 		return false;
 	});
-	
+
 	//condition for starting to jump from standing, running, or dashing
-	auto startJumpSquat = [&](float t) 
+	auto startJumpSquat = [&](float t)
 	{
 		return getInput()->jumpPressed();
 	};
@@ -70,9 +77,9 @@ void secro::PlayerCharacter::setupStates(StateMachine & sm)
 	sm.addCondition(PlayerState::Run, PlayerState::JumpSquat, startJumpSquat);
 	sm.addCondition(PlayerState::Dash, PlayerState::JumpSquat, startJumpSquat);
 	sm.addCondition(PlayerState::Walk, PlayerState::JumpSquat, startJumpSquat);
-	
+
 	//condition for entering jump
-	sm.addCondition(PlayerState::JumpSquat, PlayerState::Jump, [&](float t) 
+	sm.addCondition(PlayerState::JumpSquat, PlayerState::Jump, [&](float t)
 	{
 		return IsStateTimerDone();
 	});
@@ -80,7 +87,8 @@ void secro::PlayerCharacter::setupStates(StateMachine & sm)
 	//on jump squat activation
 	sm.addSetState(PlayerState::JumpSquat, std::bind(&PlayerCharacter::stateStartJumpSquat, this));
 	//on jump activation
-	sm.addSetState(PlayerState::Jump, std::bind(&PlayerCharacter::stateStartJump, this));
+	//sm.addSetState(PlayerState::Jump, std::bind(&PlayerCharacter::stateStartJump, this));
+	sm.addUnsetState(PlayerState::JumpSquat, std::bind(&PlayerCharacter::stateStartJump, this));
 
 
 	//dash
@@ -101,7 +109,7 @@ void secro::PlayerCharacter::setupStates(StateMachine & sm)
 		return IsStateTimerDone() &&
 			((mov == Direction::Right && face == FacingDirection::Right) || (mov == Direction::Left && face == FacingDirection::Left));
 	});
-	sm.addCondition(PlayerState::Stand, PlayerState::Dash, [&](float f) 
+	sm.addCondition(PlayerState::Stand, PlayerState::Dash, [&](float f)
 	{
 		auto input = getInput();
 		auto smash = input->getMovementPushDirectionExt();
@@ -113,16 +121,16 @@ void secro::PlayerCharacter::setupStates(StateMachine & sm)
 		return IsStateTimerDone();// && getPhysicsBody()->GetLinearVelocity().Length() < 0.1f;
 	});
 
-	
+
 	//run
-	sm.addCondition(PlayerState::Run, PlayerState::Stand, [&](float f) 
+	sm.addCondition(PlayerState::Run, PlayerState::Stand, [&](float f)
 	{
 		return getPhysicsBody()->GetLinearVelocity().Length() < 0.1f;
 	});
 
 
 	//walk
-	sm.addCondition(PlayerState::Stand, PlayerState::Walk, [&](float f) 
+	sm.addCondition(PlayerState::Stand, PlayerState::Walk, [&](float f)
 	{
 		auto input = getInput();
 		auto smash = input->getMovementPushDirectionExt();
@@ -139,7 +147,12 @@ void secro::PlayerCharacter::setupStates(StateMachine & sm)
 
 
 	//attacks
-	sm.addCondition(PlayerState::Jump, PlayerState::ANAir, [&](float f) 
+	auto endAerialA = [&](float f)
+	{
+		return getMovementState() == MovementState::OnGround || IsStateTimerDone();
+	};
+	//nair
+	sm.addCondition(PlayerState::Jump, PlayerState::ANAir, [&](float f)
 	{
 		auto input = getInput();
 		auto dir = input->getMovementDirection();
@@ -147,10 +160,84 @@ void secro::PlayerCharacter::setupStates(StateMachine & sm)
 	});
 	sm.addSetState(PlayerState::ANAir, std::bind(&PlayerCharacter::stateStartNewAttack, this, PlayerState::ANAir));
 	sm.addUnsetState(PlayerState::ANAir, std::bind(&PlayerCharacter::endAttack, this));
-	sm.addCondition(PlayerState::ANAir, PlayerState::LandingLag, [&](float f) 
+	sm.addCondition(PlayerState::ANAir, PlayerState::LandingLag, endAerialA);
+	//uair
+	sm.addCondition(PlayerState::Jump, PlayerState::AUAir, [&](float f)
 	{
-		return getMovementState() == MovementState::OnGround || IsStateTimerDone();
+		auto input = getInput();
+		auto dir = input->getMovementDirection();
+		auto atDir = input->getDirAttackDirection();
+		return (dir == Direction::Up && input->attackPressed()) || atDir == Direction::Up;
 	});
+	sm.addSetState(PlayerState::AUAir, std::bind(&PlayerCharacter::stateStartNewAttack, this, PlayerState::AUAir));
+	sm.addUnsetState(PlayerState::AUAir, std::bind(&PlayerCharacter::endAttack, this));
+	sm.addCondition(PlayerState::AUAir, PlayerState::LandingLag, endAerialA);
+	//fair
+	sm.addCondition(PlayerState::Jump, PlayerState::AFAir, [&](float f)
+	{
+		auto input = getInput();
+		auto dir = input->getMovementDirection();
+		auto atDir = input->getDirAttackDirection();
+		return isEqual(getFacingDirection(), dir) && input->attackPressed() || isEqual(getFacingDirection(), atDir);
+	});
+	sm.addSetState(PlayerState::AFAir, std::bind(&PlayerCharacter::stateStartNewAttack, this, PlayerState::AFAir));
+	sm.addUnsetState(PlayerState::AFAir, std::bind(&PlayerCharacter::endAttack, this));
+	sm.addCondition(PlayerState::AFAir, PlayerState::LandingLag, endAerialA);
+	//dair
+	sm.addCondition(PlayerState::Jump, PlayerState::ADAir, [&](float f)
+	{
+		auto input = getInput();
+		auto dir = input->getMovementDirection();
+		auto atDir = input->getDirAttackDirection();
+		return dir == Direction::Down && input->attackPressed() || atDir == Direction::Down;
+	});
+	sm.addSetState(PlayerState::ADAir, std::bind(&PlayerCharacter::stateStartNewAttack, this, PlayerState::ADAir));
+	sm.addUnsetState(PlayerState::ADAir, std::bind(&PlayerCharacter::endAttack, this));
+	sm.addCondition(PlayerState::ADAir, PlayerState::LandingLag, endAerialA);
+
+	//ground attacks
+	auto endGroundAttack = [&](float f) {
+		return IsStateTimerDone();
+	};
+	//utilt
+	auto UTiltAttack = [&](float f)
+	{
+		auto input = getInput();
+		auto dir = input->getMovementDirection();
+		return dir == Direction::Up && input->attackPressed();
+	};
+	sm.addCondition(PlayerState::Stand, PlayerState::AUTilt, UTiltAttack);
+	sm.addCondition(PlayerState::Walk, PlayerState::AUTilt, UTiltAttack);
+	sm.addCondition(PlayerState::Run, PlayerState::AUTilt, UTiltAttack);
+	sm.addSetState(PlayerState::AUTilt, std::bind(&PlayerCharacter::stateStartNewAttack, this, PlayerState::AUTilt));
+	sm.addUnsetState(PlayerState::AUTilt, std::bind(&PlayerCharacter::endAttack, this));
+	sm.addCondition(PlayerState::AUTilt, PlayerState::Stand, endGroundAttack);
+	//ftilt
+	auto FTiltAttack = [&](float f)
+	{
+		auto input = getInput();
+		auto dir = input->getMovementDirection();
+		return isEqual(getFacingDirection(), dir) && input->attackPressed();
+	};
+	sm.addCondition(PlayerState::Stand, PlayerState::AFTilt, FTiltAttack);
+	sm.addCondition(PlayerState::Walk, PlayerState::AFTilt, FTiltAttack);
+	sm.addCondition(PlayerState::Run, PlayerState::AFTilt, FTiltAttack);
+	sm.addSetState(PlayerState::AFTilt, std::bind(&PlayerCharacter::stateStartNewAttack, this, PlayerState::AFTilt));
+	sm.addUnsetState(PlayerState::AFTilt, std::bind(&PlayerCharacter::endAttack, this));
+	sm.addCondition(PlayerState::AFTilt, PlayerState::Stand, endGroundAttack);
+	//dtilt
+	auto DTiltAttack = [&](float f)
+	{
+		auto input = getInput();
+		auto dir = input->getMovementDirection();
+		return dir == Direction::Down && input->attackPressed();
+	};
+	sm.addCondition(PlayerState::Stand, PlayerState::ADTilt, DTiltAttack);
+	sm.addCondition(PlayerState::Walk, PlayerState::ADTilt, DTiltAttack);
+	sm.addCondition(PlayerState::Run, PlayerState::ADTilt, DTiltAttack);
+	sm.addSetState(PlayerState::ADTilt, std::bind(&PlayerCharacter::stateStartNewAttack, this, PlayerState::ADTilt));
+	sm.addUnsetState(PlayerState::ADTilt, std::bind(&PlayerCharacter::endAttack, this));
+	sm.addCondition(PlayerState::ADTilt, PlayerState::Stand, endGroundAttack);
 
 
 	//landing lag
@@ -162,27 +249,57 @@ void secro::PlayerCharacter::setupStates(StateMachine & sm)
 	{
 		return getMovementState() == MovementState::InAir;
 	});
+
+	//hitstun
+	sm.addCondition(PlayerState::Hitstun, PlayerState::Jump, [&](float f) 
+	{
+		return !IsInHitstun();
+	});
 }
 
 void secro::PlayerCharacter::setupAttacks(AttackCollection & atts)
 {
-	auto hurt = atts.loadRaw("Hurt.json");
-	hitboxManager->addHurtbox(this, hurt);
-
 	atts.loadAttack("NAir.json", PlayerState::ANAir);
+	atts.loadAttack("UAir.json", PlayerState::AUAir);
+	atts.loadAttack("FAir.json", PlayerState::AFAir);
+	atts.loadAttack("BAir.json", PlayerState::ABAir);
+	atts.loadAttack("DAir.json", PlayerState::ADAir);
+
+	atts.loadAttack("UTilt.json", PlayerState::AUTilt);
+	atts.loadAttack("FTilt.json", PlayerState::AFTilt);
+	atts.loadAttack("DTilt.json", PlayerState::ADTilt);
 }
 
 void secro::PlayerCharacter::update(float deltaTime)
 {
-	updateMovement(deltaTime);
-	updateHitstun(deltaTime);
-	updateState(deltaTime);
-	updateAttack(deltaTime);
+	updateHitlag(deltaTime);
+
+	if (!isInHitlag())
+	{
+		updateMovement(deltaTime);
+		updateHitstun(deltaTime);
+		updateState(deltaTime);
+		updateAttack(deltaTime);
+	}
+	
+	//temp kill plane
+	auto pos = physicsBody->GetPosition();
+	if (pos.x < -15.f || pos.x > 10.f || pos.y < -10.f || pos.y > 10.f)
+	{
+		auto newPos = b2Vec2{ 0.f ,0.f };
+		physicsBody->SetTransform(newPos, 0.f);
+		damage = debugDamage;
+	}
 
 	if (input->grabPressed())
 	{
 		physicsBody->SetTransform(b2Vec2(0.f,0.f), 0.f);
 		setupAttacks(attackCollection);
+	}
+
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::X))
+	{
+		damage = 0.f;
 	}
 }
 
@@ -248,6 +365,17 @@ void secro::PlayerCharacter::updateMovement(float deltaTime)
 	{
 	case MovementState::InAir:
 	{
+		//double jumps
+		if (state == PlayerState::Jump)
+		{
+			if (input->jumpPressed() && jumpsLeft > 0)
+			{
+				jumpsLeft--;
+				b2Vec2 jumpVel = { 0.f, -attributes.doubleJumpSpeed };
+				physicsBody->SetLinearVelocity(jumpVel);
+			}
+		}
+
 		//fastfall
 		if (input->getMovementPushDirection() == Direction::Down)
 		{
@@ -332,6 +460,9 @@ void secro::PlayerCharacter::updateMovement(float deltaTime)
 	} break;
 	case MovementState::OnGround:
 	{
+		//reset jump counter
+		jumpsLeft = attributes.jumpAmount;
+
 		//run/walk acceleration
 		if (state == PlayerState::Run || state == PlayerState::Walk)
 		{
@@ -424,10 +555,10 @@ bool secro::PlayerCharacter::snapToGround(float distance)
 		float32 ReportFixture(b2Fixture* fixture, const b2Vec2& point,
 			const b2Vec2& normal, float32 fraction)
 		{
-			//if (firstHit)
+			if (fixture)
 			{
-				//firstHit = false;
-				//return -1;
+				if (fixture->GetFilterData().groupIndex == GROUP_PLAYER)
+					return -1;
 			}
 
 			m_fixture = fixture;
@@ -542,8 +673,15 @@ bool secro::PlayerCharacter::groundSpeedTooHigh()
 
 void secro::PlayerCharacter::debugRenderAttributes(sf::RenderWindow & window)
 {
-	if (ImGui::Begin("Player Movement Attributes"))
+	ImGui::PushID(this);
+	std::string name = "Player Movement Attributes" + std::to_string((long long int)this);
+	if (ImGui::Begin(name.c_str()))
 	{
+		//TEMP
+		ImGui::Text("Damage: %f", damage);
+		ImGui::InputFloat("Respawn Damage", &debugDamage);
+		ImGui::Separator();
+
 		ImGui::Text("Air");
 		ImGui::InputFloat("FallSpeed", &attributes.fallSpeed);
 		ImGui::InputFloat("AirAcceleration", &attributes.airAcceleration);
@@ -576,6 +714,7 @@ void secro::PlayerCharacter::debugRenderAttributes(sf::RenderWindow & window)
 
 		ImGui::End();
 	}
+	ImGui::PopID();
 }
 
 MovementState secro::PlayerCharacter::getMovementState()
@@ -605,6 +744,12 @@ bool secro::PlayerCharacter::isEqual(FacingDirection facing, Direction dir)
 
 void secro::PlayerCharacter::knockBack(b2Vec2 knockback)
 {
+	if (knockback.y > 0.f && movementState == MovementState::OnGround)
+	{
+		knockback.y = -knockback.y;
+		mul(knockback, 0.7f);
+	}
+
 	if (knockback.y < 0)
 		movementState = MovementState::InAir;
 
@@ -626,6 +771,7 @@ void secro::PlayerCharacter::putInHitstun(float duration)
 {
 	stateMachine.changeState(this, PlayerState::Hitstun, 0.016f);
 	stateTimer = duration;
+	hitstun = duration;
 }
 
 void secro::PlayerCharacter::updateState(float deltaTime)
@@ -711,6 +857,31 @@ int & secro::PlayerCharacter::getLastHitId()
 	return lastHitId;
 }
 
+void secro::PlayerCharacter::updateHitlag(float deltaTime)
+{
+	if (hitlag > 0.f)
+	{
+		hitlag -= deltaTime;
+
+		if (hitlag <= 0.f)
+		{
+			physicsBody->SetLinearVelocity(hitlagVelocity);
+		}
+	}
+}
+
+bool secro::PlayerCharacter::isInHitlag()
+{
+	return hitlag > 0.f;
+}
+
+void secro::PlayerCharacter::putInHitlag(float duration)
+{
+	hitlag = duration;
+	hitlagVelocity = physicsBody->GetLinearVelocity();
+	physicsBody->SetLinearVelocity(b2Vec2(0.f, 0.f));
+}
+
 void secro::PlayerCharacter::stateStartNewAttack(PlayerState attack)
 {
 	if (currentAttackHitbox != nullptr)
@@ -721,6 +892,6 @@ void secro::PlayerCharacter::stateStartNewAttack(PlayerState attack)
 
 	auto& att = attackCollection.getAttack(attack);
 	currentAttackHitbox = hitboxManager->addHitbox(this, att);
-	attackTimer = 0.f;
+	attackTimer = -0.01f;
 	stateTimer = att.duration;
 }
