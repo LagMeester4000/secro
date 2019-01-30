@@ -15,10 +15,11 @@ int main()
 	bool redraw = true;      //Do I redraw everything on the screen?
 
 	//actual drawing window
-	sf::RenderWindow window(sf::VideoMode(800, 800, 32), "Hello");
+	sf::RenderWindow window(sf::VideoMode(800, 800, 32), "Hello", sf::Style::Default);
 	ImGui::SFML::Init(window, true);
 	ImGui::CreateContext();
 	window.setView(sf::View(sf::FloatRect(-21.6, -10, 31.6, 20)));
+	
 
 	if (useVsync)
 		window.setVerticalSyncEnabled(true);

@@ -12,12 +12,6 @@ const Joystick & secro::Controller::getDirAttack() const
 
 Direction secro::Controller::getDirAttackDirection() const
 {
-	std::cout << current().rightStick.y << std::endl;
-	if (getDirection(current().rightStick) != Direction::Neutral)
-	{
-		int stop = 0;
-	}
-
 	return getDirection(current().rightStick);
 }
 
@@ -212,7 +206,7 @@ void secro::Controller::update()
 	}
 	else
 	{
-		std::cout << "controller not plugged in" << std::endl;
+		//std::cout << "controller not plugged in" << std::endl;
 	}
 }
 

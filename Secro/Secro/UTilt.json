@@ -48,7 +48,7 @@
                         "damage": 10,
                         "knockbackAngle": -80,
                         "knockbackPowerBase": 17,
-                        "knockbackPowerGrowth": 8,
+                        "knockbackPowerGrowth": 3,
                         "hitstunAdjustment": 0
                     }
                 ]

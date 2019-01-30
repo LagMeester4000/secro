@@ -183,6 +183,17 @@ void secro::PlayerCharacter::setupStates(StateMachine & sm)
 	sm.addSetState(PlayerState::AFAir, std::bind(&PlayerCharacter::stateStartNewAttack, this, PlayerState::AFAir));
 	sm.addUnsetState(PlayerState::AFAir, std::bind(&PlayerCharacter::endAttack, this));
 	sm.addCondition(PlayerState::AFAir, PlayerState::LandingLag, endAerialA);
+	//bair
+	sm.addCondition(PlayerState::Jump, PlayerState::ABAir, [&](float f)
+	{
+		auto input = getInput();
+		auto dir = input->getMovementDirection();
+		auto atDir = input->getDirAttackDirection();
+		return isOpposite(getFacingDirection(), dir) && input->attackPressed() || isOpposite(getFacingDirection(), atDir);
+	});
+	sm.addSetState(PlayerState::ABAir, std::bind(&PlayerCharacter::stateStartNewAttack, this, PlayerState::ABAir));
+	sm.addUnsetState(PlayerState::ABAir, std::bind(&PlayerCharacter::endAttack, this));
+	sm.addCondition(PlayerState::ABAir, PlayerState::LandingLag, endAerialA);
 	//dair
 	sm.addCondition(PlayerState::Jump, PlayerState::ADAir, [&](float f)
 	{
@@ -742,12 +753,17 @@ bool secro::PlayerCharacter::isEqual(FacingDirection facing, Direction dir)
 	return (facing == FacingDirection::Right && dir == Direction::Right) || (facing == FacingDirection::Left && dir == Direction::Left);
 }
 
+bool secro::PlayerCharacter::isOpposite(FacingDirection facing, Direction dir)
+{
+	return  (facing == FacingDirection::Right && dir == Direction::Left) || (facing == FacingDirection::Left && dir == Direction::Right);
+}
+
 void secro::PlayerCharacter::knockBack(b2Vec2 knockback)
 {
 	if (knockback.y > 0.f && movementState == MovementState::OnGround)
 	{
 		knockback.y = -knockback.y;
-		mul(knockback, 0.7f);
+		knockback = mul(knockback, 0.8f);
 	}
 
 	if (knockback.y < 0)

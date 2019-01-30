@@ -75,6 +75,7 @@ namespace secro {
 		FacingDirection getFacingDirection() override;
 		const b2Body* getPhysicsBody();
 		static bool isEqual(FacingDirection facing, Direction dir);
+		static bool isOpposite(FacingDirection facing, Direction dir);
 
 		//knock the player back (no hitstun)
 		void knockBack(b2Vec2 knockback);
