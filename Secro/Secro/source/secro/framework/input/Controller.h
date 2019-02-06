@@ -1,5 +1,6 @@
 #pragma once
 #include <memory>
+#include <functional>
 
 namespace secro {
 	struct Joystick {
@@ -23,6 +24,7 @@ namespace secro {
 	class Controller {
 		const static int buffer = 8;
 
+	public:
 		struct Input {
 			Joystick leftStick = { 0.f, 0.f };
 			Joystick rightStick = { 0.f, 0.f };
@@ -44,6 +46,9 @@ namespace secro {
 
 	public:
 		static std::shared_ptr<Controller> createController(int index, bool keyboard = false);
+
+		//insert a fake controller
+		void interceptController(std::function<void(Input&)> function);
 
 		//read inputs into the controller
 		void update();
@@ -88,9 +93,6 @@ namespace secro {
 
 		//swap the input buffer to the back to make place for a new frame
 		void swapBack();
-		
-		//get the direction of a joystick
-		Direction getDirection(const Joystick& stick) const;
 
 		//get the current input
 		Input& current();
@@ -104,6 +106,12 @@ namespace secro {
 		Input& prev();
 		const Input& prev() const;
 
+	public:
+		//get the direction of a joystick
+		Direction getDirection(const Joystick& stick) const;
+
+		const Input& getInput(size_t index);
+
 	private:
 		int controllerIndex;
 		bool useKeyboard;
@@ -111,5 +119,10 @@ namespace secro {
 
 	private:
 		Input inputs[buffer];
+
+	private:
+		//function to interupt controller pulling
+		std::function<void(Input&)> interceptFunction;
+		bool useIntercept = false;
 	};
 }

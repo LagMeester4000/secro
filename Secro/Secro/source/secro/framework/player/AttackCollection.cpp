@@ -15,6 +15,7 @@ void secro::AttackCollection::loadAttack(std::string fileName, PlayerState attac
 	if (std::experimental::filesystem::exists(fileName))
 	{
 		auto& spot = getAttack(attack);
+		spot = FrameData();
 
 		std::ifstream file(fileName);
 		cereal::JSONInputArchive ar(file);

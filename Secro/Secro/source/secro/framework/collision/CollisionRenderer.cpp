@@ -1,6 +1,7 @@
 #include "CollisionRenderer.h"
 #include <SFML/Graphics.hpp>
 #include <imgui.h>
+#include "../DebugOptions.h"
 
 secro::CollisionRenderer::CollisionRenderer()
 {
@@ -84,6 +85,10 @@ std::string asFrames(float time)
 void secro::CollisionRenderer::renderFrameDataEditor(sf::RenderWindow & window)
 {
 	namespace fs = std::experimental::filesystem;
+
+	//check for options
+	if (!DebugOptions::getOptions().enableHitboxEditor)
+		return;
 
 	if (ImGui::Begin("Frame Data Editor"))
 	{
@@ -173,8 +178,8 @@ void secro::CollisionRenderer::renderFrameDataEditor(sf::RenderWindow & window)
 			}
 		}
 
-		ImGui::End();
 	}
+	ImGui::End();
 
 	if (ImGui::Begin("Frame"))
 	{
@@ -215,9 +220,8 @@ void secro::CollisionRenderer::renderFrameDataEditor(sf::RenderWindow & window)
 				}
 			}
 		}
-
-		ImGui::End();
 	}
+	ImGui::End();
 
 	if (ImGui::Begin("Change"))
 	{
@@ -236,9 +240,12 @@ void secro::CollisionRenderer::renderFrameDataEditor(sf::RenderWindow & window)
 					}
 				}
 
-				ImGui::InputFloat2("Position", (float*)&selectedC.position);
+				//ImGui::InputFloat2("Position", (float*)&selectedC.position);
+				ImGui::DragFloat2("Position", (float*)&selectedC.position, 0.01f);
 				ImGui::Checkbox("IsActive", &selectedC.isActive);
 				ImGui::Checkbox("IsHitbox (or hurtbox)", &selectedC.isHitbox);
+				ImGui::Checkbox("IsShieldBox", &selectedC.isShieldBox);
+				ImGui::Checkbox("IsGrabBox", &selectedC.isGrabBox);
 				ImGui::InputInt("HitNumber", &selectedC.hitNumber);
 				ImGui::InputFloat("Width", &selectedC.width);
 				ImGui::InputFloat("Height", &selectedC.height);
@@ -254,9 +261,8 @@ void secro::CollisionRenderer::renderFrameDataEditor(sf::RenderWindow & window)
 				ImGui::InputFloat("HitstunAdjustment", &selectedC.hitstunAdjustment);
 			}
 		}
-
-		ImGui::End();
 	}
+	ImGui::End();
 
 	//render the center
 	{

@@ -81,6 +81,7 @@
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
+      <AdditionalIncludeDirectories>$(SolutionDir)./cereal/include/;$(ProjectDir)./source/;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <AdditionalDependencies>%(AdditionalDependencies)</AdditionalDependencies>
@@ -92,6 +93,7 @@
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
+      <AdditionalIncludeDirectories>$(SolutionDir)./cereal/include/;$(ProjectDir)./source/;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <AdditionalDependencies>opengl32.lib;%(AdditionalDependencies)</AdditionalDependencies>
@@ -105,6 +107,7 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
+      <AdditionalIncludeDirectories>$(SolutionDir)./cereal/include/;$(ProjectDir)./source/;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
@@ -120,6 +123,7 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
+      <AdditionalIncludeDirectories>$(SolutionDir)./cereal/include/;$(ProjectDir)./source/;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
@@ -141,6 +145,8 @@
     <ClInclude Include="source\secro\framework\collision\HitboxChange.h" />
     <ClInclude Include="source\secro\framework\collision\HitboxCollection.h" />
     <ClInclude Include="source\secro\framework\collision\HitboxManager.h" />
+    <ClInclude Include="source\secro\framework\collision\HitResult.h" />
+    <ClInclude Include="source\secro\framework\DebugOptions.h" />
     <ClInclude Include="source\secro\framework\detail\PlainVectorMath.h" />
     <ClInclude Include="source\secro\framework\Entity.h" />
     <ClInclude Include="source\secro\framework\collision\CircleHitbox.h" />
@@ -156,11 +162,15 @@
     <ClInclude Include="source\secro\framework\player\MovementState.h" />
     <ClInclude Include="source\secro\framework\player\PlayerAttributes.h" />
     <ClInclude Include="source\secro\framework\player\PlayerCharacter.h" />
-    <ClInclude Include="source\secro\framework\PlayerMovement.h" />
     <ClInclude Include="source\secro\framework\player\PlayerState.h" />
     <ClInclude Include="source\secro\framework\player\StateMachine.h" />
     <ClInclude Include="source\secro\framework\player\Timeline.h" />
     <ClInclude Include="source\secro\Game.h" />
+    <ClInclude Include="source\secro\gameplay\Camera.h" />
+    <ClInclude Include="source\secro\gameplay\characters\CharacterDashette.h" />
+    <ClInclude Include="source\secro\gameplay\characters\CharacterDashetteP2.h" />
+    <ClInclude Include="source\secro\gameplay\PlayerManager.h" />
+    <ClInclude Include="source\secro\gameplay\Rules.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="source\imgui\imgui-SFML.cpp" />
@@ -173,18 +183,22 @@
     <ClCompile Include="source\secro\framework\collision\HitboxChange.cpp" />
     <ClCompile Include="source\secro\framework\collision\HitboxCollection.cpp" />
     <ClCompile Include="source\secro\framework\collision\HitboxManager.cpp" />
+    <ClCompile Include="source\secro\framework\DebugOptions.cpp" />
     <ClCompile Include="source\secro\framework\GameplaySettings.cpp" />
     <ClCompile Include="source\secro\framework\input\Controller.cpp" />
     <ClCompile Include="source\secro\framework\input\InputManager.cpp" />
     <ClCompile Include="source\secro\framework\physics\PhysicsManager.cpp" />
     <ClCompile Include="source\secro\framework\physics\PlayerCollision.cpp" />
     <ClCompile Include="source\secro\framework\physics\StageCollision.cpp" />
-    <ClCompile Include="source\secro\framework\PlayerMovement.cpp" />
     <ClCompile Include="source\secro\framework\player\AttackCollection.cpp" />
     <ClCompile Include="source\secro\framework\player\PlayerAttributes.cpp" />
     <ClCompile Include="source\secro\framework\player\PlayerCharacter.cpp" />
     <ClCompile Include="source\secro\framework\player\StateMachine.cpp" />
     <ClCompile Include="source\secro\Game.cpp" />
+    <ClCompile Include="source\secro\gameplay\Camera.cpp" />
+    <ClCompile Include="source\secro\gameplay\characters\CharacterDashette.cpp" />
+    <ClCompile Include="source\secro\gameplay\characters\CharacterDashetteP2.cpp" />
+    <ClCompile Include="source\secro\gameplay\PlayerManager.cpp" />
     <ClCompile Include="source\secro\main.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
@@ -196,7 +210,6 @@
     <Import Project="..\packages\sfml_window.redist.2.5.1\build\native\sfml_window.redist.targets" Condition="Exists('..\packages\sfml_window.redist.2.5.1\build\native\sfml_window.redist.targets')" />
     <Import Project="..\packages\sfml_window.2.5.1\build\native\sfml_window.targets" Condition="Exists('..\packages\sfml_window.2.5.1\build\native\sfml_window.targets')" />
     <Import Project="..\packages\sfml_graphics.2.5.1\build\native\sfml_graphics.targets" Condition="Exists('..\packages\sfml_graphics.2.5.1\build\native\sfml_graphics.targets')" />
-    <Import Project="..\packages\cereal.1.0.0\build\native\cereal.targets" Condition="Exists('..\packages\cereal.1.0.0\build\native\cereal.targets')" />
   </ImportGroup>
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
     <PropertyGroup>
@@ -209,6 +222,5 @@
     <Error Condition="!Exists('..\packages\sfml_window.redist.2.5.1\build\native\sfml_window.redist.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\sfml_window.redist.2.5.1\build\native\sfml_window.redist.targets'))" />
     <Error Condition="!Exists('..\packages\sfml_window.2.5.1\build\native\sfml_window.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\sfml_window.2.5.1\build\native\sfml_window.targets'))" />
     <Error Condition="!Exists('..\packages\sfml_graphics.2.5.1\build\native\sfml_graphics.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\sfml_graphics.2.5.1\build\native\sfml_graphics.targets'))" />
-    <Error Condition="!Exists('..\packages\cereal.1.0.0\build\native\cereal.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\cereal.1.0.0\build\native\cereal.targets'))" />
   </Target>
 </Project>

@@ -65,7 +65,7 @@
                         "relativePriority": 0,
                         "absolutePriority": 0,
                         "damage": 7,
-                        "knockbackAngle": -105,
+                        "knockbackAngle": -75,
                         "knockbackPowerBase": 15,
                         "knockbackPowerGrowth": 4,
                         "hitstunAdjustment": 0
@@ -84,7 +84,7 @@
                         "relativePriority": 0,
                         "absolutePriority": 0,
                         "damage": 7,
-                        "knockbackAngle": -105,
+                        "knockbackAngle": -75,
                         "knockbackPowerBase": 15,
                         "knockbackPowerGrowth": 4,
                         "hitstunAdjustment": 0

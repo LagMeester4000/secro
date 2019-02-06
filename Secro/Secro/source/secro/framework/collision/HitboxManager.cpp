@@ -24,15 +24,11 @@ void secro::HitboxManager::update(float deltaTime)
 
 			auto results = hit->collide(*hurt);
 
-			if (results.size() > 0)
+			if (results.hasHit)
 			{
-				std::sort(results.begin(), results.end(), [](auto& f1, auto& f2)
+				for (auto& it : results.hits)
 				{
-					return f1->relativePriority > f2->relativePriority;
-				});
-
-				for (auto& it : results)
-				{
+					Entity* otherEnt = hit->getOwner();
 					Entity* hitEnt = hurt->getOwner();
 					if (auto* asPlayer = dynamic_cast<PlayerCharacter*>(hitEnt))
 					{
@@ -44,11 +40,25 @@ void secro::HitboxManager::update(float deltaTime)
 						asPlayer->getLastHitId() = it->hitNumber + hit->getHitId();
 
 						//actual knockback
-						results[0]->knockbackPlayer(asPlayer, hit->getOwner()->getFacingDirection());
-
+						//flip if player is on other side
+						if (!results.hurts[0]->isShieldBox || (results.hurts[0]->isShieldBox && results.hits[0]->isGrabBox))
+						{
+							if ((otherEnt->getPosition().x > hitEnt->getPosition().x && otherEnt->getFacingDirection() == FacingDirection::Right) ||
+								(otherEnt->getPosition().x < hitEnt->getPosition().x && otherEnt->getFacingDirection() == FacingDirection::Left))
+								results.hits[0]->knockbackPlayer(asPlayer, flip(hit->getOwner()->getFacingDirection()));
+							else
+								results.hits[0]->knockbackPlayer(asPlayer, hit->getOwner()->getFacingDirection());
+						}
+						
+						//hitlag
 						asPlayer->putInHitlag(0.12f);
 						if (auto* otherPlayer = dynamic_cast<PlayerCharacter*>(hit->getOwner()))
+						{
 							otherPlayer->putInHitlag(0.12f);
+
+							//has hit
+							otherPlayer->attackHasHit();
+						}
 					}
 				}
 

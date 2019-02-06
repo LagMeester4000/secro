@@ -20,6 +20,9 @@ void secro::Hitbox::update(HitboxChange & change)
 	knockbackPowerBase = change.knockbackPowerBase;
 	knockbackPowerGrowth = change.knockbackPowerGrowth;
 	hitstunAdjustment = change.hitstunAdjustment;
+
+	isGrabBox = change.isGrabBox;
+	isShieldBox = change.isShieldBox;
 }
 
 void secro::Hitbox::knockbackPlayer(PlayerCharacter * player, FacingDirection direction)

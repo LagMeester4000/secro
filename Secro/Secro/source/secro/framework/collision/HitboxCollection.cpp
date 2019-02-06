@@ -4,6 +4,7 @@
 #include "CircleHitbox.h"
 #include <set>
 #include <iostream>
+#include <algorithm>
 
 using namespace secro;
 
@@ -33,12 +34,15 @@ secro::HitboxCollection::HitboxCollection(Entity * owner, FrameData & framedata,
 void secro::HitboxCollection::update()
 {
 	//not yet
+
+	
 }
 
-std::vector<std::shared_ptr<Hitbox>> secro::HitboxCollection::collide(HitboxCollection & other)
+HitResult secro::HitboxCollection::collide(HitboxCollection & other)
 {
 	//set can only have one of the same
-	std::set<std::shared_ptr<Hitbox>> set;
+	std::set<std::shared_ptr<Hitbox>> setHit;
+	std::set<std::shared_ptr<Hitbox>> setHurt;
 
 	//find scale and stuff
 	auto otherPos = other.owner->getPosition();
@@ -61,18 +65,38 @@ std::vector<std::shared_ptr<Hitbox>> secro::HitboxCollection::collide(HitboxColl
 				myScale
 			))
 			{
-				set.insert(myHit);
+				setHit.insert(myHit);
+				setHurt.insert(otherHit);
 			}
 		}
 	}
 
 	//make return... LOL
-	std::vector<std::shared_ptr<Hitbox>> ret;
-	ret.reserve(set.size());
-	for (auto& it : set)
+	HitResult ret;
+	ret.hits.reserve(setHit.size());
+	for (auto& it : setHit)
 	{
-		ret.push_back(it);
+		ret.hits.push_back(it);
 	}
+	ret.hurts.reserve(setHit.size());
+	for (auto& it : setHurt)
+	{
+		ret.hurts.push_back(it);
+	}
+	if (ret.hits.size() > 0)
+	{
+		ret.hasHit = true;
+	}
+	//sort results
+	std::sort(ret.hits.begin(), ret.hits.end(), [](auto& f1, auto& f2) 
+	{
+		return f1->relativePriority > f2->relativePriority;
+	});
+	std::sort(ret.hurts.begin(), ret.hurts.end(), [](auto& f1, auto& f2)
+	{
+		return f1->relativePriority > f2->relativePriority;
+	});
+
 	return ret;
 }
 

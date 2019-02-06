@@ -49,6 +49,12 @@ namespace secro {
 		//priority this hitbox has over hitboxes with another owner
 		int absolutePriority;
 
+		//if the hitbox is a shield
+		bool isShieldBox;
+
+		//if the hitbox is a grab
+		bool isGrabBox;
+
 	public://hit properties
 		//damage dealt on hit
 		float damage;

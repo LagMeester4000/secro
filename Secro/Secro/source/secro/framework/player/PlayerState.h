@@ -34,7 +34,16 @@ namespace secro {
 		AFAir,
 		ABAir,
 		ADAir,
+		//other
+		AGrab,
+		AGrabAir,
 		ALastAttack,//NULL
+
+		//specials
+		SpecialU,
+		SpecialF,
+		SpecialD,
+		SpecialN,
 
 
 		//should always be the last state

@@ -3,6 +3,7 @@
 #include <memory>
 #include "Hitbox.h"
 #include "HitboxChange.h"
+#include "HitResult.h"
 
 namespace sf {
 	class RenderWindow;
@@ -22,7 +23,7 @@ namespace secro {
 		void update();
 
 		//check for collision
-		std::vector<std::shared_ptr<Hitbox>> collide(HitboxCollection& other);
+		HitResult collide(HitboxCollection& other);
 
 		//render the hitboxes
 		void debugRender(sf::RenderWindow& window);

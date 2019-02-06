@@ -3,9 +3,12 @@
 #include "framework/physics/PhysicsManager.h"
 #include "framework/input/InputManager.h"
 #include "framework/collision/HitboxManager.h"
+#include "gameplay/PlayerManager.h"
+#include "gameplay/Camera.h"
 
 //TEMP
 #include "framework/collision/CollisionRenderer.h"
+#include <SFML/Graphics/Font.hpp>
 
 namespace sf {
 	class RenderWindow;
@@ -29,14 +32,25 @@ namespace secro {
 		void render(sf::RenderWindow& window);
 
 	private:
+		void renderScores(sf::RenderWindow& window);
+		void renderScore(sf::RenderWindow& window, sf::Vector2f position, PlayerCharacter* player, int stocks);
+
+	private:
 		PhysicsManager physicsManager;
 		InputManager inputManager;
-		PlayerCharacter* player;
-		PlayerCharacter* dummyPlayer;
+		PlayerManager playerManager;
 		HitboxManager hitboxManager;
+		Camera camera;
 
 	private: //TEMP
 		CollisionRenderer c;
+		sf::Font uiFont;
 
+	private: //death animation
+		void updateDeath(float deltaTime);
+		float dtScalar;
+		float deathSpeed;
+		float deathDuration;
+		float deathTimer;
 	};
 }

@@ -1,0 +1,60 @@
+{
+    "value0": {
+        "amountOfHitboxes": 1,
+        "duration": 0.4000000059604645,
+        "landingLag": 0.0,
+        "frames": [
+            {
+                "time": 0.0,
+                "changes": [
+                    {
+                        "cereal_class_version": 1,
+                        "index": 0,
+                        "position": {
+                            "x": 0.0,
+                            "y": 0.0
+                        },
+                        "isActive": false,
+                        "isHitbox": true,
+                        "hitNumber": 0,
+                        "width": 1.0,
+                        "height": 1.0,
+                        "relativePriority": 0,
+                        "absolutePriority": 0,
+                        "damage": 1.0,
+                        "knockbackAngle": -45.0,
+                        "knockbackPowerBase": 1.0,
+                        "knockbackPowerGrowth": 1.0,
+                        "hitstunAdjustment": 0.0,
+                        "isGrabBox": false
+                    }
+                ]
+            },
+            {
+                "time": 0.09099999815225601,
+                "changes": [
+                    {
+                        "index": 0,
+                        "position": {
+                            "x": 0.1899999976158142,
+                            "y": 0.4000000059604645
+                        },
+                        "isActive": true,
+                        "isHitbox": true,
+                        "hitNumber": 0,
+                        "width": 0.5,
+                        "height": 1.0,
+                        "relativePriority": 0,
+                        "absolutePriority": 0,
+                        "damage": 15.0,
+                        "knockbackAngle": -45.0,
+                        "knockbackPowerBase": 5.0,
+                        "knockbackPowerGrowth": 20.0,
+                        "hitstunAdjustment": 0.0,
+                        "isGrabBox": false
+                    }
+                ]
+            }
+        ]
+    }
+}

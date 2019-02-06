@@ -4,7 +4,8 @@
 #include <imgui.h>
 #include "Game.h"
 
-const bool useVsync = true;
+const bool useVsync = false;
+const bool useSleep = false;
 const float FPS = 60.0f; //The desired FPS. (The number of updates each second).
 
 int main()
@@ -15,10 +16,10 @@ int main()
 	bool redraw = true;      //Do I redraw everything on the screen?
 
 	//actual drawing window
-	sf::RenderWindow window(sf::VideoMode(800, 800, 32), "Hello", sf::Style::Default);
+	sf::RenderWindow window(sf::VideoMode(800, 800, 32), "Hello", sf::Style::Fullscreen);
 	ImGui::SFML::Init(window, true);
 	ImGui::CreateContext();
-	window.setView(sf::View(sf::FloatRect(-21.6, -10, 31.6, 20)));
+	window.setView(sf::View(sf::FloatRect(-21.6f, -10.f, 31.6f, 20.f)));
 	
 
 	if (useVsync)
@@ -44,7 +45,7 @@ int main()
 				redraw = true; //We're ready to redraw everything
 				clock.restart();
 			}
-			else //Sleep until next 1/60th of a second comes around
+			else if (useSleep) //Sleep until next 1/60th of a second comes around
 			{
 				sf::Time sleepTime = sf::seconds((1.0f / FPS) - clock.getElapsedTime().asSeconds());
 				sf::sleep(sleepTime);
@@ -71,7 +72,8 @@ int main()
 
 			//draw things here
 			ImGui::SFML::Update(window, dtClock);
-			game->update(deltaTime);
+			//game->update(deltaTime);
+			game->update(1.f/FPS);
 			game->render(window);
 
 			ImGui::SFML::Render(window);

@@ -75,4 +75,22 @@ namespace secro {
 		ret.y = sin(angle);
 		return ret;
 	}
+
+	template<typename T, typename U>
+	T conv(U& other)
+	{
+		T ret;
+		ret.x = other.x;
+		ret.y = other.y;
+		return ret;
+	}
+
+	template<typename T, typename U>
+	T convNR(U other)
+	{
+		T ret;
+		ret.x = other.x;
+		ret.y = other.y;
+		return ret;
+	}
 }

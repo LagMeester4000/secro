@@ -77,12 +77,12 @@ bool secro::Controller::grabReleased() const
 
 bool secro::Controller::jumpPressed() const
 {
-	return current().yButton && !prev().yButton;
+	return (current().yButton && !prev().yButton) || (current().xButton && !prev().xButton);
 }
 
 bool secro::Controller::jumpHeld() const
 {
-	return current().yButton;
+	return current().yButton || current().xButton;
 }
 
 bool secro::Controller::jumpReleased() const
@@ -131,6 +131,11 @@ Direction secro::Controller::getDirection(const Joystick & stick) const
 	return Direction::Neutral;
 }
 
+const typename Controller::Input & secro::Controller::getInput(size_t index)
+{
+	return inputs[index];
+}
+
 secro::Controller::Input& secro::Controller::current()
 {
 	return inputs[0];
@@ -171,6 +176,12 @@ std::shared_ptr<Controller> secro::Controller::createController(int index, bool 
 	return std::make_shared<make_shared_enabler>(index, keyboard);
 }
 
+void secro::Controller::interceptController(std::function<void(Input&)> function)
+{
+	interceptFunction = function;
+	useIntercept = true;
+}
+
 #include <iostream>
 void secro::Controller::update()
 {
@@ -178,35 +189,42 @@ void secro::Controller::update()
 	swapBack();
 
 	//get new inputs
-	if (sf::Joystick::isConnected(controllerIndex))
+	if (!useIntercept)
 	{
-		Input& i = current();
+		if (sf::Joystick::isConnected(controllerIndex))
+		{
+			Input& i = current();
 
-		//buttons
-		i.aButton = sf::Joystick::isButtonPressed(controllerIndex, 0);
-		i.bButton = sf::Joystick::isButtonPressed(controllerIndex, 1);
-		i.xButton = sf::Joystick::isButtonPressed(controllerIndex, 2);
-		i.yButton = sf::Joystick::isButtonPressed(controllerIndex, 3);
-		i.lTrigger1 = sf::Joystick::isButtonPressed(controllerIndex, 4);
-		i.rTrigger1 = sf::Joystick::isButtonPressed(controllerIndex, 5);
-		i.select = sf::Joystick::isButtonPressed(controllerIndex, 9);
-		i.start = sf::Joystick::isButtonPressed(controllerIndex, 8);
+			//buttons
+			i.aButton = sf::Joystick::isButtonPressed(controllerIndex, 0);
+			i.bButton = sf::Joystick::isButtonPressed(controllerIndex, 1);
+			i.xButton = sf::Joystick::isButtonPressed(controllerIndex, 2);
+			i.yButton = sf::Joystick::isButtonPressed(controllerIndex, 3);
+			i.lTrigger1 = sf::Joystick::isButtonPressed(controllerIndex, 4);
+			i.rTrigger1 = sf::Joystick::isButtonPressed(controllerIndex, 5);
+			i.select = sf::Joystick::isButtonPressed(controllerIndex, 9);
+			i.start = sf::Joystick::isButtonPressed(controllerIndex, 8);
 
-		//triggers (need to be tested)
-		i.lTrigger2 = sf::Joystick::getAxisPosition(controllerIndex, sf::Joystick::Axis::U) > 0.5f;
-		i.rTrigger2 = sf::Joystick::getAxisPosition(controllerIndex, sf::Joystick::Axis::V) > 0.5f;
+			//triggers (need to be tested)
+			i.lTrigger2 = sf::Joystick::getAxisPosition(controllerIndex, sf::Joystick::Axis::Z) > 20.f;
+			i.rTrigger2 = sf::Joystick::getAxisPosition(controllerIndex, sf::Joystick::Axis::Z) < -20.f;
 
-		//joysticks
-		i.leftStick.x = sf::Joystick::getAxisPosition(controllerIndex, sf::Joystick::Axis::X);
-		i.leftStick.y = sf::Joystick::getAxisPosition(controllerIndex, sf::Joystick::Axis::Y);
+			//joysticks
+			i.leftStick.x = sf::Joystick::getAxisPosition(controllerIndex, sf::Joystick::Axis::X);
+			i.leftStick.y = sf::Joystick::getAxisPosition(controllerIndex, sf::Joystick::Axis::Y);
 
-		//joysticks
-		i.rightStick.x = sf::Joystick::getAxisPosition(controllerIndex, sf::Joystick::Axis::U);
-		i.rightStick.y = sf::Joystick::getAxisPosition(controllerIndex, sf::Joystick::Axis::V);
+			//joysticks
+			i.rightStick.x = sf::Joystick::getAxisPosition(controllerIndex, sf::Joystick::Axis::U);
+			i.rightStick.y = sf::Joystick::getAxisPosition(controllerIndex, sf::Joystick::Axis::V);
+		}
+		else
+		{
+			//std::cout << "controller not plugged in" << std::endl;
+		}
 	}
 	else
 	{
-		//std::cout << "controller not plugged in" << std::endl;
+		interceptFunction(current());
 	}
 }
 

@@ -7,6 +7,7 @@
 #include "../collision/HitboxManager.h"
 #include "../physics/Filters.h"
 #include "../detail/PlainVectorMath.h"
+#include "../DebugOptions.h"
 
 using namespace secro;
 
@@ -52,10 +53,9 @@ void secro::PlayerCharacter::init()
 	//setup the attacks
 	setupAttacks(attackCollection);
 
-
-	//temp
-	auto hurt = attackCollection.loadRaw("Hurt.json");
-	hitboxManager->addHurtbox(this, hurt);
+	//set up hurtbox
+	hurtboxFrames = attackCollection.loadRaw("Hurt.json");
+	hurtbox = hitboxManager->addHurtbox(this, hurtboxFrames);
 }
 
 void secro::PlayerCharacter::setupStates(StateMachine & sm)
@@ -250,9 +250,33 @@ void secro::PlayerCharacter::setupStates(StateMachine & sm)
 	sm.addUnsetState(PlayerState::ADTilt, std::bind(&PlayerCharacter::endAttack, this));
 	sm.addCondition(PlayerState::ADTilt, PlayerState::Stand, endGroundAttack);
 
+	//grabs
+	//ground
+	auto GrabAttack = [&](float f)
+	{
+		auto input = getInput();
+		return input->grabPressed();
+	};
+	sm.addCondition(PlayerState::Stand, PlayerState::AGrab, GrabAttack);
+	sm.addCondition(PlayerState::Walk, PlayerState::AGrab, GrabAttack);
+	sm.addCondition(PlayerState::Run, PlayerState::AGrab, GrabAttack);
+	sm.addCondition(PlayerState::Dash, PlayerState::AGrab, GrabAttack);
+	sm.addSetState(PlayerState::AGrab, std::bind(&PlayerCharacter::stateStartNewAttack, this, PlayerState::AGrab));
+	sm.addUnsetState(PlayerState::AGrab, std::bind(&PlayerCharacter::endAttack, this));
+	sm.addCondition(PlayerState::AGrab, PlayerState::Stand, endGroundAttack);
+	//air
+	sm.addCondition(PlayerState::Jump, PlayerState::AGrabAir, [&](float f)
+	{
+		auto input = getInput();
+		return input->grabPressed();
+	});
+	sm.addSetState(PlayerState::AGrabAir, std::bind(&PlayerCharacter::stateStartNewAttack, this, PlayerState::AGrabAir));
+	sm.addUnsetState(PlayerState::AGrabAir, std::bind(&PlayerCharacter::endAttack, this));
+	sm.addCondition(PlayerState::AGrabAir, PlayerState::LandingLag, endAerialA);
+
 
 	//landing lag
-	sm.addCondition(PlayerState::LandingLag, PlayerState::Stand, [&](float f) 
+	sm.addCondition(PlayerState::LandingLag, PlayerState::Stand, [&](float f)
 	{
 		return IsStateTimerDone();
 	});
@@ -261,11 +285,35 @@ void secro::PlayerCharacter::setupStates(StateMachine & sm)
 		return getMovementState() == MovementState::InAir;
 	});
 
+
 	//hitstun
-	sm.addCondition(PlayerState::Hitstun, PlayerState::Jump, [&](float f) 
+	sm.addCondition(PlayerState::Hitstun, PlayerState::Jump, [&](float f)
 	{
 		return !IsInHitstun();
 	});
+
+
+	//shielding
+	auto shieldCond = [&](float f)
+	{
+		return getInput()->blockHeld();
+	};
+	sm.addCondition(PlayerState::Stand, PlayerState::Shield, shieldCond);
+	sm.addCondition(PlayerState::Run, PlayerState::Shield, shieldCond);
+	sm.addCondition(PlayerState::Dash, PlayerState::Shield, shieldCond);
+	sm.addCondition(PlayerState::Walk, PlayerState::Shield, shieldCond);
+	sm.addCondition(PlayerState::Jump, PlayerState::Shield, shieldCond);
+	sm.addCondition(PlayerState::Shield, PlayerState::Stand, [&](float f) 
+	{
+		return !getInput()->blockHeld() && getMovementState() == MovementState::OnGround;
+	});
+	sm.addCondition(PlayerState::Shield, PlayerState::Jump, [&](float f)
+	{
+		return !getInput()->blockHeld() && getMovementState() == MovementState::InAir;
+	});
+	//activation and deactivation
+	sm.addSetState(PlayerState::Shield, std::bind(&PlayerCharacter::stateStartShield, this));
+	sm.addUnsetState(PlayerState::Shield, std::bind(&PlayerCharacter::stateEndShield, this));
 }
 
 void secro::PlayerCharacter::setupAttacks(AttackCollection & atts)
@@ -279,6 +327,9 @@ void secro::PlayerCharacter::setupAttacks(AttackCollection & atts)
 	atts.loadAttack("UTilt.json", PlayerState::AUTilt);
 	atts.loadAttack("FTilt.json", PlayerState::AFTilt);
 	atts.loadAttack("DTilt.json", PlayerState::ADTilt);
+
+	atts.loadAttack("Grab.json", PlayerState::AGrab);
+	atts.loadAttack("Grab.json", PlayerState::AGrabAir);
 }
 
 void secro::PlayerCharacter::update(float deltaTime)
@@ -292,21 +343,6 @@ void secro::PlayerCharacter::update(float deltaTime)
 		updateState(deltaTime);
 		updateAttack(deltaTime);
 	}
-	
-	//temp kill plane
-	auto pos = physicsBody->GetPosition();
-	if (pos.x < -15.f || pos.x > 10.f || pos.y < -10.f || pos.y > 10.f)
-	{
-		auto newPos = b2Vec2{ 0.f ,0.f };
-		physicsBody->SetTransform(newPos, 0.f);
-		damage = debugDamage;
-	}
-
-	if (input->grabPressed())
-	{
-		physicsBody->SetTransform(b2Vec2(0.f,0.f), 0.f);
-		setupAttacks(attackCollection);
-	}
 
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::X))
 	{
@@ -317,7 +353,8 @@ void secro::PlayerCharacter::update(float deltaTime)
 void secro::PlayerCharacter::render(sf::RenderWindow & window)
 {
 	//draw attributes gui
-	debugRenderAttributes(window);
+	if (DebugOptions::getOptions().enablePlayerAttributeEditor)
+		debugRenderAttributes(window);
 
 	sf::CircleShape c(0.4f);
 	auto pos = getPosition();
@@ -363,11 +400,37 @@ void secro::PlayerCharacter::render(sf::RenderWindow & window)
 	}
 
 	window.draw(c2);
+
+
+	//draw shield
+	if (state == PlayerState::Shield)
+	{
+		sf::CircleShape shield(1.f);
+		shield.setPosition(convNR<sf::Vector2f>(getPosition()) - sf::Vector2f(1.f, 1.f));
+		shield.setFillColor(sf::Color(0, 100, 255, 126));
+		window.draw(shield);
+	}
 }
 
 b2Vec2 secro::PlayerCharacter::getPosition()
 {
 	return physicsBody->GetPosition();
+}
+
+void secro::PlayerCharacter::setPosition(b2Vec2 pos)
+{
+	physicsBody->SetTransform(pos, 0.f);
+}
+
+void secro::PlayerCharacter::reset(b2Vec2 position)
+{
+	damage = debugDamage;
+	physicsBody->SetTransform(position, 0.f);
+}
+
+void secro::PlayerCharacter::freeze()
+{
+	physicsBody->SetLinearVelocity({ 0.f, 0.f });
 }
 
 void secro::PlayerCharacter::updateMovement(float deltaTime)
@@ -398,6 +461,7 @@ void secro::PlayerCharacter::updateMovement(float deltaTime)
 		}
 
 		//update gravity
+		if (useGravity)
 		{
 			auto cvel = physicsBody->GetLinearVelocity();
 			physicsBody->SetLinearVelocity(b2Vec2(cvel.x, cvel.y + attributes.fallSpeed * deltaTime * deltaTime));
@@ -459,9 +523,12 @@ void secro::PlayerCharacter::updateMovement(float deltaTime)
 		
 
 		//shap to ground
-		if (snapToGround(0.3f))
+		auto FVel = physicsBody->GetLinearVelocity();
+		if (snapToGround(FVel.y * deltaTime * 1.2f))
 		{
 			movementState = MovementState::OnGround;
+			FVel.y = 0.f;
+			physicsBody->SetLinearVelocity(FVel);
 		}
 
 	} break;
@@ -568,7 +635,11 @@ bool secro::PlayerCharacter::snapToGround(float distance)
 		{
 			if (fixture)
 			{
-				if (fixture->GetFilterData().groupIndex == GROUP_PLAYER)
+				//ignore players but don't ignore platforms
+				if (fixture->GetFilterData().groupIndex == GROUP_PLAYER && fixture->GetFilterData().categoryBits != CATEGORY_STAGE_PLATFORM)
+					return -1;
+
+				if (fixture->GetFilterData().categoryBits == CATEGORY_STAGE_PLATFORM && ignorePlatforms)
 					return -1;
 			}
 
@@ -584,10 +655,15 @@ bool secro::PlayerCharacter::snapToGround(float distance)
 		b2Vec2 m_normal;
 		float32 m_fraction;
 		bool firstHit = true;
+		bool ignorePlatforms = false;
 	};
 	auto* world = physicsBody->GetWorld();
 
 	auto callBack = IgnorePlayerRay();
+	
+	//see if the player can drop through platforms
+	callBack.ignorePlatforms = canDropThroughPlatform();
+
 	b2Vec2 p1 = getPosition() + b2Vec2{ 0.f, 0.8f };
 	b2Vec2 p2 = p1 + b2Vec2{ 0.f, distance + 0.2f };
 
@@ -668,6 +744,9 @@ void secro::PlayerCharacter::endAttack()
 		auto& at = attackCollection.getAttack(state);
 		stateTimer = at.landingLag;
 	}
+
+	//reset has attack hit
+	hasAttackHit = false;
 }
 
 bool secro::PlayerCharacter::groundSpeedTooHigh()
@@ -679,6 +758,30 @@ bool secro::PlayerCharacter::groundSpeedTooHigh()
 	else if (state == PlayerState::Walk)
 		return vel.Length() > attributes.walkMaxSpeed;
 
+	return false;
+}
+
+bool secro::PlayerCharacter::canDropThroughPlatform()
+{
+	if (movementState == MovementState::InAir)
+	{
+		if (isAttacking() || IsInHitstun())
+			return false;
+		return input->getMovementDirection() == Direction::Down;
+	}
+	else if (movementState == MovementState::OnGround)
+	{
+		if (isAttacking() || IsInHitstun() || state == PlayerState::JumpSquat || state == PlayerState::LandingLag)
+			return false;
+
+		for (size_t i = 0; i < 5; ++i)
+		{
+			if (input->getDirection(input->getInput(i).leftStick) != Direction::Down)
+				return false;
+		}
+
+		return true;
+	}
 	return false;
 }
 
@@ -722,9 +825,8 @@ void secro::PlayerCharacter::debugRenderAttributes(sf::RenderWindow & window)
 		ImGui::InputFloat("WalkMaxSpeed", &attributes.walkMaxSpeed);
 		ImGui::InputFloat("RunMaxSpeed", &attributes.runMaxSpeed);
 		ImGui::InputFloat("GroundDeceleration", &attributes.groundDeceleration);
-
-		ImGui::End();
 	}
+	ImGui::End();
 	ImGui::PopID();
 }
 
@@ -770,6 +872,11 @@ void secro::PlayerCharacter::knockBack(b2Vec2 knockback)
 		movementState = MovementState::InAir;
 
 	physicsBody->SetLinearVelocity(knockback);
+}
+
+void secro::PlayerCharacter::setMovementState(MovementState m)
+{
+	movementState = m;
 }
 
 void secro::PlayerCharacter::updateHitstun(float deltaTime)
@@ -820,7 +927,7 @@ std::shared_ptr<Controller> secro::PlayerCharacter::getInput()
 
 float secro::PlayerCharacter::getDamage()
 {
-	return 0.0f;
+	return damage;
 }
 
 float secro::PlayerCharacter::getDamageScalar()
@@ -873,6 +980,24 @@ int & secro::PlayerCharacter::getLastHitId()
 	return lastHitId;
 }
 
+void secro::PlayerCharacter::attackHasHit()
+{
+	if ((int)state > (int)PlayerState::AFirstAttack && (int)state < (int)PlayerState::ALastAttack)
+	{
+		hasAttackHit = true;
+	}
+}
+
+bool secro::PlayerCharacter::getHasAttackHit()
+{
+	return hasAttackHit;
+}
+
+bool secro::PlayerCharacter::isAttacking()
+{
+	return (int)state > (int)PlayerState::AFirstAttack && (int)state < (int)PlayerState::ALastAttack;
+}
+
 void secro::PlayerCharacter::updateHitlag(float deltaTime)
 {
 	if (hitlag > 0.f)
@@ -910,4 +1035,26 @@ void secro::PlayerCharacter::stateStartNewAttack(PlayerState attack)
 	currentAttackHitbox = hitboxManager->addHitbox(this, att);
 	attackTimer = -0.01f;
 	stateTimer = att.duration;
+}
+
+void secro::PlayerCharacter::stateStartShield()
+{
+	if (hurtboxFrames.frames.size() < 2)
+	{
+		std::cout << "ERROR: player does not have a shielding state" << std::endl;
+		return;
+	}
+
+	hurtbox->changeHitboxes(hurtboxFrames.frames[1].changes);
+}
+
+void secro::PlayerCharacter::stateEndShield()
+{
+	if (hurtboxFrames.frames.size() < 1)
+	{
+		std::cout << "ERROR: player does not have a hurtbox state" << std::endl;
+		return;
+	}
+
+	hurtbox->changeHitboxes(hurtboxFrames.frames[0].changes);
 }

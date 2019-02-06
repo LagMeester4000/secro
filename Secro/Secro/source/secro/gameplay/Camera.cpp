@@ -1,0 +1,63 @@
+#include "Camera.h"
+#include <SFML/Graphics.hpp>
+#include "secro/framework/player/PlayerCharacter.h"
+#include "secro/framework/detail/PlainVectorMath.h"
+
+secro::Camera::Camera()
+{
+	speed = 200.f;
+
+	//setup frustum
+	frustumWidth = 5.f;
+	frustumHeight = 5.f;
+}
+
+void secro::Camera::update(float deltaTime, std::vector<PlayerCharacter*> players)
+{
+	sf::Vector2f avg = getPlayerAveragePosition(players);
+
+	auto mov = avg - position;
+	position = position + mov * speed * deltaTime * deltaTime;
+
+	clamp();
+}
+
+void secro::Camera::render(sf::RenderWindow & window)
+{
+	auto view = window.getView();
+	view.setCenter(position);
+	window.setView(view);
+}
+
+sf::Vector2f secro::Camera::getPlayerAveragePosition(std::vector<PlayerCharacter*>& players)
+{
+	float divi = (float)players.size();
+	sf::Vector2f total = { 0.f, 0.f };
+	
+	for (auto& it : players)
+	{
+		total += convNR<sf::Vector2f>(it->getPosition());
+	}
+
+	total /= divi;
+
+	return total;
+}
+
+sf::Vector2f secro::Camera::getMaxWidthAndHeightDiff(std::vector<PlayerCharacter*>& players)
+{
+	return sf::Vector2f();
+}
+
+void secro::Camera::clamp()
+{
+	if (position.x < -frustumWidth)
+		position.x = -frustumWidth;
+	else if (position.x > frustumWidth)
+		position.x = frustumWidth;
+
+	if (position.y < -frustumHeight)
+		position.y = -frustumHeight;
+	else if (position.y > frustumHeight)
+		position.y = frustumHeight;
+}

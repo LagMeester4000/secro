@@ -1,14 +1,17 @@
 #include "StageCollision.h"
 #include <Box2D/Box2D.h>
 #include <SFML/Graphics.hpp>
+#include "Filters.h"
 
-secro::StageCollision::StageCollision(b2World& world, b2Vec2 position, b2Vec2 size)
+secro::StageCollision::StageCollision(b2World& world, b2Vec2 position, b2Vec2 size, bool isPlatform)
 {
-	setupBody(world, position, size);
+	setupBody(world, position, size, isPlatform);
 }
 
 secro::StageCollision::StageCollision(StageCollision &&other)
 {
+	size = other.size;
+
 	body = other.body;
 	fixture = other.fixture;
 	other.body = nullptr;
@@ -35,7 +38,7 @@ void secro::StageCollision::render(sf::RenderWindow& window)
 	window.draw(shape);
 }
 
-void secro::StageCollision::setupBody(b2World& world, b2Vec2 position, b2Vec2 size)
+void secro::StageCollision::setupBody(b2World& world, b2Vec2 position, b2Vec2 size, bool isPlatform)
 {
 	this->size = size;
 
@@ -48,4 +51,12 @@ void secro::StageCollision::setupBody(b2World& world, b2Vec2 position, b2Vec2 si
 
 	body = world.CreateBody(&bodyDef);
 	fixture = body->CreateFixture(&box, 0.f);
+
+	if (isPlatform)
+	{
+		b2Filter f;
+		f.categoryBits = CATEGORY_STAGE_PLATFORM;
+		f.groupIndex = GROUP_PLAYER;
+		fixture->SetFilterData(f);
+	}
 }

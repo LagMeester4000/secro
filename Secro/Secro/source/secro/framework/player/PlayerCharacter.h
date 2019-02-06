@@ -31,6 +31,9 @@ namespace secro {
 		virtual void render(sf::RenderWindow& window);
 
 		b2Vec2 getPosition() override;
+		void setPosition(b2Vec2 pos);
+		void reset(b2Vec2 position);
+		void freeze();
 
 	private: //movement
 		void updateMovement(float deltaTime);
@@ -39,6 +42,7 @@ namespace secro {
 		//to test if the character should keep running forward, or stop adding velocity
 		bool keepRunning();
 
+	protected:
 		//the current movement state
 		MovementState movementState;
 
@@ -54,6 +58,9 @@ namespace secro {
 		//the amount of jumps that the player has left
 		int jumpsLeft;
 
+		//should the player be influenced by gravity?
+		bool useGravity = true;
+
 	private:
 		//movement switch functions
 		void stateStartJump();
@@ -62,9 +69,12 @@ namespace secro {
 		void stateStartWalk();
 		void endAttack();
 		void stateStartNewAttack(PlayerState attack);
+		void stateStartShield();
+		void stateEndShield();
 
 		//tests
 		bool groundSpeedTooHigh();
+		bool canDropThroughPlatform();
 
 		//debug
 		void debugRenderAttributes(sf::RenderWindow& window);
@@ -79,6 +89,9 @@ namespace secro {
 
 		//knock the player back (no hitstun)
 		void knockBack(b2Vec2 knockback);
+
+	protected:
+		void setMovementState(MovementState m);
 
 	private: //hitstun
 		void updateHitstun(float deltaTime);
@@ -116,7 +129,7 @@ namespace secro {
 		//set the frame timer
 		void setStateTimer(float seconds);
 
-	private: //input
+	protected: //input
 		//input object
 		std::shared_ptr<Controller> input;
 
@@ -159,11 +172,17 @@ namespace secro {
 		//the current attack
 		std::shared_ptr<HitboxCollection> currentAttackHitbox;
 
+		//frame data of the hurtbox
+		FrameData hurtboxFrames;
+
 		//the player's hurtbox
 		std::shared_ptr<HitboxCollection> hurtbox;
 
 		//the id the player got hit by last
 		int lastHitId = -1;
+
+		//to check if the attack has connected
+		bool hasAttackHit;
 
 	public:
 		//get the attack timer value
@@ -171,6 +190,15 @@ namespace secro {
 
 		//get last hit id
 		int& getLastHitId();
+
+		//set the hasAttackHit
+		void attackHasHit();
+
+		//get the hasAttackHit
+		bool getHasAttackHit();
+
+		//check if the player is attacking
+		bool isAttacking();
 
 	private: //hitlag
 		//update the hitlag variable
