@@ -3,6 +3,7 @@
 #include "framework/detail/PlainVectorMath.h"
 #include "framework/player/PlayerCharacter.h"
 #include "framework/DebugOptions.h"
+#include "framework/GameplaySettings.h"
 #include "gameplay/characters/CharacterDashette.h"
 #include "gameplay/characters/CharacterDashetteP2.h"
 
@@ -21,11 +22,11 @@ secro::Game::Game()
 
 	//set up the players
 	playerManager.addPlayer(new CharacterDashette(&hitboxManager, physicsManager.getPlayerBody(0), inputManager.getController(0)));
-	//inputManager.getController(1)->interceptController([](typename Controller::Input& inp) 
-	//{
-	//	inp.rTrigger2 = true;
-	//});
-	playerManager.addPlayer(new PlayerCharacter(&hitboxManager, physicsManager.getPlayerBody(1), inputManager.getController(1)));
+	auto* secondPlayer = new PlayerCharacter(&hitboxManager, physicsManager.getPlayerBody(1), inputManager.getController(1));
+	playerManager.addPlayer(secondPlayer);
+
+	//hack the input
+	inputBot = new InputTestBot(secondPlayer, *inputManager.getController(1), 1);
 
 	//set up the stage
 	playerManager.setStageSize(20.f, 20.f);
@@ -63,6 +64,7 @@ void secro::Game::update(float deltaTime)
 	std::vector<PlayerCharacter*> players { playerManager.getPlayer(0), playerManager.getPlayer(1) };
 	camera.update(deltaTime * dtScalar, players);
 
+	//update the debug menu
 	DebugOptions::update(deltaTime);
 }
 
@@ -78,8 +80,16 @@ void secro::Game::render(sf::RenderWindow & window)
 	//camera
 	camera.render(window);
 
+	//render the debug menu
 	DebugOptions::render(window);
 
+	//render the gameplay settings
+	GameplaySettings::render();
+
+	//render the input bot
+	inputBot->render();
+
+	//render the score UI
 	renderScores(window);
 }
 

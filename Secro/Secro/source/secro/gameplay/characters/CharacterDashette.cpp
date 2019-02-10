@@ -3,6 +3,8 @@
 #include <Box2D/Box2D.h>
 #include <functional>
 
+#include <tuple>
+
 secro::CharacterDashette::CharacterDashette(HitboxManager * hitboxManager, b2Body * body, std::shared_ptr<Controller> controller)
 	: PlayerCharacter(hitboxManager, body, controller)
 {
@@ -15,7 +17,7 @@ void secro::CharacterDashette::init()
 	specialDuration = 0.20f;
 	specialSpeed = 15.f;
 	specialRemainSpeed = 0.4f;
-	specialGroundFriction = -5000.f;
+	specialGroundFriction = -100.f;
 	specialHyperJumpPower = 3.f;
 	specialHyperJumpHeight = 14.f;
 	specialAmountOfAirDash = 3;

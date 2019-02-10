@@ -8,6 +8,7 @@
 #include "../physics/Filters.h"
 #include "../detail/PlainVectorMath.h"
 #include "../DebugOptions.h"
+#include "../GameplaySettings.h"
 
 using namespace secro;
 
@@ -27,23 +28,35 @@ void secro::PlayerCharacter::init()
 {
 	//setup testing attributes
 	auto& a = attributes;
-	a.airAcceleration = 2000.f;
+	a.airAcceleration = 50.f;
 	a.airDeceleration = 1.f;
 	a.airMaxSpeed = 10.f;
 	a.dashDuration = 0.3f;
 	a.dashInitialSpeed = 10.f;
 	a.doubleJumpSpeed = 20.f;
-	a.fallSpeed = 3000.f;
+	a.fallSpeed = 50.f;
 	a.fastfallSpeed = 10.f;
-	a.groundDeceleration = 3000.f;
+	a.groundDeceleration = 50.f;
 	a.jumpAmount = 1;
 	a.jumpFullSpeed = 17.f;
 	a.jumpShortSpeed = 10.f;
 	a.jumpSquatDuration = 0.05f;
-	a.runAcceleration = 1000.f;
+	a.runAcceleration = 50.f;
 	a.runMaxSpeed = 8.f;
 	a.walkMaxSpeed = 3.f;
-
+	//airdodge
+	a.airdodgeDuration = 0.1f;
+	a.airdodgeInvDuration = 0.1f;
+	a.airdodgeInvStart = 0.5f;
+	a.airdodgeLandingLag = 0.1f;
+	a.airdodgeSpeed = 13.f;
+	//tech
+	a.techInPlaceDuration = 1.f;
+	a.techInPlaceInvDuration = 0.5f;
+	a.techRollDuration = 1.f;
+	a.techRollInvDuration = 0.5f;
+	a.techRollSpeed = 10.f;
+		
 	state = PlayerState::Jump;
 	movementState = MovementState::InAir;
 
@@ -302,8 +315,11 @@ void secro::PlayerCharacter::setupStates(StateMachine & sm)
 	sm.addCondition(PlayerState::Run, PlayerState::Shield, shieldCond);
 	sm.addCondition(PlayerState::Dash, PlayerState::Shield, shieldCond);
 	sm.addCondition(PlayerState::Walk, PlayerState::Shield, shieldCond);
-	sm.addCondition(PlayerState::Jump, PlayerState::Shield, shieldCond);
-	sm.addCondition(PlayerState::Shield, PlayerState::Stand, [&](float f) 
+	sm.addCondition(PlayerState::Jump, PlayerState::Shield, [&](float f)
+	{
+		return getInput()->blockHeld() && getInput()->getMovementDirection() == Direction::Neutral;
+	});
+	sm.addCondition(PlayerState::Shield, PlayerState::Stand, [&](float f)
 	{
 		return !getInput()->blockHeld() && getMovementState() == MovementState::OnGround;
 	});
@@ -314,6 +330,60 @@ void secro::PlayerCharacter::setupStates(StateMachine & sm)
 	//activation and deactivation
 	sm.addSetState(PlayerState::Shield, std::bind(&PlayerCharacter::stateStartShield, this));
 	sm.addUnsetState(PlayerState::Shield, std::bind(&PlayerCharacter::stateEndShield, this));
+
+
+	//special fall
+	sm.addCondition(PlayerState::SpecialFall, PlayerState::Stand, [&](float f) 
+	{
+		return getMovementState() == MovementState::OnGround;
+	});
+
+
+	//airdodge
+	sm.addCondition(PlayerState::Jump, PlayerState::Airdodge, std::bind(&PlayerCharacter::stateCanAirdodge, this));
+	//sm.addCondition(PlayerState::JumpSquat, PlayerState::Airdodge, std::bind(&PlayerCharacter::stateCanEarlyAirdodge, this));
+	sm.addCondition(PlayerState::Airdodge, PlayerState::SpecialFall, [&](float f) 
+	{
+		return IsStateTimerDone();
+	});
+	sm.addCondition(PlayerState::Airdodge, PlayerState::LandingLag, [&](float f)
+	{
+		return getMovementState() == MovementState::OnGround;
+	});
+	//activation/deactivation
+	sm.addSetState(PlayerState::Airdodge, std::bind(&PlayerCharacter::stateAirdodgeStart, this));
+	sm.addUnsetState(PlayerState::Airdodge, std::bind(&PlayerCharacter::stateAirdodgeEnd, this));
+	sm.addUpdateState(PlayerState::Airdodge, std::bind(&PlayerCharacter::stateUpdateAirdodge, this, std::placeholders::_1));
+
+
+	//teching
+	sm.addCondition(PlayerState::Hitstun, PlayerState::TechInPlace, [&](float f) 
+	{
+		auto dir = getInput()->getMovementDirection();
+		return stateCanTech() &&
+			dir != Direction::Left && dir != Direction::Right;
+	});
+	sm.addCondition(PlayerState::Hitstun, PlayerState::TechRollRight, [&](float f)
+	{
+		auto dir = getInput()->getMovementDirection();
+		return stateCanTech() &&
+			dir == Direction::Right;
+	});
+	sm.addCondition(PlayerState::Hitstun, PlayerState::TechRollLeft, [&](float f)
+	{
+		auto dir = getInput()->getMovementDirection();
+		return stateCanTech() &&
+			dir == Direction::Left;
+	});
+	sm.addCondition(PlayerState::TechInPlace, PlayerState::Stand, std::bind(&PlayerCharacter::stateCanTechEnd, this));
+	sm.addCondition(PlayerState::TechRollLeft, PlayerState::Stand, std::bind(&PlayerCharacter::stateCanTechEnd, this));
+	sm.addCondition(PlayerState::TechRollRight, PlayerState::Stand, std::bind(&PlayerCharacter::stateCanTechEnd, this));
+	sm.addSetState(PlayerState::TechRollLeft, std::bind(&PlayerCharacter::stateTechLeftBegin, this));
+	sm.addSetState(PlayerState::TechRollRight, std::bind(&PlayerCharacter::stateTechRightBegin, this));
+	sm.addSetState(PlayerState::TechInPlace, std::bind(&PlayerCharacter::stateTechInPlaceBegin, this));
+	sm.addUnsetState(PlayerState::TechRollLeft, std::bind(&PlayerCharacter::stateTechEnd, this));
+	sm.addUnsetState(PlayerState::TechRollRight, std::bind(&PlayerCharacter::stateTechEnd, this));
+	sm.addUnsetState(PlayerState::TechInPlace, std::bind(&PlayerCharacter::stateTechEnd, this));
 }
 
 void secro::PlayerCharacter::setupAttacks(AttackCollection & atts)
@@ -334,6 +404,7 @@ void secro::PlayerCharacter::setupAttacks(AttackCollection & atts)
 
 void secro::PlayerCharacter::update(float deltaTime)
 {
+	updateDI(deltaTime);
 	updateHitlag(deltaTime);
 
 	if (!isInHitlag())
@@ -342,6 +413,7 @@ void secro::PlayerCharacter::update(float deltaTime)
 		updateHitstun(deltaTime);
 		updateState(deltaTime);
 		updateAttack(deltaTime);
+		updateInvincibility(deltaTime);
 	}
 
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::X))
@@ -382,7 +454,6 @@ void secro::PlayerCharacter::render(sf::RenderWindow & window)
 	{
 		c.setFillColor(sf::Color(100, 100, 100));
 	}
-
 	window.draw(c);
 
 
@@ -398,7 +469,6 @@ void secro::PlayerCharacter::render(sf::RenderWindow & window)
 	{
 		c2.setPosition({ pos.x - 0.2f - 1.f, pos.y - 0.2f });
 	}
-
 	window.draw(c2);
 
 
@@ -409,6 +479,16 @@ void secro::PlayerCharacter::render(sf::RenderWindow & window)
 		shield.setPosition(convNR<sf::Vector2f>(getPosition()) - sf::Vector2f(1.f, 1.f));
 		shield.setFillColor(sf::Color(0, 100, 255, 126));
 		window.draw(shield);
+	}
+
+
+	//draw invincibility thingy
+	if (isInvincible())
+	{
+		sf::CircleShape inv(0.6f);
+		inv.setFillColor(sf::Color(0, 0, 200, 126));
+		inv.setPosition(convNR<sf::Vector2f>(getPosition()) - sf::Vector2f(0.6f, 0.6f));
+		window.draw(inv);
 	}
 }
 
@@ -435,92 +515,100 @@ void secro::PlayerCharacter::freeze()
 
 void secro::PlayerCharacter::updateMovement(float deltaTime)
 {
+	//swap the movementstate
+	previousMovementState = movementState;
+
 	switch (movementState)
 	{
 	case MovementState::InAir:
 	{
-		//double jumps
-		if (state == PlayerState::Jump)
-		{
-			if (input->jumpPressed() && jumpsLeft > 0)
-			{
-				jumpsLeft--;
-				b2Vec2 jumpVel = { 0.f, -attributes.doubleJumpSpeed };
-				physicsBody->SetLinearVelocity(jumpVel);
-			}
-		}
-
-		//fastfall
-		if (input->getMovementPushDirection() == Direction::Down)
-		{
-			auto vel = physicsBody->GetLinearVelocity();
-			if (vel.y > 0.f)
-			{
-				physicsBody->SetLinearVelocity(b2Vec2(vel.x, attributes.fastfallSpeed));
-			}
-		}
-
 		//update gravity
 		if (useGravity)
 		{
 			auto cvel = physicsBody->GetLinearVelocity();
-			physicsBody->SetLinearVelocity(b2Vec2(cvel.x, cvel.y + attributes.fallSpeed * deltaTime * deltaTime));
+			physicsBody->SetLinearVelocity(b2Vec2(cvel.x, cvel.y + attributes.fallSpeed * deltaTime/* * deltaTime*/));
 		}
 
-		auto mdir = input->getMovementDirection();
-		if (mdir != Direction::Neutral)
+		//actual movement
+		if (!IsInHitstun())
 		{
-			if (mdir == Direction::Left)
+			//double jumps
+			if (state == PlayerState::Jump)
 			{
-				//maybe setting velocity wrong !!!
-				auto vel = physicsBody->GetLinearVelocity();
-
-				b2Vec2 unitVec = { -attributes.airAcceleration * deltaTime * deltaTime, 0.f };
-
-				if (vel.x > -attributes.airMaxSpeed)
+				if (input->jumpPressed() && jumpsLeft > 0)
 				{
-					vel += unitVec;
-					physicsBody->SetLinearVelocity(vel);
-				}
-			}
-			else if (mdir == Direction::Right)
-			{
-				//maybe setting velocity wrong !!!
-				auto vel = physicsBody->GetLinearVelocity();
-
-				b2Vec2 unitVec = { attributes.airAcceleration * deltaTime * deltaTime, 0.f };
-
-				if (vel.x < attributes.airMaxSpeed)
-				{
-					vel += unitVec;
-					physicsBody->SetLinearVelocity(vel);
+					jumpsLeft--;
+					b2Vec2 jumpVel = { 0.f, -attributes.doubleJumpSpeed };
+					physicsBody->SetLinearVelocity(jumpVel);
 				}
 			}
 
-		}
-		
-
-		//apply tracktion when needed
-		if (input->getMovementDirection() == Direction::Neutral)
-		{
-			auto decelVal = attributes.airDeceleration * deltaTime * deltaTime;
-			auto vel = physicsBody->GetLinearVelocity();
-
-			if (vel.Length() > decelVal)
+			//fastfall
+			if (input->getMovementPushDirection() == Direction::Down)
 			{
-				auto adder = vel;
-				adder.Normalize();
-				adder *= decelVal;
-				vel -= adder;
-			}
-			else
-			{
-				vel = { 0.f, 0.f };
+				auto vel = physicsBody->GetLinearVelocity();
+				if (vel.y > 0.f && vel.y < attributes.fastfallSpeed)
+				{
+					physicsBody->SetLinearVelocity(b2Vec2(vel.x, attributes.fastfallSpeed));
+				}
 			}
 
-			physicsBody->SetLinearVelocity(vel);
+			auto mdir = input->getMovementDirection();
+			if (mdir != Direction::Neutral)
+			{
+				if (mdir == Direction::Left)
+				{
+					//maybe setting velocity wrong !!!
+					auto vel = physicsBody->GetLinearVelocity();
+
+					b2Vec2 unitVec = { -attributes.airAcceleration * deltaTime/* * deltaTime*/, 0.f };
+
+					if (vel.x > -attributes.airMaxSpeed)
+					{
+						vel += unitVec;
+						physicsBody->SetLinearVelocity(vel);
+					}
+				}
+				else if (mdir == Direction::Right)
+				{
+					//maybe setting velocity wrong !!!
+					auto vel = physicsBody->GetLinearVelocity();
+
+					b2Vec2 unitVec = { attributes.airAcceleration * deltaTime/* * deltaTime*/, 0.f };
+
+					if (vel.x < attributes.airMaxSpeed)
+					{
+						vel += unitVec;
+						physicsBody->SetLinearVelocity(vel);
+					}
+				}
+
+			}
+
+			//apply tracktion when needed
+			if (shouldHaveFriction)
+			{
+				if (input->getMovementDirection() == Direction::Neutral)
+				{
+					auto decelVal = attributes.airDeceleration * deltaTime/* * deltaTime*/;
+					auto vel = physicsBody->GetLinearVelocity();
+
+					if (vel.Length() > decelVal)
+					{
+						auto adder = vel;
+						adder.Normalize();
+						adder *= decelVal;
+						vel -= adder;
+					}
+					else
+					{
+						vel = { 0.f, 0.f };
+					}
+
+					physicsBody->SetLinearVelocity(vel);
+				}
+			}
 		}
-		
 
 		//shap to ground
 		auto FVel = physicsBody->GetLinearVelocity();
@@ -557,7 +645,7 @@ void secro::PlayerCharacter::updateMovement(float deltaTime)
 					//maybe setting velocity wrong !!!
 					auto vel = physicsBody->GetLinearVelocity();
 					
-					b2Vec2 unitVec = { -attributes.runAcceleration * deltaTime * deltaTime, 0.f };
+					b2Vec2 unitVec = { -attributes.runAcceleration * deltaTime/* * deltaTime*/, 0.f };
 
 					if (abs(vel.x) < maxSpeed)
 					{
@@ -570,7 +658,7 @@ void secro::PlayerCharacter::updateMovement(float deltaTime)
 					//maybe setting velocity wrong !!!
 					auto vel = physicsBody->GetLinearVelocity();
 
-					b2Vec2 unitVec = { attributes.runAcceleration * deltaTime * deltaTime, 0.f };
+					b2Vec2 unitVec = { attributes.runAcceleration * deltaTime/* * deltaTime*/, 0.f };
 
 					if (abs(vel.x) < maxSpeed)
 					{
@@ -583,34 +671,50 @@ void secro::PlayerCharacter::updateMovement(float deltaTime)
 		}
 
 		//apply tracktion when needed
-		if ((!keepRunning() || groundSpeedTooHigh()) && state != PlayerState::Dash)
+		if (shouldHaveFriction)
 		{
-			auto decelVal = attributes.groundDeceleration * deltaTime * deltaTime;
-			auto vel = physicsBody->GetLinearVelocity();
-
-			if (vel.Length() > decelVal)
+			if ((!keepRunning() || groundSpeedTooHigh()) && state != PlayerState::Dash)
 			{
-				auto adder = vel;
-				adder.Normalize();
-				adder *= decelVal;
-				vel -= adder;
-			}
-			else
-			{
-				vel = { 0.f, 0.f };
-			}
+				auto decelVal = attributes.groundDeceleration * deltaTime/* * deltaTime*/;
+				auto vel = physicsBody->GetLinearVelocity();
 
-			physicsBody->SetLinearVelocity(vel);
+				if (vel.Length() > decelVal)
+				{
+					auto adder = vel;
+					adder.Normalize();
+					adder *= decelVal;
+					vel -= adder;
+				}
+				else
+				{
+					vel = { 0.f, 0.f };
+				}
+
+				physicsBody->SetLinearVelocity(vel);
+			}
 		}
 
 		//shap to ground
 		if (!snapToGround(0.3f))
 		{
-			movementState = MovementState::InAir;
-			stateMachine.unsafeChangeState(this, PlayerState::Jump, deltaTime);
+			if (canSlideOffPlatforms)
+			{
+				movementState = MovementState::InAir;
+				stateMachine.unsafeChangeState(this, PlayerState::Jump, deltaTime);
+			}
+			else //put the character back on the platform 
+			{
+				physicsBody->SetTransform(previousPosition, 0.f);
+				auto oldVel = physicsBody->GetLinearVelocity();
+				physicsBody->SetLinearVelocity({ 0.f, oldVel.y });
+			}
 		}
 	} break;
 	}
+
+
+	//update the previous position
+	previousPosition = physicsBody->GetPosition();
 }
 
 bool secro::PlayerCharacter::snapToGround(float distance)
@@ -681,11 +785,14 @@ bool secro::PlayerCharacter::snapToGround(float distance)
 
 bool secro::PlayerCharacter::keepRunning()
 {
-	return isEqual(facingDirection, input->getMovementDirection());
+	return isEqual(facingDirection, input->getMovementDirection()) && (state == PlayerState::Walk || state == PlayerState::Run || state == PlayerState::Dash);
 }
 
 void secro::PlayerCharacter::stateStartJump()
 {
+	if (state == PlayerState::Airdodge)
+		return;
+
 	movementState = MovementState::InAir;
 
 	bool fullHop = input->jumpHeld();
@@ -741,7 +848,7 @@ void secro::PlayerCharacter::endAttack()
 
 	if (movementState == MovementState::OnGround)
 	{
-		auto& at = attackCollection.getAttack(state);
+		auto& at = attackCollection.getAttack(currentAttackState);
 		stateTimer = at.landingLag;
 	}
 
@@ -763,6 +870,9 @@ bool secro::PlayerCharacter::groundSpeedTooHigh()
 
 bool secro::PlayerCharacter::canDropThroughPlatform()
 {
+	if (state == PlayerState::Airdodge)
+		return false;
+
 	if (movementState == MovementState::InAir)
 	{
 		if (isAttacking() || IsInHitstun())
@@ -792,8 +902,10 @@ void secro::PlayerCharacter::debugRenderAttributes(sf::RenderWindow & window)
 	if (ImGui::Begin(name.c_str()))
 	{
 		//TEMP
+		ImGui::Text("TEMP debug values");
 		ImGui::Text("Damage: %f", damage);
 		ImGui::InputFloat("Respawn Damage", &debugDamage);
+
 		ImGui::Separator();
 
 		ImGui::Text("Air");
@@ -802,6 +914,15 @@ void secro::PlayerCharacter::debugRenderAttributes(sf::RenderWindow & window)
 		ImGui::InputFloat("AirDeceleration", &attributes.airDeceleration);
 		ImGui::InputFloat("AirMaxSpeed", &attributes.airMaxSpeed);
 		ImGui::InputFloat("FastFallSpeed", &attributes.fastfallSpeed);
+
+		ImGui::Separator();
+
+		ImGui::Text("Airdodge");
+		ImGui::InputFloat("AirdodgeInvStart", &attributes.airdodgeInvStart);
+		ImGui::InputFloat("AirdodgeInvDuration", &attributes.airdodgeInvDuration);
+		ImGui::InputFloat("AirdodgeDuration", &attributes.airdodgeDuration);
+		ImGui::InputFloat("AirdodgeSpeed", &attributes.airdodgeSpeed);
+		ImGui::InputFloat("AirdodgeLandingLag", &attributes.airdodgeLandingLag);
 
 		ImGui::Separator();
 
@@ -825,6 +946,16 @@ void secro::PlayerCharacter::debugRenderAttributes(sf::RenderWindow & window)
 		ImGui::InputFloat("WalkMaxSpeed", &attributes.walkMaxSpeed);
 		ImGui::InputFloat("RunMaxSpeed", &attributes.runMaxSpeed);
 		ImGui::InputFloat("GroundDeceleration", &attributes.groundDeceleration);
+
+		ImGui::Separator();
+
+		ImGui::Text("Teching");
+		ImGui::InputFloat("TechInPlaceInvDuration", &attributes.techInPlaceInvDuration);
+		ImGui::InputFloat("TechInPlaceDuration", &attributes.techInPlaceDuration);
+		ImGui::InputFloat("TechRollInvDuration", &attributes.techRollInvDuration);
+		ImGui::InputFloat("TechRollDuration", &attributes.techRollDuration);
+		ImGui::InputFloat("TechRollSpeed", &attributes.techRollSpeed);
+
 	}
 	ImGui::End();
 	ImGui::PopID();
@@ -862,6 +993,9 @@ bool secro::PlayerCharacter::isOpposite(FacingDirection facing, Direction dir)
 
 void secro::PlayerCharacter::knockBack(b2Vec2 knockback)
 {
+	if (isInvincible())
+		return;
+
 	if (knockback.y > 0.f && movementState == MovementState::OnGround)
 	{
 		knockback.y = -knockback.y;
@@ -892,6 +1026,9 @@ bool secro::PlayerCharacter::IsInHitstun()
 
 void secro::PlayerCharacter::putInHitstun(float duration)
 {
+	if (isInvincible())
+		return;
+
 	stateMachine.changeState(this, PlayerState::Hitstun, 0.016f);
 	stateTimer = duration;
 	hitstun = duration;
@@ -899,6 +1036,7 @@ void secro::PlayerCharacter::putInHitstun(float duration)
 
 void secro::PlayerCharacter::updateState(float deltaTime)
 {
+	previousStateTimer = stateTimer;
 	if (stateTimer >= 0.f)
 		stateTimer -= deltaTime;
 
@@ -1007,6 +1145,9 @@ void secro::PlayerCharacter::updateHitlag(float deltaTime)
 		if (hitlag <= 0.f)
 		{
 			physicsBody->SetLinearVelocity(hitlagVelocity);
+
+			if (!isInvincible() && state == PlayerState::Hitstun)
+				applyDI();
 		}
 	}
 }
@@ -1031,6 +1172,7 @@ void secro::PlayerCharacter::stateStartNewAttack(PlayerState attack)
 		currentAttackHitbox = nullptr;
 	}
 
+	currentAttackState = attack;
 	auto& att = attackCollection.getAttack(attack);
 	currentAttackHitbox = hitboxManager->addHitbox(this, att);
 	attackTimer = -0.01f;
@@ -1057,4 +1199,183 @@ void secro::PlayerCharacter::stateEndShield()
 	}
 
 	hurtbox->changeHitboxes(hurtboxFrames.frames[0].changes);
+}
+
+bool secro::PlayerCharacter::stateCanTech()
+{
+	//temp
+	return previousMovementState == MovementState::InAir && movementState == MovementState::OnGround &&
+		input->blockHeld();
+}
+
+bool secro::PlayerCharacter::stateCanTechEnd()
+{
+	return IsStateTimerDone();
+}
+
+void secro::PlayerCharacter::stateTechLeftBegin()
+{
+	b2Vec2 vel = { -attributes.techRollSpeed, 0.f };
+	physicsBody->SetLinearVelocity(vel);
+	setStateTimer(attributes.techRollDuration);
+	makeInvincible(attributes.techRollInvDuration);
+
+	//character can not slide off platform during tech
+	canSlideOffPlatforms = false;
+
+	//character should not have any friction on the ground
+	shouldHaveFriction = false;
+}
+
+void secro::PlayerCharacter::stateTechRightBegin()
+{
+	b2Vec2 vel = { attributes.techRollSpeed, 0.f };
+	physicsBody->SetLinearVelocity(vel);
+	setStateTimer(attributes.techRollDuration);
+	makeInvincible(attributes.techRollInvDuration);
+
+	//character can not slide off platform during tech
+	canSlideOffPlatforms = false;
+
+	//character should not have any friction on the ground
+	shouldHaveFriction = false;
+}
+
+void secro::PlayerCharacter::stateTechInPlaceBegin()
+{
+	b2Vec2 vel = { 0.f, 0.f };
+	physicsBody->SetLinearVelocity(vel);
+	setStateTimer(attributes.techInPlaceDuration);
+	makeInvincible(attributes.techInPlaceInvDuration);
+
+	//character can not slide off platform during tech
+	canSlideOffPlatforms = false;
+
+	//character should not have any friction on the ground
+	shouldHaveFriction = false;
+}
+
+void secro::PlayerCharacter::stateTechEnd()
+{
+	canSlideOffPlatforms = true;
+	shouldHaveFriction = true;
+}
+
+bool secro::PlayerCharacter::stateCanAirdodge()
+{
+	auto dir = input->getMovementDirection();
+	return dir != Direction::Neutral && input->blockHeld(); //temp
+}
+
+bool secro::PlayerCharacter::stateCanEarlyAirdodge()
+{
+	return stateCanAirdodge();// && stateTimer < 0.017f;
+}
+
+void secro::PlayerCharacter::stateAirdodgeStart()
+{
+	useGravity = false;
+
+	//set velocity
+	auto dir = conv<b2Vec2>(input->getMovement());
+	if (dir.y > -50.f && dir.y < 0.f && movementState == MovementState::OnGround)
+		dir.y = 0.f;
+	dir.Normalize();
+	dir *= attributes.airdodgeSpeed;
+	physicsBody->SetLinearVelocity(dir);
+
+	//check for air
+	if (dir.y < 0.f)
+	{
+		movementState = MovementState::InAir;
+	}
+
+	//set state duration
+	setStateTimer(attributes.airdodgeDuration);
+}
+
+void secro::PlayerCharacter::stateAirdodgeEnd()
+{
+	useGravity = true;
+
+	if (movementState == MovementState::InAir)
+	{
+		b2Vec2 vel = { 0.f,0.f };
+		physicsBody->SetLinearVelocity(vel);
+	}
+	else if (movementState == MovementState::OnGround)
+	{
+		setStateTimer(attributes.airdodgeLandingLag);
+	}
+}
+
+void secro::PlayerCharacter::stateUpdateAirdodge(float deltaTime)
+{
+	//give invincibility once needed
+	//only happens once during the airdodge
+	if (attributes.airdodgeDuration - previousStateTimer < attributes.airdodgeInvStart &&
+		attributes.airdodgeDuration - stateTimer >= attributes.airdodgeInvStart)
+	{
+		makeInvincible(attributes.airdodgeInvDuration);
+	}
+}
+
+void secro::PlayerCharacter::updateInvincibility(float deltaTime)
+{
+	if (invincibilityTimer >= 0.f)
+		invincibilityTimer -= deltaTime;
+}
+
+void secro::PlayerCharacter::makeInvincible(float duration)
+{
+	invincibilityTimer = duration;
+}
+
+bool secro::PlayerCharacter::isInvincible()
+{
+	return invincibilityTimer > 0.f;
+}
+
+void secro::PlayerCharacter::updateDI(float deltaTime)
+{
+	DI = input->getMovement().x / 100.f;
+}
+
+void secro::PlayerCharacter::applyDI()
+{
+	auto vel = physicsBody->GetLinearVelocity();
+	float angle = angleFromDirection(vel);
+	float DIDiff = getDI(angle);
+	auto newVel = adjustAngle(vel, DIDiff);
+	physicsBody->SetLinearVelocity(newVel);
+}
+
+float secro::PlayerCharacter::getDI(float angle)
+{
+	if (angle <= 0.f)
+	{
+		if (angle >= -180.f)
+		{
+			//up
+			return DI * GameplaySettings::DIInfluence;
+		}
+		else
+		{
+			//down
+			return -DI * GameplaySettings::DIInfluence;
+		}
+	}
+	else 
+	{
+		if (angle < 180.f)
+		{
+			//down
+			return -DI * GameplaySettings::DIInfluence;
+		}
+		else
+		{
+			//up
+			return DI * GameplaySettings::DIInfluence;
+		}
+	}
 }

@@ -18,7 +18,8 @@ namespace secro {
 
 		//air states
 		Jump,
-		AirDodge,
+		Airdodge,
+		SpecialFall,
 
 
 		//attacks
@@ -44,6 +45,12 @@ namespace secro {
 		SpecialF,
 		SpecialD,
 		SpecialN,
+
+
+		//teching states
+		TechInPlace,
+		TechRollLeft,
+		TechRollRight,
 
 
 		//should always be the last state

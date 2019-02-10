@@ -3,6 +3,9 @@
 namespace secro {
 	class GameplaySettings {
 	public:
+		//render a screen to adjust the values
+		static void render();
+
 		//the formula that calculates knockback
 		static float calculateKnockback(float playerDamage, float moveBaseKB, float moveKBGrowth);
 
@@ -11,5 +14,9 @@ namespace secro {
 
 		//scaler that linearly influences the hitstun
 		static float hitstunScalar;
+
+		//value that decides how much DI influences the knockback
+		//in degrees
+		static float DIInfluence;
 	};
 }

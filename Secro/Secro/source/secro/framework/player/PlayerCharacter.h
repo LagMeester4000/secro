@@ -45,6 +45,9 @@ namespace secro {
 	protected:
 		//the current movement state
 		MovementState movementState;
+		
+		//the previous movement state
+		MovementState previousMovementState;
 
 		//the movement attributes of the player
 		PlayerAttributes attributes;
@@ -60,6 +63,16 @@ namespace secro {
 
 		//should the player be influenced by gravity?
 		bool useGravity = true;
+
+		//should the player be able to slide off platforms
+		bool canSlideOffPlatforms = true;
+
+		//the previous position of the player
+		//used for the canSlideOffPlatforms functionality
+		b2Vec2 previousPosition;
+
+		//should the player have friction
+		bool shouldHaveFriction = true;
 
 	private:
 		//movement switch functions
@@ -115,6 +128,9 @@ namespace secro {
 		//a frame timer used to update states
 		float stateTimer;
 
+		//to keep track of changes in the state timer
+		float previousStateTimer;
+
 		//the state machine that keeps track of when the state should be changed
 		StateMachine stateMachine;
 
@@ -169,6 +185,9 @@ namespace secro {
 		//timer for the attack
 		float attackTimer;
 
+		//the current attack state
+		PlayerState currentAttackState;
+
 		//the current attack
 		std::shared_ptr<HitboxCollection> currentAttackHitbox;
 
@@ -216,5 +235,52 @@ namespace secro {
 
 		//put the player in hitlag
 		void putInHitlag(float duration);
+
+	public: //teching
+		bool stateCanTech();
+		bool stateCanTechEnd();
+
+	private:
+		void stateTechLeftBegin();
+		void stateTechRightBegin();
+		void stateTechInPlaceBegin();
+		void stateTechEnd();
+
+	private: //airdodge
+		bool stateCanAirdodge();
+		bool stateCanEarlyAirdodge();
+		void stateAirdodgeStart();
+		void stateAirdodgeEnd();
+		void stateUpdateAirdodge(float deltaTime);
+
+	private: //invincibility
+		//update the invincibility
+		void updateInvincibility(float deltaTime);
+
+		//timer to check if character is invincible
+		float invincibilityTimer;
+		
+	protected:
+		//make the character invincible
+		void makeInvincible(float duration);
+
+	public:
+		//check if the character is invincible
+		bool isInvincible();
+
+	private: //DI
+		//update the DI scalar
+		void updateDI(float deltaTime);
+
+		//apply the DI to the velocity
+		void applyDI();
+
+		//float variable for directional influence
+		//as a scalar from -1 to 1
+		float DI;
+
+	public:
+		//get the DI in degrees
+		float getDI(float angle);
 	};
 }

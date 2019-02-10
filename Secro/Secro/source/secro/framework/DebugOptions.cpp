@@ -22,6 +22,8 @@ void secro::DebugOptions::render(sf::RenderWindow & window)
 		{
 			ImGui::Checkbox("Hitbox", &options.enableHitboxEditor);
 			ImGui::Checkbox("Player Attributes", &options.enablePlayerAttributeEditor);
+			ImGui::Checkbox("CPU Input", &options.enableInputEditor);
+			ImGui::Checkbox("Gameplay Settings", &options.enableGameplaySettingsEditor);
 
 			ImGui::EndMenu();
 		}

@@ -1,6 +1,8 @@
 #pragma once
 #include <math.h>
 
+#define PI 3.14159265359f
+
 namespace secro {
 	//it is assumed that the objects used in these functions have a public x and y member
 
@@ -69,10 +71,28 @@ namespace secro {
 	template<typename T>
 	T directionFromAngle(float angle)
 	{
-		angle = angle / 180.f * 3.14159265359f;
+		angle = angle / 180.f * PI;
 		T ret;
 		ret.x = cos(angle);
 		ret.y = sin(angle);
+		return ret;
+	}
+
+	template<typename T>
+	float angleFromDirection(const T& direction)
+	{
+		T directionR = normalise(direction);
+		float ret = atan2(-directionR.x, directionR.y) / PI * 180.f + 90.f;
+		return ret;
+	}
+
+	template<typename T>
+	T adjustAngle(const T& vec, float angleChange)
+	{
+		float len = length(vec);
+		float angle = angleFromDirection(vec);
+		T ret = directionFromAngle<T>(angle + angleChange);
+		ret = mul(ret, len);
 		return ret;
 	}
 

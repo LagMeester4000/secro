@@ -126,6 +126,9 @@
     <ClInclude Include="source\secro\gameplay\Rules.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="source\secro\framework\input\InputTestBot.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="source\secro\main.cpp">
@@ -207,6 +210,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="source\secro\gameplay\PlayerManager.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="source\secro\framework\input\InputTestBot.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

@@ -154,6 +154,7 @@
     <ClInclude Include="source\secro\framework\GameplaySettings.h" />
     <ClInclude Include="source\secro\framework\input\Controller.h" />
     <ClInclude Include="source\secro\framework\input\InputManager.h" />
+    <ClInclude Include="source\secro\framework\input\InputTestBot.h" />
     <ClInclude Include="source\secro\framework\physics\Filters.h" />
     <ClInclude Include="source\secro\framework\physics\PhysicsManager.h" />
     <ClInclude Include="source\secro\framework\physics\PlayerCollision.h" />
@@ -187,6 +188,7 @@
     <ClCompile Include="source\secro\framework\GameplaySettings.cpp" />
     <ClCompile Include="source\secro\framework\input\Controller.cpp" />
     <ClCompile Include="source\secro\framework\input\InputManager.cpp" />
+    <ClCompile Include="source\secro\framework\input\InputTestBot.cpp" />
     <ClCompile Include="source\secro\framework\physics\PhysicsManager.cpp" />
     <ClCompile Include="source\secro\framework\physics\PlayerCollision.cpp" />
     <ClCompile Include="source\secro\framework\physics\StageCollision.cpp" />

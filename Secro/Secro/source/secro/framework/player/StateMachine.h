@@ -25,6 +25,9 @@ namespace secro {
 		//add a function for when a state is unset
 		void addUnsetState(PlayerState to, std::function<void(float)> func);
 
+		//add a function for updating a state
+		void addUpdateState(PlayerState state, std::function<void(float)> func);
+
 		//forcefully change the state of the character
 		void changeState(PlayerCharacter* player, PlayerState newState, float deltaTime);
 
@@ -36,6 +39,9 @@ namespace secro {
 		//unset function is called first, then the set function is called
 		SwitchFuncList setState;
 		SwitchFuncList unsetState;
+
+		//list of update functions for each state
+		SwitchFuncList updateState;
 
 		//the map with all the conditions for switching the state
 		SwitchConditionList conditions;

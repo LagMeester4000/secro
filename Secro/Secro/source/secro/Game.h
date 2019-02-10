@@ -5,6 +5,7 @@
 #include "framework/collision/HitboxManager.h"
 #include "gameplay/PlayerManager.h"
 #include "gameplay/Camera.h"
+#include "framework/input/InputTestBot.h"
 
 //TEMP
 #include "framework/collision/CollisionRenderer.h"
@@ -41,6 +42,9 @@ namespace secro {
 		PlayerManager playerManager;
 		HitboxManager hitboxManager;
 		Camera camera;
+
+	private: //debug
+		InputTestBot* inputBot;
 
 	private: //TEMP
 		CollisionRenderer c;

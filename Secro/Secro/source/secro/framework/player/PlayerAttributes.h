@@ -14,6 +14,12 @@ namespace secro {
 		float airDeceleration;
 		float airMaxSpeed;
 		float fastfallSpeed;
+		
+		//airdodge
+		float airdodgeInvStart, airdodgeInvDuration;
+		float airdodgeDuration;
+		float airdodgeSpeed;
+		float airdodgeLandingLag;
 
 		//jump
 		int jumpAmount;
@@ -22,7 +28,7 @@ namespace secro {
 		float doubleJumpSpeed;
 		float jumpSquatDuration;
 
-		//dash
+		//dash (not the character dash, but the dash on the ground)
 		float dashDuration;
 		float dashInitialSpeed;
 		
@@ -31,6 +37,13 @@ namespace secro {
 		float walkMaxSpeed;
 		float runMaxSpeed;
 		float groundDeceleration;
+
+		//tech
+		float techInPlaceInvDuration;
+		float techInPlaceDuration;
+		float techRollInvDuration;
+		float techRollDuration;
+		float techRollSpeed;
 	};
 }
 

@@ -10,6 +10,16 @@ secro::StateMachine::StateMachine()
 void secro::StateMachine::update(float deltaTime, PlayerCharacter * player)
 {
 	auto state = player->getState();
+
+	//update the state if possible
+	auto& updates = updateState[(size_t)state];
+	if (updates.size() > 0)
+	{
+		for (auto& it : updates)
+		{
+			it(deltaTime);
+		}
+	}
 	
 	auto trans = conditions.find(state);
 	if (trans == conditions.end())
@@ -22,6 +32,9 @@ void secro::StateMachine::update(float deltaTime, PlayerCharacter * player)
 	{
 		if (it.second(deltaTime))
 		{
+			//set the actual player state
+			player->state = it.first;
+
 			//call unset functions
 			auto& unsetFuncs = unsetState[(int)state];
 			for (auto& f : unsetFuncs)
@@ -31,9 +44,6 @@ void secro::StateMachine::update(float deltaTime, PlayerCharacter * player)
 			auto setFuncs = setState[(int)it.first];
 			for (auto& f : setFuncs)
 				f(deltaTime);
-			
-			//set the actual player state
-			player->state = it.first;
 		}
 	}
 }
@@ -51,6 +61,11 @@ void secro::StateMachine::addSetState(PlayerState to, std::function<void(float)>
 void secro::StateMachine::addUnsetState(PlayerState to, std::function<void(float)> func)
 {
 	unsetState[(int)to].push_back(func);
+}
+
+void secro::StateMachine::addUpdateState(PlayerState state, std::function<void(float)> func)
+{
+	updateState[(size_t)state].push_back(func);
 }
 
 void secro::StateMachine::changeState(PlayerCharacter * player, PlayerState newState, float deltaTime)
