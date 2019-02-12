@@ -1,6 +1,7 @@
 #include "Controller.h"
 #include <SFML/Window.hpp>
 #include <iostream>
+#include <math.h>
 #include "../detail/PlainVectorMath.h"
 
 using namespace secro;
@@ -212,6 +213,14 @@ void secro::Controller::update()
 			//joysticks
 			i.leftStick.x = sf::Joystick::getAxisPosition(controllerIndex, sf::Joystick::Axis::X);
 			i.leftStick.y = sf::Joystick::getAxisPosition(controllerIndex, sf::Joystick::Axis::Y);
+
+			if (controllerIndex == 2)
+			{
+				if (std::abs(i.leftStick.x) > 15.f)
+				{
+					int stop = 0;
+				}
+			}
 
 			//joysticks
 			i.rightStick.x = sf::Joystick::getAxisPosition(controllerIndex, sf::Joystick::Axis::U);

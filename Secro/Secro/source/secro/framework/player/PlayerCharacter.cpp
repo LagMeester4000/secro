@@ -28,7 +28,7 @@ void secro::PlayerCharacter::init()
 {
 	//setup testing attributes
 	auto& a = attributes;
-	a.airAcceleration = 50.f;
+	a.airAcceleration = 30.f;
 	a.airDeceleration = 1.f;
 	a.airMaxSpeed = 10.f;
 	a.dashDuration = 0.3f;
@@ -51,11 +51,11 @@ void secro::PlayerCharacter::init()
 	a.airdodgeLandingLag = 0.1f;
 	a.airdodgeSpeed = 13.f;
 	//tech
-	a.techInPlaceDuration = 1.f;
-	a.techInPlaceInvDuration = 0.5f;
-	a.techRollDuration = 1.f;
-	a.techRollInvDuration = 0.5f;
-	a.techRollSpeed = 10.f;
+	a.techInPlaceDuration = 0.2f;
+	a.techInPlaceInvDuration = 0.14f;
+	a.techRollDuration = 0.2f;
+	a.techRollInvDuration = 0.15f;
+	a.techRollSpeed = 14.f;
 		
 	state = PlayerState::Jump;
 	movementState = MovementState::InAir;
@@ -228,7 +228,8 @@ void secro::PlayerCharacter::setupStates(StateMachine & sm)
 	{
 		auto input = getInput();
 		auto dir = input->getMovementDirection();
-		return dir == Direction::Up && input->attackPressed();
+		auto aDir = input->getDirAttackDirection();
+		return (dir == Direction::Up && input->attackPressed()) || aDir == Direction::Up;
 	};
 	sm.addCondition(PlayerState::Stand, PlayerState::AUTilt, UTiltAttack);
 	sm.addCondition(PlayerState::Walk, PlayerState::AUTilt, UTiltAttack);
@@ -241,7 +242,8 @@ void secro::PlayerCharacter::setupStates(StateMachine & sm)
 	{
 		auto input = getInput();
 		auto dir = input->getMovementDirection();
-		return isEqual(getFacingDirection(), dir) && input->attackPressed();
+		auto aDir = input->getDirAttackDirection();
+		return (isEqual(getFacingDirection(), dir) && input->attackPressed()) || isEqual(getFacingDirection(), aDir);
 	};
 	sm.addCondition(PlayerState::Stand, PlayerState::AFTilt, FTiltAttack);
 	sm.addCondition(PlayerState::Walk, PlayerState::AFTilt, FTiltAttack);
@@ -254,7 +256,8 @@ void secro::PlayerCharacter::setupStates(StateMachine & sm)
 	{
 		auto input = getInput();
 		auto dir = input->getMovementDirection();
-		return dir == Direction::Down && input->attackPressed();
+		auto aDir = input->getDirAttackDirection();
+		return (dir == Direction::Down && input->attackPressed()) || aDir == Direction::Down;
 	};
 	sm.addCondition(PlayerState::Stand, PlayerState::ADTilt, DTiltAttack);
 	sm.addCondition(PlayerState::Walk, PlayerState::ADTilt, DTiltAttack);
@@ -719,6 +722,7 @@ void secro::PlayerCharacter::updateMovement(float deltaTime)
 
 bool secro::PlayerCharacter::snapToGround(float distance)
 {
+
 	auto vel = physicsBody->GetLinearVelocity();
 	
 	//don't want to snap to the ground if we're moving upwards
@@ -770,6 +774,11 @@ bool secro::PlayerCharacter::snapToGround(float distance)
 
 	b2Vec2 p1 = getPosition() + b2Vec2{ 0.f, 0.8f };
 	b2Vec2 p2 = p1 + b2Vec2{ 0.f, distance + 0.2f };
+
+	float d = secro::distance(p1, p2);
+	//ERROR, it is -nan(ind)
+	if (d == 0.f || d == NAN || d == -NAN || d == INFINITY || d == -INFINITY)
+		return false;
 
 	world->RayCast(&callBack, p1, p2);
 
@@ -1344,6 +1353,10 @@ void secro::PlayerCharacter::updateDI(float deltaTime)
 void secro::PlayerCharacter::applyDI()
 {
 	auto vel = physicsBody->GetLinearVelocity();
+	
+	if (vel.x == 0.f && vel.y == 0.f)
+		return;
+
 	float angle = angleFromDirection(vel);
 	float DIDiff = getDI(angle);
 	auto newVel = adjustAngle(vel, DIDiff);

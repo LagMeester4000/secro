@@ -2,7 +2,7 @@
 
 namespace secro {
 	struct Rules {
-		int stocks = 20;
+		int stocks = 4;
 		float time = 180.f;
 	};
 }

@@ -2,7 +2,7 @@
 #include <imgui.h>
 #include "DebugOptions.h"
 
-float secro::GameplaySettings::hitstunScalar = 0.03f;
+float secro::GameplaySettings::hitstunScalar = 0.04f;
 float secro::GameplaySettings::DIInfluence = 15.f;
 
 void secro::GameplaySettings::render()

@@ -138,12 +138,14 @@ int secro::CharacterDashette::getAirDashLeft()
 
 bool secro::CharacterDashette::canBeginSpecial(float dt)
 {
-	return input->specialPressed() && getAirDashLeft() > 0;
+	auto joy = input->getMovement();
+	return input->specialPressed() && getAirDashLeft() > 0 && length(joy) > 0.2f;
 }
 
 bool secro::CharacterDashette::canBeginSpecialFromAttack(float dt)
 {
-	return getHasAttackHit() && input->specialHeld();
+	auto joy = input->getMovement();
+	return getHasAttackHit() && input->specialHeld() && length(joy) > 0.2f;
 }
 
 secro::Joystick makeOctoDir(secro::Joystick j)

@@ -22,11 +22,11 @@ secro::Game::Game()
 
 	//set up the players
 	playerManager.addPlayer(new CharacterDashette(&hitboxManager, physicsManager.getPlayerBody(0), inputManager.getController(0)));
-	auto* secondPlayer = new PlayerCharacter(&hitboxManager, physicsManager.getPlayerBody(1), inputManager.getController(1));
+	auto* secondPlayer = new CharacterDashette(&hitboxManager, physicsManager.getPlayerBody(1), inputManager.getController(1));
 	playerManager.addPlayer(secondPlayer);
 
 	//hack the input
-	inputBot = new InputTestBot(secondPlayer, *inputManager.getController(1), 1);
+	//inputBot = new InputTestBot(secondPlayer, *inputManager.getController(1), 1);
 
 	//set up the stage
 	playerManager.setStageSize(20.f, 20.f);
@@ -87,7 +87,7 @@ void secro::Game::render(sf::RenderWindow & window)
 	GameplaySettings::render();
 
 	//render the input bot
-	inputBot->render();
+	//inputBot->render();
 
 	//render the score UI
 	renderScores(window);
