@@ -46,7 +46,9 @@ sf::Vector2f secro::Camera::getPlayerAveragePosition(std::vector<PlayerCharacter
 
 sf::Vector2f secro::Camera::getMaxWidthAndHeightDiff(std::vector<PlayerCharacter*>& players)
 {
-	return sf::Vector2f();
+	auto pos1 = players[0]->getPosition();
+	auto pos2 = players[1]->getPosition();
+	return convNR<sf::Vector2f>(length(secro::min(pos2, pos1)));
 }
 
 void secro::Camera::clamp()

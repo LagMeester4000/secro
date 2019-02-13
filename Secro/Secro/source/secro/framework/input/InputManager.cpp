@@ -1,4 +1,6 @@
 #include "InputManager.h"
+#include <SFML/Window.hpp>
+#include <iostream>
 
 using namespace secro;
 
@@ -11,10 +13,31 @@ void secro::InputManager::init(int amountOfControllers)
 	if (controllers.size() > 0)
 		return;
 
-	for (int i = 0; i < amountOfControllers; ++i)
+	int foundControllers = 0;
+	for (int i = 0; i < 8; ++i)
+	{
+		if (sf::Joystick::isConnected((unsigned)i))
+			foundControllers++;
+		else
+			continue;
+
+		controllers.push_back(
+			Controller::createController(i, false)
+		);
+
+		std::cout << "Registered controller (" << foundControllers - 1 << ") with index " << i << std::endl;
+
+		if (foundControllers == amountOfControllers)
+			return;
+	}
+
+	//print error
+	std::cout << "Could only find " << foundControllers << " controller(s)!" << std::endl;
+
+	for (int i = foundControllers; i < amountOfControllers; ++i)
 	{
 		controllers.push_back(
-			Controller::createController(i + 1, false)
+			Controller::createController(8, false)
 		);
 	}
 }

@@ -10,8 +10,6 @@ const float FPS = 60.0f; //The desired FPS. (The number of updates each second).
 
 int main()
 {
-	//game start object
-	auto game = secro::Game::createGame();
 
 	bool redraw = true;      //Do I redraw everything on the screen?
 
@@ -20,10 +18,12 @@ int main()
 	ImGui::SFML::Init(window, true);
 	ImGui::CreateContext();
 	window.setView(sf::View(sf::FloatRect(-21.6f, -10.f, 31.6f, 20.f)));
-	
 
 	if (useVsync)
 		window.setVerticalSyncEnabled(true);
+
+	//game start object
+	auto game = secro::Game::createGame();
 	
 	//clock for timing
 	sf::Clock clock;

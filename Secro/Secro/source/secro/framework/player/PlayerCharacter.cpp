@@ -31,12 +31,12 @@ void secro::PlayerCharacter::init()
 	a.airAcceleration = 30.f;
 	a.airDeceleration = 1.f;
 	a.airMaxSpeed = 10.f;
-	a.dashDuration = 0.3f;
-	a.dashInitialSpeed = 10.f;
+	a.dashDuration = 0.25f;
+	a.dashInitialSpeed = 11.5f;
 	a.doubleJumpSpeed = 20.f;
 	a.fallSpeed = 50.f;
 	a.fastfallSpeed = 10.f;
-	a.groundDeceleration = 50.f;
+	a.groundDeceleration = 30.f;
 	a.jumpAmount = 1;
 	a.jumpFullSpeed = 17.f;
 	a.jumpShortSpeed = 10.f;
@@ -45,9 +45,9 @@ void secro::PlayerCharacter::init()
 	a.runMaxSpeed = 8.f;
 	a.walkMaxSpeed = 3.f;
 	//airdodge
-	a.airdodgeDuration = 0.1f;
-	a.airdodgeInvDuration = 0.1f;
-	a.airdodgeInvStart = 0.5f;
+	a.airdodgeDuration = 0.15f;
+	a.airdodgeInvDuration = 0.11f;
+	a.airdodgeInvStart = 0.04f;
 	a.airdodgeLandingLag = 0.1f;
 	a.airdodgeSpeed = 13.f;
 	//tech
@@ -73,6 +73,10 @@ void secro::PlayerCharacter::init()
 
 void secro::PlayerCharacter::setupStates(StateMachine & sm)
 {
+	//standing
+	sm.addUnsetState(PlayerState::Stand, std::bind(&PlayerCharacter::stateEndStand, this));
+	sm.addUpdateState(PlayerState::Stand, std::bind(&PlayerCharacter::stateUpdateStand, this, std::placeholders::_1));
+
 	//jumping
 	sm.addCondition(PlayerState::Jump, PlayerState::Stand, [&](float t)
 	{
@@ -106,6 +110,7 @@ void secro::PlayerCharacter::setupStates(StateMachine & sm)
 
 	//dash
 	sm.addSetState(PlayerState::Dash, std::bind(&PlayerCharacter::stateStartDash, this));
+	sm.addUnsetState(PlayerState::Dash, std::bind(&PlayerCharacter::stateEndDash, this));
 	sm.addCondition(PlayerState::Dash, PlayerState::Dash, [&](float f)
 	{
 		auto input = getInput();
@@ -131,8 +136,9 @@ void secro::PlayerCharacter::setupStates(StateMachine & sm)
 	});
 	sm.addCondition(PlayerState::Dash, PlayerState::Stand, [&](float f)
 	{
-		return IsStateTimerDone();// && getPhysicsBody()->GetLinearVelocity().Length() < 0.1f;
+		return IsStateTimerDone()/* && getPhysicsBody()->GetLinearVelocity().Length() < 1.f*/;
 	});
+	sm.addUpdateState(PlayerState::Dash, std::bind(&PlayerCharacter::stateUpdateDash, this, std::placeholders::_1));
 
 
 	//run
@@ -615,7 +621,7 @@ void secro::PlayerCharacter::updateMovement(float deltaTime)
 
 		//shap to ground
 		auto FVel = physicsBody->GetLinearVelocity();
-		if (snapToGround(FVel.y * deltaTime * 1.2f))
+		if (snapToGround(FVel.y * deltaTime * 1.2f, isAttacking()))
 		{
 			movementState = MovementState::OnGround;
 			FVel.y = 0.f;
@@ -676,7 +682,7 @@ void secro::PlayerCharacter::updateMovement(float deltaTime)
 		//apply tracktion when needed
 		if (shouldHaveFriction)
 		{
-			if ((!keepRunning() || groundSpeedTooHigh()) && state != PlayerState::Dash)
+			if ((!keepRunning() || groundSpeedTooHigh())/* && state != PlayerState::Dash*/)
 			{
 				auto decelVal = attributes.groundDeceleration * deltaTime/* * deltaTime*/;
 				auto vel = physicsBody->GetLinearVelocity();
@@ -720,7 +726,7 @@ void secro::PlayerCharacter::updateMovement(float deltaTime)
 	previousPosition = physicsBody->GetPosition();
 }
 
-bool secro::PlayerCharacter::snapToGround(float distance)
+bool secro::PlayerCharacter::snapToGround(float distance, bool startAtBottom)
 {
 
 	auto vel = physicsBody->GetLinearVelocity();
@@ -772,7 +778,11 @@ bool secro::PlayerCharacter::snapToGround(float distance)
 	//see if the player can drop through platforms
 	callBack.ignorePlatforms = canDropThroughPlatform();
 
-	b2Vec2 p1 = getPosition() + b2Vec2{ 0.f, 0.8f };
+	b2Vec2 backDist = { 0.f, 0.8f };
+	if (startAtBottom)
+		backDist.y = 1.f;
+
+	b2Vec2 p1 = getPosition() + backDist;
 	b2Vec2 p2 = p1 + b2Vec2{ 0.f, distance + 0.2f };
 
 	float d = secro::distance(p1, p2);
@@ -795,6 +805,11 @@ bool secro::PlayerCharacter::snapToGround(float distance)
 bool secro::PlayerCharacter::keepRunning()
 {
 	return isEqual(facingDirection, input->getMovementDirection()) && (state == PlayerState::Walk || state == PlayerState::Run || state == PlayerState::Dash);
+}
+
+void secro::PlayerCharacter::stateEndStand()
+{
+	canSlideOffPlatforms = true;
 }
 
 void secro::PlayerCharacter::stateStartJump()
@@ -834,6 +849,11 @@ void secro::PlayerCharacter::stateStartDash()
 	}
 
 	stateTimer = attributes.dashDuration;
+}
+
+void secro::PlayerCharacter::stateEndDash()
+{
+	canSlideOffPlatforms = true;
 }
 
 void secro::PlayerCharacter::stateStartWalk()
@@ -1208,6 +1228,39 @@ void secro::PlayerCharacter::stateEndShield()
 	}
 
 	hurtbox->changeHitboxes(hurtboxFrames.frames[0].changes);
+}
+
+void secro::PlayerCharacter::stateUpdateDash(float deltaTime)
+{
+	auto dir = input->getMovementDirection();
+	if (!isEqual(facingDirection, dir))
+		canSlideOffPlatforms = false;
+	else
+		canSlideOffPlatforms = true;
+}
+
+void secro::PlayerCharacter::stateUpdateStand(float deltaTime)
+{
+	auto vel = physicsBody->GetLinearVelocity();
+
+	if (vel.x > 0.5f)
+	{
+		if (facingDirection == FacingDirection::Right)
+			canSlideOffPlatforms = false;
+		else
+			canSlideOffPlatforms = true;
+	}
+	else if (vel.x < -0.5f)
+	{
+		if (facingDirection == FacingDirection::Left)
+			canSlideOffPlatforms = false;
+		else
+			canSlideOffPlatforms = true;
+	}
+	else 
+	{
+		canSlideOffPlatforms = true;
+	}
 }
 
 bool secro::PlayerCharacter::stateCanTech()

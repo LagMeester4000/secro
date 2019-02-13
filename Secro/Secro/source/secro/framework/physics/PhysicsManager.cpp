@@ -25,9 +25,11 @@ void secro::PhysicsManager::update(float deltaTime)
 
 void secro::PhysicsManager::debugRender(sf::RenderWindow& window)
 {
+	int i = 0;
 	for (auto& it : playersColliders)
 	{
-		it.render(window);
+		it.render(window, i);
+		i++;
 	}
 
 	for (auto& it : stageColliders)

@@ -18,7 +18,7 @@ namespace secro {
 		PlayerCollision(PlayerCollision&&);
 		~PlayerCollision();
 
-		void render(class sf::RenderWindow& window);
+		void render(class sf::RenderWindow& window, int playerNum);
 
 	private:
 		void setupPlayerBody(b2World& world, b2Vec2 pos);

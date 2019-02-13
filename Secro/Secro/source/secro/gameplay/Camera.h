@@ -33,6 +33,8 @@ namespace secro {
 
 		//minimum and maximum distance between players
 		float minPlayerDistance, maxPlayerDistance;
+		
+		float minZoomIn, maxZoomIn;
 
 	private: //consts
 		float screenWidth, screenHeight;

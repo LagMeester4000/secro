@@ -37,7 +37,7 @@ namespace secro {
 
 	private: //movement
 		void updateMovement(float deltaTime);
-		bool snapToGround(float distance);
+		bool snapToGround(float distance, bool startAtBottom = false);
 
 		//to test if the character should keep running forward, or stop adding velocity
 		bool keepRunning();
@@ -76,14 +76,18 @@ namespace secro {
 
 	private:
 		//movement switch functions
+		void stateEndStand();
 		void stateStartJump();
 		void stateStartJumpSquat();
 		void stateStartDash();
+		void stateEndDash();
 		void stateStartWalk();
 		void endAttack();
 		void stateStartNewAttack(PlayerState attack);
 		void stateStartShield();
 		void stateEndShield();
+		void stateUpdateDash(float deltaTime);
+		void stateUpdateStand(float deltaTime);
 
 		//tests
 		bool groundSpeedTooHigh();

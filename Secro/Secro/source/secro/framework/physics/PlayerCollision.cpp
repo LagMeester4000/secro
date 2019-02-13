@@ -20,7 +20,7 @@ secro::PlayerCollision::~PlayerCollision()
 		playerBody->GetWorld()->DestroyBody(playerBody);
 }
 
-void secro::PlayerCollision::render(sf::RenderWindow& window)
+void secro::PlayerCollision::render(sf::RenderWindow& window, int playerNum)
 {
 	sf::ConvexShape convex = sf::ConvexShape();
 	
@@ -33,8 +33,10 @@ void secro::PlayerCollision::render(sf::RenderWindow& window)
 		auto vertex = shape->GetVertex(i);
 		convex.setPoint(i, { vertex.x + pos.x, vertex.y + pos.y });
 	}
-
-	convex.setFillColor(sf::Color(255, 0, 0));
+	if (playerNum == 0)
+		convex.setFillColor(sf::Color(255, 0, 0));
+	else if (playerNum == 1)
+		convex.setFillColor(sf::Color(80, 80, 255));
 
 	window.draw(convex);
 }
