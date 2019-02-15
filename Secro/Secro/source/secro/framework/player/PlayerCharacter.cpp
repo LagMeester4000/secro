@@ -26,6 +26,9 @@ secro::PlayerCharacter::PlayerCharacter(HitboxManager* hitboxM, b2Body * body, s
 
 void secro::PlayerCharacter::init()
 {
+	//walking deadzone
+	walkDeadzone = 10.f;
+
 	//setup testing attributes
 	auto& a = attributes;
 	a.airAcceleration = 30.f;
@@ -146,6 +149,14 @@ void secro::PlayerCharacter::setupStates(StateMachine & sm)
 	{
 		return getPhysicsBody()->GetLinearVelocity().Length() < 0.1f;
 	});
+	sm.addCondition(PlayerState::Run, PlayerState::Dash, [&](float f)
+	{
+		auto input = getInput();
+		auto mov = input->getMovementDirection();
+		auto smash = input->getMovementPushDirectionExt();
+		auto face = getFacingDirection();
+		return smash.speed > 30.f && ((mov == Direction::Left && face == FacingDirection::Right) || (mov == Direction::Right && face == FacingDirection::Left));
+	});
 
 
 	//walk
@@ -154,13 +165,25 @@ void secro::PlayerCharacter::setupStates(StateMachine & sm)
 		auto input = getInput();
 		auto smash = input->getMovementPushDirectionExt();
 		auto mov = input->getMovementDirection();
-		return smash.speed <= 30.f && ((mov == Direction::Left) || (mov == Direction::Right));
+		auto joy = input->getMovement();
+		bool oldCond = smash.speed <= 30.f && ((mov == Direction::Left) || (mov == Direction::Right));
+		bool upDown = (mov != Direction::Up && mov != Direction::Down);
+		return oldCond || (upDown && abs(joy.x) > getWalkDeadzone() && smash.speed <= 30.f);
 	});
 	sm.addCondition(PlayerState::Walk, PlayerState::Stand, [&](float f)
 	{
+		//auto input = getInput();
+		//auto mov = input->getMovementDirection();
+		//return !isEqual(getFacingDirection(), mov);
+		return !keepRunning();
+	});
+	sm.addCondition(PlayerState::Walk, PlayerState::Dash, [&](float f)
+	{
 		auto input = getInput();
 		auto mov = input->getMovementDirection();
-		return !isEqual(getFacingDirection(), mov);
+		auto smash = input->getMovementPushDirectionExt();
+		auto face = getFacingDirection();
+		return smash.speed > 30.f;// && ((mov == Direction::Left && face == FacingDirection::Right) || (mov == Direction::Right && face == FacingDirection::Left));
 	});
 	sm.addSetState(PlayerState::Walk, std::bind(&PlayerCharacter::stateStartWalk, this));
 
@@ -804,7 +827,19 @@ bool secro::PlayerCharacter::snapToGround(float distance, bool startAtBottom)
 
 bool secro::PlayerCharacter::keepRunning()
 {
-	return isEqual(facingDirection, input->getMovementDirection()) && (state == PlayerState::Walk || state == PlayerState::Run || state == PlayerState::Dash);
+	auto joy = input->getMovement();
+	if (abs(joy.x) < walkDeadzone)
+		return false;
+
+	FacingDirection face;
+	if (joy.x > 0.f)
+		face = FacingDirection::Right;
+	else
+		face = FacingDirection::Left;
+
+	return face == facingDirection && (state == PlayerState::Walk || state == PlayerState::Run || state == PlayerState::Dash);
+
+	//return isEqual(facingDirection, input->getMovementDirection()) && (state == PlayerState::Walk || state == PlayerState::Run || state == PlayerState::Dash);
 }
 
 void secro::PlayerCharacter::stateEndStand()
@@ -1018,6 +1053,11 @@ bool secro::PlayerCharacter::isEqual(FacingDirection facing, Direction dir)
 bool secro::PlayerCharacter::isOpposite(FacingDirection facing, Direction dir)
 {
 	return  (facing == FacingDirection::Right && dir == Direction::Left) || (facing == FacingDirection::Left && dir == Direction::Right);
+}
+
+float secro::PlayerCharacter::getWalkDeadzone()
+{
+	return walkDeadzone;
 }
 
 void secro::PlayerCharacter::knockBack(b2Vec2 knockback)

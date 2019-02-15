@@ -22,6 +22,7 @@ namespace secro {
 	private:
 		sf::Vector2f getPlayerAveragePosition(std::vector<PlayerCharacter*>& players);
 		sf::Vector2f getMaxWidthAndHeightDiff(std::vector<PlayerCharacter*>& players);
+		float getTargetZoom(std::vector<PlayerCharacter*>& players);
 		void clamp();
 
 	private: //tweakable
@@ -35,9 +36,12 @@ namespace secro {
 		float minPlayerDistance, maxPlayerDistance;
 		
 		float minZoomIn, maxZoomIn;
+		float zoomSpeed;
 
 	private: //consts
 		float screenWidth, screenHeight;
+		sf::Vector2f screenSize;
+		bool firstRun = true;
 
 	private: //final
 		float zoom;

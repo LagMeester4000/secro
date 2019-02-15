@@ -39,6 +39,7 @@ namespace secro {
 		void updateMovement(float deltaTime);
 		bool snapToGround(float distance, bool startAtBottom = false);
 
+	public:
 		//to test if the character should keep running forward, or stop adding velocity
 		bool keepRunning();
 
@@ -74,6 +75,9 @@ namespace secro {
 		//should the player have friction
 		bool shouldHaveFriction = true;
 
+		//deadzone on the x axis of the stick to enable movement
+		float walkDeadzone;
+
 	private:
 		//movement switch functions
 		void stateEndStand();
@@ -103,6 +107,9 @@ namespace secro {
 		const b2Body* getPhysicsBody();
 		static bool isEqual(FacingDirection facing, Direction dir);
 		static bool isOpposite(FacingDirection facing, Direction dir);
+		
+		//getters
+		float getWalkDeadzone();
 
 		//knock the player back (no hitstun)
 		void knockBack(b2Vec2 knockback);
