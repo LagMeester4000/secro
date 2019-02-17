@@ -172,6 +172,10 @@
     <ClInclude Include="source\secro\gameplay\characters\CharacterDashetteP2.h" />
     <ClInclude Include="source\secro\gameplay\PlayerManager.h" />
     <ClInclude Include="source\secro\gameplay\Rules.h" />
+    <ClInclude Include="source\secro\IGame.h" />
+    <ClInclude Include="source\secro\netplay\Essentials.h" />
+    <ClInclude Include="source\secro\netplay\InputPacket.h" />
+    <ClInclude Include="source\secro\netplay\NetplayGame.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="source\imgui\imgui-SFML.cpp" />
@@ -202,6 +206,8 @@
     <ClCompile Include="source\secro\gameplay\characters\CharacterDashetteP2.cpp" />
     <ClCompile Include="source\secro\gameplay\PlayerManager.cpp" />
     <ClCompile Include="source\secro\main.cpp" />
+    <ClCompile Include="source\secro\netplay\InputPacket.cpp" />
+    <ClCompile Include="source\secro\netplay\NetplayGame.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

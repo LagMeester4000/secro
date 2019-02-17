@@ -20,10 +20,10 @@ namespace secro {
 
 	class Game {
 	public:
-		static std::shared_ptr<Game> createGame();
+		static std::shared_ptr<Game> createGame(std::shared_ptr<InputManager> input);
 
 	private:
-		Game();
+		Game(std::shared_ptr<InputManager> input);
 
 	public:
 		//update the game
@@ -38,7 +38,7 @@ namespace secro {
 
 	private:
 		PhysicsManager physicsManager;
-		InputManager inputManager;
+		std::shared_ptr<InputManager> inputManager;
 		PlayerManager playerManager;
 		HitboxManager hitboxManager;
 		Camera camera;

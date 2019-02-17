@@ -9,20 +9,27 @@
 
 using namespace secro;
 
-std::shared_ptr<Game> secro::Game::createGame()
+std::shared_ptr<Game> secro::Game::createGame(std::shared_ptr<InputManager> input)
 {
-	class make_shared_enabler : public Game {};
+	class make_shared_enabler : public Game 
+	{
+	public:
+		make_shared_enabler(std::shared_ptr<InputManager> input)
+			: Game(input)
+		{}
+	};
 
-	return std::make_shared<make_shared_enabler>();
+	return std::make_shared<make_shared_enabler>(input);
 }
 
-secro::Game::Game()
+secro::Game::Game(std::shared_ptr<InputManager> input)
+	: inputManager(input)
 {
-	inputManager.init(2);
+	inputManager->init(2);
 
 	//set up the players
-	playerManager.addPlayer(new CharacterDashette(&hitboxManager, physicsManager.getPlayerBody(0), inputManager.getController(0)));
-	auto* secondPlayer = new CharacterDashette(&hitboxManager, physicsManager.getPlayerBody(1), inputManager.getController(1));
+	playerManager.addPlayer(new CharacterDashette(&hitboxManager, physicsManager.getPlayerBody(0), inputManager->getController(0)));
+	auto* secondPlayer = new CharacterDashette(&hitboxManager, physicsManager.getPlayerBody(1), inputManager->getController(1));
 	playerManager.addPlayer(secondPlayer);
 
 	//hack the input
@@ -49,7 +56,7 @@ secro::Game::Game()
 void secro::Game::update(float deltaTime)
 {
 	updateDeath(deltaTime);
-	inputManager.update();
+	//inputManager.update();//netplay change
 	playerManager.update(deltaTime * dtScalar);
 	physicsManager.update(deltaTime * dtScalar);
 	hitboxManager.update(deltaTime * dtScalar);

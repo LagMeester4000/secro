@@ -54,3 +54,8 @@ std::shared_ptr<Controller> secro::InputManager::getController(int index)
 {
 	return controllers[index];
 }
+
+const std::vector<std::shared_ptr<Controller>>& secro::InputManager::getControllers()
+{
+	return controllers;
+}

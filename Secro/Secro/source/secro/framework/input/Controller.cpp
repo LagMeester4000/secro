@@ -196,35 +196,37 @@ void secro::Controller::update()
 		{
 			Input& i = current();
 
-			//buttons
-			i.aButton = sf::Joystick::isButtonPressed(controllerIndex, 0);
-			i.bButton = sf::Joystick::isButtonPressed(controllerIndex, 1);
-			i.xButton = sf::Joystick::isButtonPressed(controllerIndex, 2);
-			i.yButton = sf::Joystick::isButtonPressed(controllerIndex, 3);
-			i.lTrigger1 = sf::Joystick::isButtonPressed(controllerIndex, 4);
-			i.rTrigger1 = sf::Joystick::isButtonPressed(controllerIndex, 5);
-			i.select = sf::Joystick::isButtonPressed(controllerIndex, 9);
-			i.start = sf::Joystick::isButtonPressed(controllerIndex, 8);
+			i = readInput();
 
-			//triggers (need to be tested)
-			i.lTrigger2 = sf::Joystick::getAxisPosition(controllerIndex, sf::Joystick::Axis::Z) > 20.f;
-			i.rTrigger2 = sf::Joystick::getAxisPosition(controllerIndex, sf::Joystick::Axis::Z) < -20.f;
-
-			//joysticks
-			i.leftStick.x = sf::Joystick::getAxisPosition(controllerIndex, sf::Joystick::Axis::X);
-			i.leftStick.y = sf::Joystick::getAxisPosition(controllerIndex, sf::Joystick::Axis::Y);
-
-			if (controllerIndex == 2)
-			{
-				if (std::abs(i.leftStick.x) > 15.f)
-				{
-					int stop = 0;
-				}
-			}
-
-			//joysticks
-			i.rightStick.x = sf::Joystick::getAxisPosition(controllerIndex, sf::Joystick::Axis::U);
-			i.rightStick.y = sf::Joystick::getAxisPosition(controllerIndex, sf::Joystick::Axis::V);
+			////buttons
+			//i.aButton = sf::Joystick::isButtonPressed(controllerIndex, 0);
+			//i.bButton = sf::Joystick::isButtonPressed(controllerIndex, 1);
+			//i.xButton = sf::Joystick::isButtonPressed(controllerIndex, 2);
+			//i.yButton = sf::Joystick::isButtonPressed(controllerIndex, 3);
+			//i.lTrigger1 = sf::Joystick::isButtonPressed(controllerIndex, 4);
+			//i.rTrigger1 = sf::Joystick::isButtonPressed(controllerIndex, 5);
+			//i.select = sf::Joystick::isButtonPressed(controllerIndex, 9);
+			//i.start = sf::Joystick::isButtonPressed(controllerIndex, 8);
+			//
+			////triggers (need to be tested)
+			//i.lTrigger2 = sf::Joystick::getAxisPosition(controllerIndex, sf::Joystick::Axis::Z) > 20.f;
+			//i.rTrigger2 = sf::Joystick::getAxisPosition(controllerIndex, sf::Joystick::Axis::Z) < -20.f;
+			//
+			////joysticks
+			//i.leftStick.x = sf::Joystick::getAxisPosition(controllerIndex, sf::Joystick::Axis::X);
+			//i.leftStick.y = sf::Joystick::getAxisPosition(controllerIndex, sf::Joystick::Axis::Y);
+			//
+			//if (controllerIndex == 2)
+			//{
+			//	if (std::abs(i.leftStick.x) > 15.f)
+			//	{
+			//		int stop = 0;
+			//	}
+			//}
+			//
+			////joysticks
+			//i.rightStick.x = sf::Joystick::getAxisPosition(controllerIndex, sf::Joystick::Axis::U);
+			//i.rightStick.y = sf::Joystick::getAxisPosition(controllerIndex, sf::Joystick::Axis::V);
 		}
 		else
 		{
@@ -235,6 +237,53 @@ void secro::Controller::update()
 	{
 		interceptFunction(current());
 	}
+}
+
+void secro::Controller::manualUpdate(Input & push)
+{
+	swapBack();
+	current() = push;
+}
+
+secro::Controller::Input secro::Controller::readInput() const
+{
+	if (sf::Joystick::isConnected(controllerIndex))
+	{
+		Input i;
+
+		//buttons
+		i.aButton = sf::Joystick::isButtonPressed(controllerIndex, 0);
+		i.bButton = sf::Joystick::isButtonPressed(controllerIndex, 1);
+		i.xButton = sf::Joystick::isButtonPressed(controllerIndex, 2);
+		i.yButton = sf::Joystick::isButtonPressed(controllerIndex, 3);
+		i.lTrigger1 = sf::Joystick::isButtonPressed(controllerIndex, 4);
+		i.rTrigger1 = sf::Joystick::isButtonPressed(controllerIndex, 5);
+		i.select = sf::Joystick::isButtonPressed(controllerIndex, 9);
+		i.start = sf::Joystick::isButtonPressed(controllerIndex, 8);
+
+		//triggers (need to be tested)
+		i.lTrigger2 = sf::Joystick::getAxisPosition(controllerIndex, sf::Joystick::Axis::Z) > 20.f;
+		i.rTrigger2 = sf::Joystick::getAxisPosition(controllerIndex, sf::Joystick::Axis::Z) < -20.f;
+
+		//joysticks
+		i.leftStick.x = sf::Joystick::getAxisPosition(controllerIndex, sf::Joystick::Axis::X);
+		i.leftStick.y = sf::Joystick::getAxisPosition(controllerIndex, sf::Joystick::Axis::Y);
+
+		if (controllerIndex == 2)
+		{
+			if (std::abs(i.leftStick.x) > 15.f)
+			{
+				int stop = 0;
+			}
+		}
+
+		//joysticks
+		i.rightStick.x = sf::Joystick::getAxisPosition(controllerIndex, sf::Joystick::Axis::U);
+		i.rightStick.y = sf::Joystick::getAxisPosition(controllerIndex, sf::Joystick::Axis::V);
+
+		return i;
+	}
+	return Input();
 }
 
 const Joystick & secro::Controller::getMovement() const

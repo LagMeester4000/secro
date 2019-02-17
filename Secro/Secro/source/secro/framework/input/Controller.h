@@ -53,6 +53,12 @@ namespace secro {
 		//read inputs into the controller
 		void update();
 
+		//manual update function, used for netplay
+		void manualUpdate(Input& push);
+
+		//read the inputs and put them into an input struct
+		Input readInput() const;
+
 		//movement
 		const Joystick& getMovement() const;
 		Direction getMovementDirection() const;
@@ -125,4 +131,7 @@ namespace secro {
 		std::function<void(Input&)> interceptFunction;
 		bool useIntercept = false;
 	};
+
+	//shorthand
+	using ControllerInput = typename Controller::Input;
 }

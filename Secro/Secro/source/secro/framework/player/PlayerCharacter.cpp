@@ -1402,7 +1402,7 @@ void secro::PlayerCharacter::stateAirdodgeEnd()
 
 	if (movementState == MovementState::InAir)
 	{
-		b2Vec2 vel = { 0.f,0.f };
+		b2Vec2 vel = mul(physicsBody->GetLinearVelocity(), 0.3f);
 		physicsBody->SetLinearVelocity(vel);
 	}
 	else if (movementState == MovementState::OnGround)
