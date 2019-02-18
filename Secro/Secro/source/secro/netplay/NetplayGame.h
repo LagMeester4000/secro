@@ -5,6 +5,7 @@
 
 namespace secro {
 	class InputManager;
+	class Game;
 
 	class NetplayGame : IGame {
 	public:

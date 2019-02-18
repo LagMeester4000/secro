@@ -46,7 +46,7 @@ void secro::PlayerCharacter::init()
 	a.jumpSquatDuration = 0.05f;
 	a.runAcceleration = 50.f;
 	a.runMaxSpeed = 8.f;
-	a.walkMaxSpeed = 3.f;
+	a.walkMaxSpeed = 6.f;
 	//airdodge
 	a.airdodgeDuration = 0.15f;
 	a.airdodgeInvDuration = 0.11f;

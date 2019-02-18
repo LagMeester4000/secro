@@ -56,7 +56,7 @@ secro::Game::Game(std::shared_ptr<InputManager> input)
 void secro::Game::update(float deltaTime)
 {
 	updateDeath(deltaTime);
-	//inputManager.update();//netplay change
+	inputManager->update();//netplay change
 	playerManager.update(deltaTime * dtScalar);
 	physicsManager.update(deltaTime * dtScalar);
 	hitboxManager.update(deltaTime * dtScalar);

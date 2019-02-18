@@ -3,6 +3,7 @@
 #include <imgui/imgui-SFML.h>
 #include <imgui.h>
 #include "Game.h"
+#include "framework/input/InputManager.h"
 
 const bool useVsync = false;
 const bool useSleep = false;
@@ -23,7 +24,7 @@ int main()
 		window.setVerticalSyncEnabled(true);
 
 	//game start object
-	auto game = secro::Game::createGame();
+	auto game = secro::Game::createGame(std::make_shared<secro::InputManager>());
 	
 	//clock for timing
 	sf::Clock clock;

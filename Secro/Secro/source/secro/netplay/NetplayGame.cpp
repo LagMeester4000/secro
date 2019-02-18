@@ -23,7 +23,7 @@ void secro::NetplayGame::setup()
 
 		std::cout << "running client code" << std::endl << "attempting to connect..." << std::endl;
 
-		auto status = socket.
+		//auto status = socket.
 	}
 	else
 	{

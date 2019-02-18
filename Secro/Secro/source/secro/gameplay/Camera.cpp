@@ -7,6 +7,7 @@ secro::Camera::Camera()
 {
 	speed = 200.f;
 	zoomSpeed = 2.f;
+	zoom = 0.f;
 
 	minPlayerDistance = 2.f;
 	maxPlayerDistance = 10.f;
