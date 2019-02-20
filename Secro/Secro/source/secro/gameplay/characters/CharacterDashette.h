@@ -34,5 +34,7 @@ namespace secro {
 		void stateStartSpecial();
 		void stateEndSpecial();
 		void stateStartHyperJump();
+
+	private: //graphics
 	};
 }

@@ -39,6 +39,7 @@ void secro::NetplayGame::update(float deltaTime)
 
 void secro::NetplayGame::render(sf::RenderWindow & window)
 {
+	game->render(window);
 }
 
 void secro::NetplayGame::simulate(float deltaTime)

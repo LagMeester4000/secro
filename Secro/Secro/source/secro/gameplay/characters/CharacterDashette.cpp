@@ -23,6 +23,11 @@ void secro::CharacterDashette::init()
 	specialAmountOfAirDash = 3;
 
 	normalFriction = attributes.groundDeceleration;
+
+
+
+	//init animations
+
 }
 
 void secro::CharacterDashette::setupStates(StateMachine & sm)
