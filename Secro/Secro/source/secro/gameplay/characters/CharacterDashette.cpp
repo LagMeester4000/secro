@@ -27,7 +27,7 @@ void secro::CharacterDashette::init()
 
 
 	//init animations
-
+	animation.loop
 }
 
 void secro::CharacterDashette::setupStates(StateMachine & sm)

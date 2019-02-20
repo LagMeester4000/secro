@@ -21,9 +21,5 @@ namespace secro {
 
 	private:
 		std::vector<std::shared_ptr<Controller>> controllers;
-		
-	private: //netcode
-		std::vector<std::vector<typename Controller::Input>> inputBuffer;
-		int inputBufferSize;
 	};
 }

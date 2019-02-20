@@ -1,5 +1,6 @@
 #pragma once
 #include "secro/framework/player/PlayerCharacter.h"
+#include "secro/framework/graphics/AnimatedSprite.h"
 
 namespace secro {
 	class CharacterDashette : public PlayerCharacter {
@@ -35,6 +36,13 @@ namespace secro {
 		void stateEndSpecial();
 		void stateStartHyperJump();
 
-	private: //graphics
+	public: //graphics
+		AnimatedSprite animation;
+
+		Animation animStand;
+		Animation animDash;
+		Animation animRun;
+		Animation animJumpSquat;
+		Animation animInAir;
 	};
 }

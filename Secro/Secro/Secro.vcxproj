@@ -152,6 +152,8 @@
     <ClInclude Include="source\secro\framework\collision\CircleHitbox.h" />
     <ClInclude Include="source\secro\framework\collision\Hitbox.h" />
     <ClInclude Include="source\secro\framework\GameplaySettings.h" />
+    <ClInclude Include="source\secro\framework\graphics\AnimatedSprite.h" />
+    <ClInclude Include="source\secro\framework\graphics\Animation.h" />
     <ClInclude Include="source\secro\framework\input\Controller.h" />
     <ClInclude Include="source\secro\framework\input\InputManager.h" />
     <ClInclude Include="source\secro\framework\input\InputTestBot.h" />
@@ -190,6 +192,8 @@
     <ClCompile Include="source\secro\framework\collision\HitboxManager.cpp" />
     <ClCompile Include="source\secro\framework\DebugOptions.cpp" />
     <ClCompile Include="source\secro\framework\GameplaySettings.cpp" />
+    <ClCompile Include="source\secro\framework\graphics\AnimatedSprite.cpp" />
+    <ClCompile Include="source\secro\framework\graphics\Animation.cpp" />
     <ClCompile Include="source\secro\framework\input\Controller.cpp" />
     <ClCompile Include="source\secro\framework\input\InputManager.cpp" />
     <ClCompile Include="source\secro\framework\input\InputTestBot.cpp" />

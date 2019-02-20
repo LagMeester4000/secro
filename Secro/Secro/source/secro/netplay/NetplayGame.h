@@ -59,5 +59,8 @@ namespace secro {
 	private:
 		//the size of the input buffer in frames
 		int inputBufferSize;
+
+		//actual input buffer
+		std::vector<std::vector<typename Controller::Input>> inputBuffer;
 	};
 }

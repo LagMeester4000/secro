@@ -35,6 +35,8 @@ void AnimatedSprite::setAnimation(const Animation& animation)
 	m_texture = m_animation->getSpriteSheet();
 	m_currentFrame = 0;
 	setFrame(m_currentFrame);
+	setFrameTime(sf::seconds(animation.getSpeed()));
+	setLooped(animation.getLoops());
 }
 
 void AnimatedSprite::setFrameTime(sf::Time time)
