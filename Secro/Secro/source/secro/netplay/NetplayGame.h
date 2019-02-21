@@ -2,6 +2,7 @@
 #include <SFML/Network.hpp>
 #include <memory>
 #include "secro/IGame.h"
+#include "secro/framework/input/Controller.h"
 
 namespace secro {
 	class InputManager;

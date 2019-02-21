@@ -12,7 +12,7 @@ namespace secro {
 		void setupAttacks(AttackCollection& attacks) override;
 		void update(float deltaTime) override;
 		void render(sf::RenderWindow& window) override;
-		
+
 	private: //special
 		b2Vec2 specialDirection;
 		float specialSpeed;
@@ -37,12 +37,24 @@ namespace secro {
 		void stateStartHyperJump();
 
 	public: //graphics
-		AnimatedSprite animation;
+		AnimatedSprite animatedSprite;
 
 		Animation animStand;
 		Animation animDash;
 		Animation animRun;
 		Animation animJumpSquat;
 		Animation animInAir;
+
+		//attack
+		Animation animNAir;
+		Animation animUAir;
+		Animation animFAir;
+		Animation animDAir;
+		Animation animBAir;
+
+
+	private:
+		void addFrames(int amount, Animation& animation);
+		void loadAnimation(std::string fileName, int frames, bool loop, float speed, Animation& animation);
 	};
 }

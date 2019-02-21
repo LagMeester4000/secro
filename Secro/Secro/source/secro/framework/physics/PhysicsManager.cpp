@@ -28,7 +28,7 @@ void secro::PhysicsManager::debugRender(sf::RenderWindow& window)
 	int i = 0;
 	for (auto& it : playersColliders)
 	{
-		it.render(window, i);
+		//it.render(window, i);
 		i++;
 	}
 

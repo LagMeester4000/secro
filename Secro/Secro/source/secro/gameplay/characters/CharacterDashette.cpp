@@ -2,7 +2,7 @@
 #include "secro/framework/detail/PlainVectorMath.h"
 #include <Box2D/Box2D.h>
 #include <functional>
-
+#include <SFML/Graphics.hpp>
 #include <tuple>
 
 secro::CharacterDashette::CharacterDashette(HitboxManager * hitboxManager, b2Body * body, std::shared_ptr<Controller> controller)
@@ -26,8 +26,18 @@ void secro::CharacterDashette::init()
 
 
 
-	//init animations
-	animation.loop
+	loadAnimation("Dashette-Run.png", 7, true, 0.1f, animRun);
+	loadAnimation("Dashette-groundDash.png", 1, true, 0.1f, animDash);
+	loadAnimation("Dashette-base.png", 1, true, 0.1f, animStand);
+	loadAnimation("Dashette-InAir.png", 1, true, 0.1f, animInAir);
+	loadAnimation("Dashette-JumpSquat.png", 3, true, 0.0166666f, animJumpSquat);
+	loadAnimation("Dashette-NAir.png", 4, false, 0.02f, animNAir);
+	loadAnimation("Dashette-UAir.png", 7, false, 0.04f, animUAir);
+	loadAnimation("Dashette-FAir.png", 2, false, 0.1f, animFAir);
+	loadAnimation("Dashette-DAir.png", 2, false, 0.07f, animDAir);
+	loadAnimation("Dashette-BAir.png", 2, false, 0.07f, animBAir);
+
+	animatedSprite.setAnimation(animRun);
 }
 
 void secro::CharacterDashette::setupStates(StateMachine & sm)
@@ -101,6 +111,56 @@ void secro::CharacterDashette::setupStates(StateMachine & sm)
 	{
 		return IsStateTimerDone();
 	});
+
+
+
+	//animations
+	sm.addSetState(PlayerState::Jump, [&](float f)
+	{
+		animatedSprite.setAnimation(animInAir);
+	});
+	sm.addSetState(PlayerState::JumpSquat, [&](float f)
+	{
+		animatedSprite.setAnimation(animJumpSquat);
+	});
+	sm.addSetState(PlayerState::Dash, [&](float f)
+	{
+		animatedSprite.setAnimation(animDash);
+	});
+	sm.addSetState(PlayerState::Run, [&](float f)
+	{
+		animatedSprite.setAnimation(animRun);
+	});
+	sm.addSetState(PlayerState::Stand, [&](float f)
+	{
+		animatedSprite.setAnimation(animStand);
+	});
+	sm.addUnsetState(PlayerState::JumpSquat, [&](float f)
+	{
+		animatedSprite.setAnimation(animStand);
+	});
+
+	sm.addSetState(PlayerState::ANAir, [&](float f)
+	{
+		animatedSprite.setAnimation(animNAir);
+	});
+	sm.addSetState(PlayerState::AUAir, [&](float f)
+	{
+		animatedSprite.setAnimation(animUAir);
+	});
+	sm.addSetState(PlayerState::AFAir, [&](float f)
+	{
+		animatedSprite.setAnimation(animFAir);
+	});
+	sm.addSetState(PlayerState::ADAir, [&](float f)
+	{
+		animatedSprite.setAnimation(animDAir);
+	});
+	sm.addSetState(PlayerState::ABAir, [&](float f)
+	{
+		animatedSprite.setAnimation(animBAir);
+	});
+
 }
 
 void secro::CharacterDashette::setupAttacks(AttackCollection & atts)
@@ -124,6 +184,7 @@ void secro::CharacterDashette::setupAttacks(AttackCollection & atts)
 void secro::CharacterDashette::update(float deltaTime)
 {
 	PlayerCharacter::update(deltaTime);
+	animatedSprite.update(sf::seconds(deltaTime));
 
 	if (movementState == MovementState::OnGround)
 	{
@@ -134,6 +195,16 @@ void secro::CharacterDashette::update(float deltaTime)
 void secro::CharacterDashette::render(sf::RenderWindow & window)
 {
 	PlayerCharacter::render(window);
+
+	float scale = 1.f;
+	if (facingDirection == FacingDirection::Left)
+		scale = -1.f;
+
+	auto pos = physicsBody->GetPosition();
+	animatedSprite.setPosition(pos.x, pos.y + 0.15f);
+	animatedSprite.setScale(sf::Vector2f(0.05f * scale, 0.05f));
+	animatedSprite.setOrigin(32.f, 32.f);
+	window.draw(animatedSprite);
 }
 
 int secro::CharacterDashette::getAirDashLeft()
@@ -206,4 +277,27 @@ void secro::CharacterDashette::stateStartHyperJump()
 	vel.y = -specialHyperJumpHeight;
 
 	physicsBody->SetLinearVelocity(vel);
+}
+
+void secro::CharacterDashette::addFrames(int amount, Animation & animation)
+{
+	for (int i = 0; i < amount; ++i)
+	{
+		animation.addFrame(sf::IntRect(i * 64, 0, 64, 64));
+	}
+}
+
+void secro::CharacterDashette::loadAnimation(std::string fileName, int frames, bool loop, float speed, Animation & animation)
+{
+	//TEMP
+	sf::Texture* tex = new sf::Texture();
+	if (!tex->loadFromFile(fileName))
+	{
+		std::cout << "could not load " << fileName << std::endl;
+		return;
+	}
+	animation.setSpriteSheet(*tex);
+	addFrames(frames, animation);
+	animation.setLoops(loop);
+	animation.setSpeed(speed);
 }

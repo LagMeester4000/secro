@@ -37,6 +37,7 @@ void AnimatedSprite::setAnimation(const Animation& animation)
 	setFrame(m_currentFrame);
 	setFrameTime(sf::seconds(animation.getSpeed()));
 	setLooped(animation.getLoops());
+	m_isPaused = false;
 }
 
 void AnimatedSprite::setFrameTime(sf::Time time)
@@ -164,11 +165,14 @@ void AnimatedSprite::update(sf::Time deltaTime)
 			else
 			{
 				// animation has ended
-				m_currentFrame = 0; // reset to start
 
 				if (!m_isLooped)
 				{
 					m_isPaused = true;
+				}
+				else
+				{
+					m_currentFrame = 0; // reset to start
 				}
 
 			}
