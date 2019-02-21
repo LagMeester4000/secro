@@ -71,7 +71,7 @@ void secro::HitboxManager::render(sf::RenderWindow & window)
 {
 	for (auto& it : hitboxes)
 	{
-		it->debugRender(window);
+		//it->debugRender(window);
 	}
 
 	for (auto& it : hurtboxes)

@@ -51,6 +51,10 @@ namespace secro {
 		Animation animFAir;
 		Animation animDAir;
 		Animation animBAir;
+		Animation animDTilt;
+		Animation animFTilt;
+		Animation animUTilt;
+		Animation animGrab;
 
 
 	private:

@@ -34,8 +34,12 @@ void secro::CharacterDashette::init()
 	loadAnimation("Dashette-NAir.png", 4, false, 0.02f, animNAir);
 	loadAnimation("Dashette-UAir.png", 7, false, 0.04f, animUAir);
 	loadAnimation("Dashette-FAir.png", 2, false, 0.1f, animFAir);
-	loadAnimation("Dashette-DAir.png", 2, false, 0.07f, animDAir);
-	loadAnimation("Dashette-BAir.png", 2, false, 0.07f, animBAir);
+	loadAnimation("Dashette-DAir.png", 2, false, 0.1f, animDAir);
+	loadAnimation("Dashette-BAir.png", 2, false, 0.1f, animBAir);
+	loadAnimation("Dashette-DTilt.png", 5, false, 0.05f, animDTilt);
+	loadAnimation("Dashette-FTilt.png", 6, false, 0.05f, animFTilt);
+	loadAnimation("Dashette-UTilt.png", 7, false, 0.05f, animUTilt);
+	loadAnimation("Dashette-Grab.png", 4, false, 0.05f, animGrab);
 
 	animatedSprite.setAnimation(animRun);
 }
@@ -159,6 +163,22 @@ void secro::CharacterDashette::setupStates(StateMachine & sm)
 	sm.addSetState(PlayerState::ABAir, [&](float f)
 	{
 		animatedSprite.setAnimation(animBAir);
+	}); 
+	sm.addSetState(PlayerState::ADTilt, [&](float f)
+	{
+		animatedSprite.setAnimation(animDTilt);
+	});
+	sm.addSetState(PlayerState::AFTilt, [&](float f)
+	{
+		animatedSprite.setAnimation(animFTilt);
+	});
+	sm.addSetState(PlayerState::AUTilt, [&](float f)
+	{
+		animatedSprite.setAnimation(animUTilt);
+	});
+	sm.addSetState(PlayerState::AGrab, [&](float f)
+	{
+		animatedSprite.setAnimation(animGrab);
 	});
 
 }
@@ -194,7 +214,7 @@ void secro::CharacterDashette::update(float deltaTime)
 
 void secro::CharacterDashette::render(sf::RenderWindow & window)
 {
-	PlayerCharacter::render(window);
+	//PlayerCharacter::render(window);
 
 	float scale = 1.f;
 	if (facingDirection == FacingDirection::Left)
