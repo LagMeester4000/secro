@@ -1,6 +1,7 @@
 #pragma once
 #include "secro/framework/player/PlayerCharacter.h"
 #include "secro/framework/graphics/AnimatedSprite.h"
+#include <SFML/Graphics/Sprite.hpp>
 
 namespace secro {
 	class CharacterDashette : public PlayerCharacter {
@@ -38,12 +39,15 @@ namespace secro {
 
 	public: //graphics
 		AnimatedSprite animatedSprite;
+		sf::Sprite shieldSprite;
 
 		Animation animStand;
 		Animation animDash;
 		Animation animRun;
 		Animation animJumpSquat;
 		Animation animInAir;
+		Animation animHitstun;
+		Animation animFreeFall;
 
 		//attack
 		Animation animNAir;

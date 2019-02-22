@@ -25,7 +25,7 @@ void secro::CharacterDashette::init()
 	normalFriction = attributes.groundDeceleration;
 
 
-
+	//load animations
 	loadAnimation("Dashette-Run.png", 7, true, 0.1f, animRun);
 	loadAnimation("Dashette-groundDash.png", 1, true, 0.1f, animDash);
 	loadAnimation("Dashette-base.png", 1, true, 0.1f, animStand);
@@ -40,8 +40,15 @@ void secro::CharacterDashette::init()
 	loadAnimation("Dashette-FTilt.png", 6, false, 0.05f, animFTilt);
 	loadAnimation("Dashette-UTilt.png", 7, false, 0.05f, animUTilt);
 	loadAnimation("Dashette-Grab.png", 4, false, 0.05f, animGrab);
-
+	loadAnimation("Dashette-DAir.png", 1, false, 0.05f, animHitstun);
+	loadAnimation("Dashette-FreeFall.png", 1, false, 0.05f, animFreeFall);
 	animatedSprite.setAnimation(animRun);
+	
+	//load shield
+	sf::Texture* shieldTexTemp = new sf::Texture();
+	shieldTexTemp->loadFromFile("Shield.png");
+	shieldSprite.setTexture(*shieldTexTemp);
+	shieldSprite.setOrigin(32.f, 32.f);
 }
 
 void secro::CharacterDashette::setupStates(StateMachine & sm)
@@ -180,6 +187,18 @@ void secro::CharacterDashette::setupStates(StateMachine & sm)
 	{
 		animatedSprite.setAnimation(animGrab);
 	});
+	sm.addSetState(PlayerState::Shield, [&](float f)
+	{
+		animatedSprite.setAnimation(animStand);
+	});
+	sm.addSetState(PlayerState::Hitstun, [&](float f)
+	{
+		animatedSprite.setAnimation(animHitstun);
+	});
+	sm.addSetState(PlayerState::SpecialFall, [&](float f)
+	{
+		animatedSprite.setAnimation(animFreeFall);
+	});
 
 }
 
@@ -225,6 +244,13 @@ void secro::CharacterDashette::render(sf::RenderWindow & window)
 	animatedSprite.setScale(sf::Vector2f(0.05f * scale, 0.05f));
 	animatedSprite.setOrigin(32.f, 32.f);
 	window.draw(animatedSprite);
+
+	if (getState() == PlayerState::Shield)
+	{
+		shieldSprite.setPosition(pos.x, pos.y + 0.15f);
+		shieldSprite.setScale(sf::Vector2f(0.05f * scale, 0.15f));
+		window.draw(shieldSprite);
+	}
 }
 
 int secro::CharacterDashette::getAirDashLeft()
