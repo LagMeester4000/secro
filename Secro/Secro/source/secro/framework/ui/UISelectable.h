@@ -3,12 +3,15 @@
 
 namespace secro {
 	class UISelectable : public UIElement {
+		friend class UIMenu;
 	public:
 
 	private: //links
-		UIElement* leftElement = nullptr;
-		UIElement* rightElement = nullptr;
-		UIElement* upElement = nullptr;
-		UIElement* downElement = nullptr;
+		UISelectable* leftElement = nullptr;
+		UISelectable* rightElement = nullptr;
+		UISelectable* upElement = nullptr;
+		UISelectable* downElement = nullptr;
+
+		bool selected = false;
 	};
 }

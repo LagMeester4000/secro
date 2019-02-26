@@ -272,5 +272,8 @@
     <ClCompile Include="source\secro\framework\ui\UIManager.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="source\secro\framework\ui\UIMenu.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

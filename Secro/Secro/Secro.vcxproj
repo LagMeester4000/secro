@@ -213,6 +213,7 @@
     <ClCompile Include="source\secro\framework\player\PlayerCharacter.cpp" />
     <ClCompile Include="source\secro\framework\player\StateMachine.cpp" />
     <ClCompile Include="source\secro\framework\ui\UIManager.cpp" />
+    <ClCompile Include="source\secro\framework\ui\UIMenu.cpp" />
     <ClCompile Include="source\secro\Game.cpp" />
     <ClCompile Include="source\secro\gameplay\Camera.cpp" />
     <ClCompile Include="source\secro\gameplay\characters\CharacterDashette.cpp" />
