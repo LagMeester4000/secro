@@ -14,7 +14,7 @@ secro::InputTestBot::InputTestBot(PlayerCharacter* player, Controller & controll
 
 void secro::InputTestBot::update(typename Controller::Input & input)
 {
-	input.rTrigger2 = holdShield;
+	input.shieldButton = holdShield;
 	
 	if (player->IsInHitstun())
 	{
@@ -24,9 +24,9 @@ void secro::InputTestBot::update(typename Controller::Input & input)
 			input.leftStick.x = (float)((rand() % 3 - 1) * 100);
 
 		if (shouldTech)
-			input.rTrigger2 = true;
+			input.shieldButton = true;
 		else
-			input.rTrigger2 = false;
+			input.shieldButton = false;
 	}
 	else 
 	{

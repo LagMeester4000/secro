@@ -155,6 +155,7 @@
     <ClInclude Include="source\secro\framework\graphics\AnimatedSprite.h" />
     <ClInclude Include="source\secro\framework\graphics\Animation.h" />
     <ClInclude Include="source\secro\framework\input\Controller.h" />
+    <ClInclude Include="source\secro\framework\input\ControllerSettings.h" />
     <ClInclude Include="source\secro\framework\input\InputManager.h" />
     <ClInclude Include="source\secro\framework\input\InputTestBot.h" />
     <ClInclude Include="source\secro\framework\level\Level.h" />
@@ -170,11 +171,15 @@
     <ClInclude Include="source\secro\framework\player\StateMachine.h" />
     <ClInclude Include="source\secro\framework\player\Timeline.h" />
     <ClInclude Include="source\secro\framework\ui\UIButton.h" />
+    <ClInclude Include="source\secro\framework\ui\UICursor.h" />
+    <ClInclude Include="source\secro\framework\ui\UICursorButton.h" />
+    <ClInclude Include="source\secro\framework\ui\UICursorManager.h" />
     <ClInclude Include="source\secro\framework\ui\UIElement.h" />
     <ClInclude Include="source\secro\framework\ui\UIManager.h" />
     <ClInclude Include="source\secro\framework\ui\UIMenu.h" />
     <ClInclude Include="source\secro\framework\ui\UIResult.h" />
     <ClInclude Include="source\secro\framework\ui\UISelectable.h" />
+    <ClInclude Include="source\secro\framework\ui\UISimpleButton.h" />
     <ClInclude Include="source\secro\framework\ui\UITransform.h" />
     <ClInclude Include="source\secro\Game.h" />
     <ClInclude Include="source\secro\gameplay\Camera.h" />
@@ -205,6 +210,7 @@
     <ClCompile Include="source\secro\framework\input\Controller.cpp" />
     <ClCompile Include="source\secro\framework\input\InputManager.cpp" />
     <ClCompile Include="source\secro\framework\input\InputTestBot.cpp" />
+    <ClCompile Include="source\secro\framework\level\Level.cpp" />
     <ClCompile Include="source\secro\framework\physics\PhysicsManager.cpp" />
     <ClCompile Include="source\secro\framework\physics\PlayerCollision.cpp" />
     <ClCompile Include="source\secro\framework\physics\StageCollision.cpp" />
@@ -212,8 +218,14 @@
     <ClCompile Include="source\secro\framework\player\PlayerAttributes.cpp" />
     <ClCompile Include="source\secro\framework\player\PlayerCharacter.cpp" />
     <ClCompile Include="source\secro\framework\player\StateMachine.cpp" />
+    <ClCompile Include="source\secro\framework\ui\UIButton.cpp" />
+    <ClCompile Include="source\secro\framework\ui\UIElement.cpp" />
     <ClCompile Include="source\secro\framework\ui\UIManager.cpp" />
     <ClCompile Include="source\secro\framework\ui\UIMenu.cpp" />
+    <ClCompile Include="source\secro\framework\ui\UIResult.cpp" />
+    <ClCompile Include="source\secro\framework\ui\UISelectable.cpp" />
+    <ClCompile Include="source\secro\framework\ui\UISimpleButton.cpp" />
+    <ClCompile Include="source\secro\framework\ui\UITransform.cpp" />
     <ClCompile Include="source\secro\Game.cpp" />
     <ClCompile Include="source\secro\gameplay\Camera.cpp" />
     <ClCompile Include="source\secro\gameplay\characters\CharacterDashette.cpp" />

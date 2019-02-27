@@ -248,7 +248,7 @@ void secro::CharacterDashette::render(sf::RenderWindow & window)
 	if (getState() == PlayerState::Shield)
 	{
 		shieldSprite.setPosition(pos.x, pos.y + 0.15f);
-		shieldSprite.setScale(sf::Vector2f(0.05f * scale, 0.15f));
+		shieldSprite.setScale(sf::Vector2f(0.05f * scale, 0.05f * scale));
 		window.draw(shieldSprite);
 	}
 }

@@ -18,77 +18,77 @@ Direction secro::Controller::getDirAttackDirection() const
 
 bool secro::Controller::attackPressed() const
 {
-	return current().bButton && !prev().bButton;
+	return current().attackButton && !prev().attackButton;
 }
 
 bool secro::Controller::attackHeld() const
 {
-	return current().bButton;
+	return current().attackButton;
 }
 
 bool secro::Controller::attackReleased() const
 {
-	return !current().bButton && prev().bButton;
+	return !current().attackButton && prev().attackButton;
 }
 
 bool secro::Controller::specialPressed() const
 {
-	return current().aButton && !prev().aButton;
+	return current().specialButton && !prev().specialButton;
 }
 
 bool secro::Controller::specialHeld() const
 {
-	return current().aButton;
+	return current().specialButton;
 }
 
 bool secro::Controller::specialReleased() const
 {
-	return !current().aButton && prev().aButton;
+	return !current().specialButton && prev().specialButton;
 }
 
 bool secro::Controller::blockPressed() const
 {
-	return current().rTrigger2 && !prev().rTrigger2;
+	return current().shieldButton && !prev().shieldButton;
 }
 
 bool secro::Controller::blockHeld() const
 {
-	return current().rTrigger2;
+	return current().shieldButton;
 }
 
 bool secro::Controller::blockReleased() const
 {
-	return !current().rTrigger2 && prev().rTrigger2;
+	return !current().shieldButton && prev().shieldButton;
 }
 
 bool secro::Controller::grabPressed() const
 {
-	return current().rTrigger1 && !prev().rTrigger1;
+	return current().grabButton && !prev().grabButton;
 }
 
 bool secro::Controller::grabHeld() const
 {
-	return current().rTrigger1;
+	return current().grabButton;
 }
 
 bool secro::Controller::grabReleased() const
 {
-	return !current().rTrigger1 && prev().rTrigger1;
+	return !current().grabButton && prev().grabButton;
 }
 
 bool secro::Controller::jumpPressed() const
 {
-	return (current().yButton && !prev().yButton) || (current().xButton && !prev().xButton);
+	return (current().jumpButton && !prev().jumpButton);
 }
 
 bool secro::Controller::jumpHeld() const
 {
-	return current().yButton || current().xButton;
+	return current().jumpButton || current().jumpButton;
 }
 
 bool secro::Controller::jumpReleased() const
 {
-	return !current().yButton && prev().yButton;
+	return !current().jumpButton && prev().jumpButton;
 }
 
 secro::Controller::Controller(int index, bool keyboard)
@@ -135,6 +135,46 @@ Direction secro::Controller::getDirection(const Joystick & stick) const
 const typename Controller::Input & secro::Controller::getInput(size_t index)
 {
 	return inputs[index];
+}
+
+ControllerSettings & secro::Controller::getSettings()
+{
+	return settings;
+}
+
+bool secro::Controller::findAxis(AxisConfig & axis)
+{
+	for (size_t i = 0; i < 8; ++i)
+	{
+		float axisVal = sf::Joystick::getAxisPosition(controllerIndex, (sf::Joystick::Axis)i);
+		if (axisVal > 90.f)
+		{
+			axis.axis = i;
+			axis.scale = 1.f;
+			return true;
+		}
+		else if (axisVal < -90.f)
+		{
+			axis.axis = i;
+			axis.scale = -1.f;
+			return true;
+		}
+	}
+	return false;
+}
+
+bool secro::Controller::findButton(ButtonIndex & button)
+{
+	unsigned int count = sf::Joystick::getButtonCount(controllerIndex);
+	for (unsigned int i = 0; i < count; ++i)
+	{
+		if (sf::Joystick::isButtonPressed(controllerIndex, i))
+		{
+			button = i;
+			return true;
+		}
+	}
+	return false;
 }
 
 secro::Controller::Input& secro::Controller::current()
@@ -197,36 +237,6 @@ void secro::Controller::update()
 			Input& i = current();
 
 			i = readInput();
-
-			////buttons
-			//i.aButton = sf::Joystick::isButtonPressed(controllerIndex, 0);
-			//i.bButton = sf::Joystick::isButtonPressed(controllerIndex, 1);
-			//i.xButton = sf::Joystick::isButtonPressed(controllerIndex, 2);
-			//i.yButton = sf::Joystick::isButtonPressed(controllerIndex, 3);
-			//i.lTrigger1 = sf::Joystick::isButtonPressed(controllerIndex, 4);
-			//i.rTrigger1 = sf::Joystick::isButtonPressed(controllerIndex, 5);
-			//i.select = sf::Joystick::isButtonPressed(controllerIndex, 9);
-			//i.start = sf::Joystick::isButtonPressed(controllerIndex, 8);
-			//
-			////triggers (need to be tested)
-			//i.lTrigger2 = sf::Joystick::getAxisPosition(controllerIndex, sf::Joystick::Axis::Z) > 20.f;
-			//i.rTrigger2 = sf::Joystick::getAxisPosition(controllerIndex, sf::Joystick::Axis::Z) < -20.f;
-			//
-			////joysticks
-			//i.leftStick.x = sf::Joystick::getAxisPosition(controllerIndex, sf::Joystick::Axis::X);
-			//i.leftStick.y = sf::Joystick::getAxisPosition(controllerIndex, sf::Joystick::Axis::Y);
-			//
-			//if (controllerIndex == 2)
-			//{
-			//	if (std::abs(i.leftStick.x) > 15.f)
-			//	{
-			//		int stop = 0;
-			//	}
-			//}
-			//
-			////joysticks
-			//i.rightStick.x = sf::Joystick::getAxisPosition(controllerIndex, sf::Joystick::Axis::U);
-			//i.rightStick.y = sf::Joystick::getAxisPosition(controllerIndex, sf::Joystick::Axis::V);
 		}
 		else
 		{
@@ -252,34 +262,23 @@ secro::Controller::Input secro::Controller::readInput() const
 		Input i;
 
 		//buttons
-		i.aButton = sf::Joystick::isButtonPressed(controllerIndex, 0);
-		i.bButton = sf::Joystick::isButtonPressed(controllerIndex, 1);
-		i.xButton = sf::Joystick::isButtonPressed(controllerIndex, 2);
-		i.yButton = sf::Joystick::isButtonPressed(controllerIndex, 3);
-		i.lTrigger1 = sf::Joystick::isButtonPressed(controllerIndex, 4);
-		i.rTrigger1 = sf::Joystick::isButtonPressed(controllerIndex, 5);
-		i.select = sf::Joystick::isButtonPressed(controllerIndex, 9);
-		i.start = sf::Joystick::isButtonPressed(controllerIndex, 8);
+		i.specialButton = sf::Joystick::isButtonPressed(controllerIndex, settings.specialButton);
+		i.attackButton = sf::Joystick::isButtonPressed(controllerIndex, settings.attackButton);
+		i.jumpButton = sf::Joystick::isButtonPressed(controllerIndex, settings.jumpButton);
+		i.grabButton = sf::Joystick::isButtonPressed(controllerIndex, settings.grabButton);
+		i.startButton = sf::Joystick::isButtonPressed(controllerIndex, settings.startButton);
+		i.selectButton = sf::Joystick::isButtonPressed(controllerIndex, settings.selectButton);
 
 		//triggers (need to be tested)
-		i.lTrigger2 = sf::Joystick::getAxisPosition(controllerIndex, sf::Joystick::Axis::Z) > 20.f;
-		i.rTrigger2 = sf::Joystick::getAxisPosition(controllerIndex, sf::Joystick::Axis::Z) < -20.f;
+		i.shieldButton = sf::Joystick::getAxisPosition(controllerIndex, (sf::Joystick::Axis)settings.shieldButton.axis) < (20.f * settings.shieldButton.scale);
 
 		//joysticks
-		i.leftStick.x = sf::Joystick::getAxisPosition(controllerIndex, sf::Joystick::Axis::X);
-		i.leftStick.y = sf::Joystick::getAxisPosition(controllerIndex, sf::Joystick::Axis::Y);
-
-		if (controllerIndex == 2)
-		{
-			if (std::abs(i.leftStick.x) > 15.f)
-			{
-				int stop = 0;
-			}
-		}
+		i.leftStick.x = sf::Joystick::getAxisPosition(controllerIndex, (sf::Joystick::Axis)settings.leftStick.x.axis) * settings.leftStick.x.scale;
+		i.leftStick.y = sf::Joystick::getAxisPosition(controllerIndex, (sf::Joystick::Axis)settings.leftStick.y.axis) * settings.leftStick.y.scale;
 
 		//joysticks
-		i.rightStick.x = sf::Joystick::getAxisPosition(controllerIndex, sf::Joystick::Axis::U);
-		i.rightStick.y = sf::Joystick::getAxisPosition(controllerIndex, sf::Joystick::Axis::V);
+		i.rightStick.x = sf::Joystick::getAxisPosition(controllerIndex, (sf::Joystick::Axis)settings.rightStick.x.axis) * settings.rightStick.x.scale;
+		i.rightStick.y = sf::Joystick::getAxisPosition(controllerIndex, (sf::Joystick::Axis)settings.rightStick.y.axis) * settings.rightStick.y.scale;
 
 		return i;
 	}

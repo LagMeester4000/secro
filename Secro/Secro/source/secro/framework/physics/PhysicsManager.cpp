@@ -2,8 +2,8 @@
 
 secro::PhysicsManager::PhysicsManager() : world(std::make_shared<b2World>(b2Vec2{0.f, 0.f}))
 {
-	playersColliders.emplace_back(*world, b2Vec2(-2.f, -5.f));
-	playersColliders.emplace_back(*world, b2Vec2(2.f, -5.f));
+	//playersColliders.emplace_back(*world, b2Vec2(-2.f, -5.f));
+	//playersColliders.emplace_back(*world, b2Vec2(2.f, -5.f));
 
 	//main ground
 	stageColliders.emplace_back(*world, b2Vec2(0.f, 5.f), b2Vec2(8.f, 3.f));
@@ -36,6 +36,12 @@ void secro::PhysicsManager::debugRender(sf::RenderWindow& window)
 	{
 		it.render(window);
 	}
+}
+
+b2Body * secro::PhysicsManager::makePlayerBody()
+{
+	playersColliders.emplace_back(*world, b2Vec2(-2.f, -5.f));
+	return playersColliders[playersColliders.size() - 1].playerBody;
 }
 
 b2Body * secro::PhysicsManager::getPlayerBody(int index)

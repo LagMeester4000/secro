@@ -4,8 +4,17 @@
 
 using namespace secro;
 
+secro::UIMenu::UIMenu()
+{
+	selected = nullptr;
+}
+
 void secro::UIMenu::update(float deltaTime)
 {
+	for (auto& it : items)
+	{
+		it->update(deltaTime);
+	}
 }
 
 UIResult secro::UIMenu::processInput(const Controller & controller, UIContext context)
@@ -58,18 +67,29 @@ UIResult secro::UIMenu::processInput(const Controller & controller, UIContext co
 
 void secro::UIMenu::render(UITransform & transform, sf::RenderWindow & window)
 {
+	UIElement::render(transform, window);
+
+	for (auto& it : items)
+	{
+		auto trans = makeTransform(transform, it->transform);
+		it->render(trans, window);
+	}
 }
 
 void secro::UIMenu::addSelectable(std::shared_ptr<UISelectable> selectable)
 {
-	if (selected)
+	if (!selected)
 	{
-		selected->selected = false;
 		selectable->selected = true;
 		selected = &*selectable;
 	}
+	items.push_back(selectable);
 }
 
-void secro::UIMenu::setSelected(std::shared_ptr<UISelectable> selected)
+void secro::UIMenu::setSelected(std::shared_ptr<UISelectable> selectedd)
 {
+	if (selected)
+		selected->selected = false;
+	selectedd->selected = true;
+	selected = &*selectedd;
 }

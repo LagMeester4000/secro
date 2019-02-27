@@ -13,14 +13,12 @@ sf::Packet & operator>>(sf::Packet & packet, secro::InputPacket & input)
 
 sf::Packet & operator<<(sf::Packet & packet, const secro::ControllerInput & input)
 {
-	return packet << input.aButton << input.bButton << input.leftStick.x << input.leftStick.y << input.rightStick.x << input.rightStick.y
-		<< input.xButton << input.yButton << input.lTrigger1 << input.lTrigger2 << input.rTrigger1 << input.rTrigger2 << input.select
-		<< input.start;
+	return packet << input.attackButton << input.specialButton << input.leftStick.x << input.leftStick.y << input.rightStick.x << input.rightStick.y
+		<< input.shieldButton << input.grabButton << input.jumpButton << input.startButton << input.selectButton;
 }
 
 sf::Packet & operator>>(sf::Packet & packet, secro::ControllerInput & input)
 {
-	return packet >> input.aButton >> input.bButton >> input.leftStick.x >> input.leftStick.y >> input.rightStick.x >> input.rightStick.y
-		>> input.xButton >> input.yButton >> input.lTrigger1 >> input.lTrigger2 >> input.rTrigger1 >> input.rTrigger2 >> input.select
-		>> input.start;
+	return packet >> input.attackButton >> input.specialButton >> input.leftStick.x >> input.leftStick.y >> input.rightStick.x >> input.rightStick.y
+		>> input.shieldButton >> input.grabButton >> input.jumpButton >> input.startButton >> input.selectButton;
 }

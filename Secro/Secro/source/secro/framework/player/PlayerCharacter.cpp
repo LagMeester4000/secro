@@ -24,6 +24,14 @@ secro::PlayerCharacter::PlayerCharacter(HitboxManager* hitboxM, b2Body * body, s
 	facingDirection = FacingDirection::Right;
 }
 
+void secro::PlayerCharacter::lateSetup(HitboxManager * hitboxM, b2Body * body, std::shared_ptr<Controller> controller)
+{
+	hitboxManager = hitboxM;
+	physicsBody = body;
+	input = controller;
+	facingDirection = FacingDirection::Right;
+}
+
 void secro::PlayerCharacter::init()
 {
 	//walking deadzone
@@ -306,6 +314,11 @@ void secro::PlayerCharacter::setupStates(StateMachine & sm)
 	sm.addCondition(PlayerState::Walk, PlayerState::AGrab, GrabAttack);
 	sm.addCondition(PlayerState::Run, PlayerState::AGrab, GrabAttack);
 	sm.addCondition(PlayerState::Dash, PlayerState::AGrab, GrabAttack);
+	sm.addCondition(PlayerState::Shield, PlayerState::AGrab, GrabAttack);
+	sm.addCondition(PlayerState::Shield, PlayerState::AGrab, [&](float f) 
+	{
+		return getInput()->attackPressed();
+	});
 	sm.addSetState(PlayerState::AGrab, std::bind(&PlayerCharacter::stateStartNewAttack, this, PlayerState::AGrab));
 	sm.addUnsetState(PlayerState::AGrab, std::bind(&PlayerCharacter::endAttack, this));
 	sm.addCondition(PlayerState::AGrab, PlayerState::Stand, endGroundAttack);

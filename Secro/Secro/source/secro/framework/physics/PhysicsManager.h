@@ -21,6 +21,9 @@ namespace secro {
 		//for debugging purposes
 		void debugRender(sf::RenderWindow& window);
 
+		//make a player body
+		b2Body* makePlayerBody();
+
 		//get the physics body of a player
 		b2Body* getPlayerBody(int index);
 		

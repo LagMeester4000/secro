@@ -21,8 +21,8 @@ namespace secro {
 	//base class for any UI element
 	class UIElement {
 	public:
-		//returns if the element is active or not
-		virtual bool isActive();
+		//returns if the element is visable or not
+		virtual bool isVisable();
 
 		//update various other things
 		virtual void update(float deltaTime);
@@ -49,8 +49,8 @@ namespace secro {
 		std::vector<std::shared_ptr<UIElement>> children;
 
 	public:
-		bool visableWhenNotOnTop;
-		bool visable;
+		bool visableWhenNotOnTop = true;
+		bool visable = true;
 
 		UITransform transform;
 	};

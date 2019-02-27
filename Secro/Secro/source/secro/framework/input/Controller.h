@@ -1,4 +1,5 @@
 #pragma once
+#include "ControllerSettings.h"
 #include <memory>
 #include <functional>
 
@@ -26,22 +27,33 @@ namespace secro {
 
 	public:
 		struct Input {
-			Joystick leftStick = { 0.f, 0.f };
-			Joystick rightStick = { 0.f, 0.f };
+			Joystick leftStick = { 0.f, 0.f }; //movement
+			Joystick rightStick = { 0.f, 0.f }; //attack
 
-			bool aButton = false;
-			bool bButton = false;
-			bool xButton = false;
-			bool yButton = false;
+			bool attackButton = false;
+			bool specialButton = false;
+			bool jumpButton = false;
+			
+			bool grabButton = false;
+			bool shieldButton = false;
 
-			bool lTrigger1 = false;
-			bool lTrigger2 = false;
+			bool startButton = false;
+			bool selectButton = false;
 
-			bool rTrigger1 = false;
-			bool rTrigger2 = false;
-
-			bool start = false;
-			bool select = false;
+			//old
+			//bool aButton = false;
+			//bool bButton = false;
+			//bool xButton = false;
+			//bool yButton = false;
+			//
+			//bool lTrigger1 = false;
+			//bool lTrigger2 = false;
+			//
+			//bool rTrigger1 = false;
+			//bool rTrigger2 = false;
+			//
+			//bool start = false;
+			//bool select = false;
 		};
 
 	public:
@@ -116,7 +128,19 @@ namespace secro {
 		//get the direction of a joystick
 		Direction getDirection(const Joystick& stick) const;
 
+		//get const ref to most recent input
 		const Input& getInput(size_t index);
+	
+	public: //settings
+		//get ref to settings
+		ControllerSettings& getSettings();
+
+		//find the axis that has been changed
+		bool findAxis(AxisConfig& axis);
+		
+		//find the button that has been changed
+		//call this in button release rather than press, else it will be confused
+		bool findButton(ButtonIndex& button);
 
 	private:
 		int controllerIndex;
@@ -125,6 +149,7 @@ namespace secro {
 
 	private:
 		Input inputs[buffer];
+		ControllerSettings settings;
 
 	private:
 		//function to interupt controller pulling

@@ -23,6 +23,7 @@ namespace secro {
 	public:
 		PlayerCharacter();
 		PlayerCharacter(HitboxManager* hitboxManager, b2Body* body, std::shared_ptr<Controller> controller);
+		void lateSetup(HitboxManager* hitboxManager, b2Body* body, std::shared_ptr<Controller> controller);
 
 		virtual void init();
 		virtual void setupStates(StateMachine& stateMachine);

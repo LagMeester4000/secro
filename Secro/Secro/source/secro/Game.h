@@ -6,6 +6,7 @@
 #include "gameplay/PlayerManager.h"
 #include "gameplay/Camera.h"
 #include "framework/input/InputTestBot.h"
+#include "framework/ui/UIManager.h"
 
 //TEMP
 #include "framework/collision/CollisionRenderer.h"
@@ -56,5 +57,8 @@ namespace secro {
 		float deathSpeed;
 		float deathDuration;
 		float deathTimer;
+
+	private: //ui
+		UIManager ui;
 	};
 }

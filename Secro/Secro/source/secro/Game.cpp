@@ -7,6 +7,11 @@
 #include "gameplay/characters/CharacterDashette.h"
 #include "gameplay/characters/CharacterDashetteP2.h"
 
+//ui
+#include "framework/ui/UIElement.h"
+#include "framework/ui/UISimpleButton.h"
+#include "framework/ui/UIMenu.h"
+
 using namespace secro;
 
 std::shared_ptr<Game> secro::Game::createGame(std::shared_ptr<InputManager> input)
@@ -48,6 +53,29 @@ secro::Game::Game(std::shared_ptr<InputManager> input)
 	deathSpeed = 0.5f;
 	deathDuration = 3.f;
 	dtScalar = 1.f;
+
+
+	//UI
+	std::shared_ptr<UIMenu> uiBase = std::make_shared<UIMenu>();
+	ui.pushTopFrame(uiBase);
+
+	{
+		//buttons
+		std::shared_ptr<UISimpleButton> button1 = std::make_shared<UISimpleButton>();
+		button1->font = uiFont;
+		button1->text = "play";
+
+		std::shared_ptr<UISimpleButton> button2 = std::make_shared<UISimpleButton>();
+		button2->font = uiFont;
+		button2->text = "options";
+		button2->transform.position.y = 10.f;
+
+		button1->downElement = &*button2;
+		button2->upElement = &*button1;
+
+		uiBase->addSelectable(button1);
+		uiBase->addSelectable(button2);
+	}
 }
 
 //TEMP
@@ -73,6 +101,10 @@ void secro::Game::update(float deltaTime)
 
 	//update the debug menu
 	DebugOptions::update(deltaTime);
+
+	//update the ui
+	ui.update(deltaTime);
+	ui.handleInput(*inputManager->getController(0));
 }
 
 void secro::Game::render(sf::RenderWindow & window)
@@ -98,6 +130,9 @@ void secro::Game::render(sf::RenderWindow & window)
 
 	//render the score UI
 	renderScores(window);
+
+	//render ui
+	ui.render(window);
 }
 
 void secro::Game::renderScores(sf::RenderWindow & window)

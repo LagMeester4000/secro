@@ -9,11 +9,5 @@ namespace secro {
 		float rotation = 0.f;
 	};
 
-	UITransform transform(const UITransform& parent, const UITransform& child)
-	{
-		UITransform ret;
-		ret.position = parent.position + mul(child.position, parent.scale); //change for rotation
-		ret.scale = mul(parent.scale, child.scale);
-		ret.rotation = parent.rotation + child.rotation;
-	}
+	UITransform makeTransform(const UITransform& parent, const UITransform& child);
 }
