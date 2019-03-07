@@ -44,6 +44,9 @@ void secro::StateMachine::update(float deltaTime, PlayerCharacter * player)
 			auto setFuncs = setState[(int)it.first];
 			for (auto& f : setFuncs)
 				f(deltaTime);
+
+			//break before other conditions are called
+			break;
 		}
 	}
 }

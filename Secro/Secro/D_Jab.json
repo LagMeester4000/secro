@@ -1,8 +1,8 @@
 {
     "value0": {
         "amountOfHitboxes": 1,
-        "duration": 0.17000000178813935,
-        "landingLag": 0.05000000074505806,
+        "duration": 0.10000000149011612,
+        "landingLag": 0.0,
         "frames": [
             {
                 "time": 0.0,
@@ -32,13 +32,13 @@
                 ]
             },
             {
-                "time": 0.07000000029802323,
+                "time": 0.03700000047683716,
                 "changes": [
                     {
                         "index": 0,
                         "position": {
-                            "x": 0.8199999928474426,
-                            "y": 0.0
+                            "x": 0.7300000190734863,
+                            "y": 0.1599999964237213
                         },
                         "isActive": true,
                         "isHitbox": true,
@@ -47,9 +47,9 @@
                         "height": 1.0,
                         "relativePriority": 0,
                         "absolutePriority": 0,
-                        "damage": 10.0,
-                        "knockbackAngle": -45.0,
-                        "knockbackPowerBase": 10.0,
+                        "damage": 5.0,
+                        "knockbackAngle": -70.0,
+                        "knockbackPowerBase": 5.0,
                         "knockbackPowerGrowth": 5.0,
                         "hitstunAdjustment": 0.0,
                         "isGrabBox": false,
@@ -58,7 +58,7 @@
                 ]
             },
             {
-                "time": 0.13600000739097596,
+                "time": 0.07599999755620957,
                 "changes": [
                     {
                         "index": 0,

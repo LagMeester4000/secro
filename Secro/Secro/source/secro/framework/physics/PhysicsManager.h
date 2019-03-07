@@ -21,6 +21,9 @@ namespace secro {
 		//for debugging purposes
 		void debugRender(sf::RenderWindow& window);
 
+		//add a stage collider
+		void addStageCollider(b2Vec2 position, b2Vec2 size, bool isPlatform = false);
+
 		//make a player body
 		b2Body* makePlayerBody();
 

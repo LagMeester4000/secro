@@ -16,26 +16,28 @@ secro::PlayerCharacter::PlayerCharacter()
 {
 }
 
-secro::PlayerCharacter::PlayerCharacter(HitboxManager* hitboxM, b2Body * body, std::shared_ptr<Controller> controller)
+secro::PlayerCharacter::PlayerCharacter(Level* levell, HitboxManager* hitboxM, b2Body * body, std::shared_ptr<Controller> controller)
 {
 	hitboxManager = hitboxM;
 	physicsBody = body;
 	input = controller;
 	facingDirection = FacingDirection::Right;
+	level = levell;
 }
 
-void secro::PlayerCharacter::lateSetup(HitboxManager * hitboxM, b2Body * body, std::shared_ptr<Controller> controller)
+void secro::PlayerCharacter::lateSetup(Level* levell, HitboxManager * hitboxM, b2Body * body, std::shared_ptr<Controller> controller)
 {
 	hitboxManager = hitboxM;
 	physicsBody = body;
 	input = controller;
 	facingDirection = FacingDirection::Right;
+	level = levell;
 }
 
 void secro::PlayerCharacter::init()
 {
 	//walking deadzone
-	walkDeadzone = 10.f;
+	walkDeadzone = 30.f;
 
 	//setup testing attributes
 	auto& a = attributes;
@@ -176,7 +178,7 @@ void secro::PlayerCharacter::setupStates(StateMachine & sm)
 		auto joy = input->getMovement();
 		bool oldCond = smash.speed <= 30.f && ((mov == Direction::Left) || (mov == Direction::Right));
 		bool upDown = (mov != Direction::Up && mov != Direction::Down);
-		return oldCond || (upDown && abs(joy.x) > getWalkDeadzone() && smash.speed <= 30.f);
+		return /*oldCond ||*/ (upDown && abs(joy.x) > getWalkDeadzone() && smash.speed <= 30.f);
 	});
 	sm.addCondition(PlayerState::Walk, PlayerState::Stand, [&](float f)
 	{
@@ -191,7 +193,7 @@ void secro::PlayerCharacter::setupStates(StateMachine & sm)
 		auto mov = input->getMovementDirection();
 		auto smash = input->getMovementPushDirectionExt();
 		auto face = getFacingDirection();
-		return smash.speed > 30.f;// && ((mov == Direction::Left && face == FacingDirection::Right) || (mov == Direction::Right && face == FacingDirection::Left));
+		return smash.speed > 20.f && (mov == Direction::Left || mov == Direction::Right); // && ((mov == Direction::Left && face == FacingDirection::Right) || (mov == Direction::Right && face == FacingDirection::Left));
 	});
 	sm.addSetState(PlayerState::Walk, std::bind(&PlayerCharacter::stateStartWalk, this));
 
@@ -199,7 +201,11 @@ void secro::PlayerCharacter::setupStates(StateMachine & sm)
 	//attacks
 	auto endAerialA = [&](float f)
 	{
-		return getMovementState() == MovementState::OnGround || IsStateTimerDone();
+		return getMovementState() == MovementState::OnGround;
+	};
+	auto endAerialAir = [&](float f)
+	{
+		return getMovementState() == MovementState::InAir && IsStateTimerDone();
 	};
 	//nair
 	sm.addCondition(PlayerState::Jump, PlayerState::ANAir, [&](float f)
@@ -211,6 +217,7 @@ void secro::PlayerCharacter::setupStates(StateMachine & sm)
 	sm.addSetState(PlayerState::ANAir, std::bind(&PlayerCharacter::stateStartNewAttack, this, PlayerState::ANAir));
 	sm.addUnsetState(PlayerState::ANAir, std::bind(&PlayerCharacter::endAttack, this));
 	sm.addCondition(PlayerState::ANAir, PlayerState::LandingLag, endAerialA);
+	sm.addCondition(PlayerState::ANAir, PlayerState::Jump, endAerialAir);
 	//uair
 	sm.addCondition(PlayerState::Jump, PlayerState::AUAir, [&](float f)
 	{
@@ -222,6 +229,7 @@ void secro::PlayerCharacter::setupStates(StateMachine & sm)
 	sm.addSetState(PlayerState::AUAir, std::bind(&PlayerCharacter::stateStartNewAttack, this, PlayerState::AUAir));
 	sm.addUnsetState(PlayerState::AUAir, std::bind(&PlayerCharacter::endAttack, this));
 	sm.addCondition(PlayerState::AUAir, PlayerState::LandingLag, endAerialA);
+	sm.addCondition(PlayerState::AUAir, PlayerState::Jump, endAerialAir);
 	//fair
 	sm.addCondition(PlayerState::Jump, PlayerState::AFAir, [&](float f)
 	{
@@ -233,6 +241,7 @@ void secro::PlayerCharacter::setupStates(StateMachine & sm)
 	sm.addSetState(PlayerState::AFAir, std::bind(&PlayerCharacter::stateStartNewAttack, this, PlayerState::AFAir));
 	sm.addUnsetState(PlayerState::AFAir, std::bind(&PlayerCharacter::endAttack, this));
 	sm.addCondition(PlayerState::AFAir, PlayerState::LandingLag, endAerialA);
+	sm.addCondition(PlayerState::AFAir, PlayerState::Jump, endAerialAir);
 	//bair
 	sm.addCondition(PlayerState::Jump, PlayerState::ABAir, [&](float f)
 	{
@@ -244,6 +253,7 @@ void secro::PlayerCharacter::setupStates(StateMachine & sm)
 	sm.addSetState(PlayerState::ABAir, std::bind(&PlayerCharacter::stateStartNewAttack, this, PlayerState::ABAir));
 	sm.addUnsetState(PlayerState::ABAir, std::bind(&PlayerCharacter::endAttack, this));
 	sm.addCondition(PlayerState::ABAir, PlayerState::LandingLag, endAerialA);
+	sm.addCondition(PlayerState::ABAir, PlayerState::Jump, endAerialAir);
 	//dair
 	sm.addCondition(PlayerState::Jump, PlayerState::ADAir, [&](float f)
 	{
@@ -255,11 +265,26 @@ void secro::PlayerCharacter::setupStates(StateMachine & sm)
 	sm.addSetState(PlayerState::ADAir, std::bind(&PlayerCharacter::stateStartNewAttack, this, PlayerState::ADAir));
 	sm.addUnsetState(PlayerState::ADAir, std::bind(&PlayerCharacter::endAttack, this));
 	sm.addCondition(PlayerState::ADAir, PlayerState::LandingLag, endAerialA);
+	sm.addCondition(PlayerState::ADAir, PlayerState::Jump, endAerialAir);
 
 	//ground attacks
 	auto endGroundAttack = [&](float f) {
 		return IsStateTimerDone();
 	};
+	//jab
+	auto JabAttack = [&](float f)
+	{
+		auto input = getInput();
+		auto dir = input->getMovementDirection();
+		auto aDir = input->getDirAttackDirection();
+		return (dir == Direction::Neutral && input->attackPressed());
+	};
+	sm.addCondition(PlayerState::Stand, PlayerState::AJab, JabAttack);
+	sm.addCondition(PlayerState::Walk, PlayerState::AJab, JabAttack);
+	sm.addCondition(PlayerState::Run, PlayerState::AJab, JabAttack);
+	sm.addSetState(PlayerState::AJab, std::bind(&PlayerCharacter::stateStartNewAttack, this, PlayerState::AJab));
+	sm.addUnsetState(PlayerState::AJab, std::bind(&PlayerCharacter::endAttack, this));
+	sm.addCondition(PlayerState::AJab, PlayerState::Stand, endGroundAttack);
 	//utilt
 	auto UTiltAttack = [&](float f)
 	{
@@ -331,6 +356,7 @@ void secro::PlayerCharacter::setupStates(StateMachine & sm)
 	sm.addSetState(PlayerState::AGrabAir, std::bind(&PlayerCharacter::stateStartNewAttack, this, PlayerState::AGrabAir));
 	sm.addUnsetState(PlayerState::AGrabAir, std::bind(&PlayerCharacter::endAttack, this));
 	sm.addCondition(PlayerState::AGrabAir, PlayerState::LandingLag, endAerialA);
+	sm.addCondition(PlayerState::AGrabAir, PlayerState::Jump, endAerialAir);
 
 
 	//landing lag
@@ -542,15 +568,18 @@ b2Vec2 secro::PlayerCharacter::getPosition()
 	return physicsBody->GetPosition();
 }
 
-void secro::PlayerCharacter::setPosition(b2Vec2 pos)
+void secro::PlayerCharacter::setPosition(b2Vec2 pos, bool resetVelocity)
 {
 	physicsBody->SetTransform(pos, 0.f);
+	if (resetVelocity)
+		physicsBody->SetLinearVelocity({ 0.f, 0.f });
 }
 
 void secro::PlayerCharacter::reset(b2Vec2 position)
 {
 	damage = debugDamage;
 	physicsBody->SetTransform(position, 0.f);
+	physicsBody->SetLinearVelocity({ 0.f, 0.f });
 }
 
 void secro::PlayerCharacter::freeze()
@@ -745,7 +774,7 @@ void secro::PlayerCharacter::updateMovement(float deltaTime)
 			if (canSlideOffPlatforms)
 			{
 				movementState = MovementState::InAir;
-				stateMachine.unsafeChangeState(this, PlayerState::Jump, deltaTime);
+				stateMachine.changeState(this, PlayerState::Jump, deltaTime);
 			}
 			else //put the character back on the platform 
 			{
@@ -844,6 +873,9 @@ bool secro::PlayerCharacter::keepRunning()
 	if (abs(joy.x) < walkDeadzone)
 		return false;
 
+	if (state == PlayerState::Stand)
+		return false;
+
 	FacingDirection face;
 	if (joy.x > 0.f)
 		face = FacingDirection::Right;
@@ -906,13 +938,13 @@ void secro::PlayerCharacter::stateEndDash()
 
 void secro::PlayerCharacter::stateStartWalk()
 {
-	auto dir = input->getMovementDirection();
+	auto dir = input->getMovement();
 
-	if (dir == Direction::Left)
+	if (dir.x < 0.f)
 	{
 		facingDirection = FacingDirection::Left;
 	}
-	else if (dir == Direction::Right)
+	else if (dir.x >= 0.f)
 	{
 		facingDirection = FacingDirection::Right;
 	}

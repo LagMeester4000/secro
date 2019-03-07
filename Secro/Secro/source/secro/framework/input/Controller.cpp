@@ -91,10 +91,11 @@ bool secro::Controller::jumpReleased() const
 	return !current().jumpButton && prev().jumpButton;
 }
 
-secro::Controller::Controller(int index, bool keyboard)
+secro::Controller::Controller(int playerIndexx, int index, bool keyboard)
 {
 	controllerIndex = index;
 	useKeyboard = keyboard;
+	playerIndex = playerIndexx;
 }
 
 void secro::Controller::swapBack()
@@ -177,6 +178,11 @@ bool secro::Controller::findButton(ButtonIndex & button)
 	return false;
 }
 
+int secro::Controller::getPlayerIndex()
+{
+	return playerIndex;
+}
+
 secro::Controller::Input& secro::Controller::current()
 {
 	return inputs[0];
@@ -207,14 +213,14 @@ const secro::Controller::Input & secro::Controller::prev() const
 	return inputs[1];
 }
 
-std::shared_ptr<Controller> secro::Controller::createController(int index, bool keyboard)
+std::shared_ptr<Controller> secro::Controller::createController(int playerIndex, int index, bool keyboard)
 {
 	class make_shared_enabler : public Controller {
 	public:
-		make_shared_enabler(int index, bool keyboard) : Controller(index, keyboard) {}
+		make_shared_enabler(int playerIndex, int index, bool keyboard) : Controller(playerIndex, index, keyboard) {}
 	};
 
-	return std::make_shared<make_shared_enabler>(index, keyboard);
+	return std::make_shared<make_shared_enabler>(playerIndex, index, keyboard);
 }
 
 void secro::Controller::interceptController(std::function<void(Input&)> function)

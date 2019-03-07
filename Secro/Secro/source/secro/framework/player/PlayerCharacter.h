@@ -17,13 +17,14 @@ namespace secro {
 	class Controller;
 	class HitboxCollection;
 	class HitboxManager;
+	class Level;
 
 	class PlayerCharacter : public Entity {
 		friend class StateMachine;
 	public:
 		PlayerCharacter();
-		PlayerCharacter(HitboxManager* hitboxManager, b2Body* body, std::shared_ptr<Controller> controller);
-		void lateSetup(HitboxManager* hitboxManager, b2Body* body, std::shared_ptr<Controller> controller);
+		PlayerCharacter(Level* level, HitboxManager* hitboxManager, b2Body* body, std::shared_ptr<Controller> controller);
+		void lateSetup(Level* level, HitboxManager* hitboxManager, b2Body* body, std::shared_ptr<Controller> controller);
 
 		virtual void init();
 		virtual void setupStates(StateMachine& stateMachine);
@@ -32,9 +33,12 @@ namespace secro {
 		virtual void render(sf::RenderWindow& window);
 
 		b2Vec2 getPosition() override;
-		void setPosition(b2Vec2 pos);
+		void setPosition(b2Vec2 pos, bool resetVelocity = false);
 		void reset(b2Vec2 position);
 		void freeze();
+
+	protected: //essentials
+		Level* level;
 
 	private: //movement
 		void updateMovement(float deltaTime);

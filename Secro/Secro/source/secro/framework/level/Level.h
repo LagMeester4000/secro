@@ -2,6 +2,7 @@
 #include "secro/framework/physics/PhysicsManager.h"
 #include "secro/framework/collision/HitboxManager.h"
 #include "secro/gameplay/Camera.h"
+#include "secro/framework/graphics/ParticleSystem.h"
 #include <vector>
 #include <memory>
 
@@ -18,6 +19,7 @@ namespace secro {
 	class Level {
 	public:
 		Level(std::shared_ptr<InputManager> input);
+		virtual ~Level() {}
 
 		//start the level
 		//called after all players have been added
@@ -29,6 +31,7 @@ namespace secro {
 
 		//render the stage, players, ui, and anything else
 		virtual void render(sf::RenderWindow& window);
+		void cameraRender(sf::RenderWindow& window);
 
 		//adds a player to the level
 		//called from the game/menu select
@@ -41,10 +44,14 @@ namespace secro {
 		//returns the player who won
 		virtual std::shared_ptr<PlayerCharacter> getWinningPlayer();
 
-	private:
+		//get the particle system
+		ParticleSystem& getParticleSystem();
+
+	protected:
 		PhysicsManager physicsManager;
 		std::shared_ptr<InputManager> inputManager;
 		HitboxManager hitboxManager;
+		ParticleSystem particleSystem;
 		Camera camera;
 
 		//entities

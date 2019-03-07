@@ -38,7 +38,8 @@ void secro::Camera::render(sf::RenderWindow & window)
 
 	if (firstRun)
 	{
-		screenSize = view.getSize();
+		//screenSize = view.getSize();
+		screenSize = { 31.6f, 20.f };
 		firstRun = false;
 	}
 

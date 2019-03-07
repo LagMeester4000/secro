@@ -3,8 +3,8 @@
 #include <Box2D/Box2D.h>
 #include <functional>
 
-secro::CharacterDashetteP2::CharacterDashetteP2(HitboxManager * hitboxManager, b2Body * body, std::shared_ptr<Controller> controller)
-	: PlayerCharacter(hitboxManager, body, controller)
+secro::CharacterDashetteP2::CharacterDashetteP2(Level* level, HitboxManager * hitboxManager, b2Body * body, std::shared_ptr<Controller> controller)
+	: PlayerCharacter(level, hitboxManager, body, controller)
 {
 }
 

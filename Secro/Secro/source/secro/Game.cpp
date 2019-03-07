@@ -6,6 +6,7 @@
 #include "framework/GameplaySettings.h"
 #include "gameplay/characters/CharacterDashette.h"
 #include "gameplay/characters/CharacterDashetteP2.h"
+#include "gameplay/level/BridgeLevel.h"
 
 //ui
 #include "framework/ui/UIElement.h"
@@ -28,53 +29,127 @@ std::shared_ptr<Game> secro::Game::createGame(std::shared_ptr<InputManager> inpu
 }
 
 secro::Game::Game(std::shared_ptr<InputManager> input)
-	: inputManager(input)
+	: inputManager(input), ui(this)
 {
+	//set starting state
+	gameState = GameState::MainMenu;
+
+	//initialize input
 	inputManager->init(2);
 
+	//set up the stage
+	auto newLevel = std::make_shared<RingOutLevel>(inputManager);
+	level = newLevel;
+	newLevel->boundsMax = { 20.f, 20.f };
+	newLevel->boundsMin = { -20.f, -20.f };
+	newLevel->stockAmount = 4;
+
 	//set up the players
-	playerManager.addPlayer(new CharacterDashette(&hitboxManager, physicsManager.getPlayerBody(0), inputManager->getController(0)));
-	auto* secondPlayer = new CharacterDashette(&hitboxManager, physicsManager.getPlayerBody(1), inputManager->getController(1));
-	playerManager.addPlayer(secondPlayer);
+	level->addPlayer(std::make_shared<CharacterDashette>());
+	level->addPlayer(std::make_shared<CharacterDashette>());
+
+	//initialize the level
+	level->init();
 
 	//hack the input
 	//inputBot = new InputTestBot(secondPlayer, *inputManager.getController(1), 1);
-
-	//set up the stage
-	playerManager.setStageSize(20.f, 20.f);
 
 	DebugOptions::init();
 
 	if (!uiFont.loadFromFile("LemonMilk.otf"))
 		std::cout << "could not load font" << std::endl;
 
-	//set death animation values
-	deathTimer = -1.f;
-	deathSpeed = 0.5f;
-	deathDuration = 3.f;
-	dtScalar = 1.f;
-
-
 	//UI
 	std::shared_ptr<UIMenu> uiBase = std::make_shared<UIMenu>();
+	uiBase->visableWhenNotOnTop = false;
+	std::shared_ptr<UIMenu> uiLevelSelect = std::make_shared<UIMenu>();
 	ui.pushTopFrame(uiBase);
+	sf::View view({ 0.f, 0.f }, { 1000.f, 1000.f });
+	ui.setView(view);
 
-	{
+	{//base ui
 		//buttons
 		std::shared_ptr<UISimpleButton> button1 = std::make_shared<UISimpleButton>();
 		button1->font = uiFont;
-		button1->text = "play";
+		button1->text = "Play";
+		button1->fontSize = 120.f;
+		button1->transform.position = { -300.f, -150.f };
+		button1->size = { 600.f, 200.f };
+		auto& state = gameState;
+		button1->onPressed = [=]()
+		{
+			ui.pushTopFrame(uiLevelSelect);
+		};
 
 		std::shared_ptr<UISimpleButton> button2 = std::make_shared<UISimpleButton>();
 		button2->font = uiFont;
-		button2->text = "options";
-		button2->transform.position.y = 10.f;
+		button2->text = "Options";
+		button2->fontSize = 100.f;
+		button2->transform.position = { -300.f, 150.f };
+		button2->size = { 600.f, 200.f };
 
 		button1->downElement = &*button2;
 		button2->upElement = &*button1;
 
 		uiBase->addSelectable(button1);
 		uiBase->addSelectable(button2);
+	}
+
+	{//level select
+		//buttons
+		std::shared_ptr<UISimpleButton> selectRingout = std::make_shared<UISimpleButton>();
+		selectRingout->font = uiFont;
+		selectRingout->text = "Ring Out";
+		selectRingout->fontSize = 120.f;
+		selectRingout->transform.position = { -300.f, -400.f };
+		selectRingout->size = { 600.f, 200.f };
+		auto& state = gameState;
+		selectRingout->onPressed = [&]()
+		{
+			//set up the stage
+			auto newLevel = std::make_shared<RingOutLevel>(inputManager);
+			level = newLevel;
+			newLevel->boundsMax = { 20.f, 20.f };
+			newLevel->boundsMin = { -20.f, -20.f };
+			newLevel->stockAmount = 4;
+			startLevel(newLevel, 2);
+		};
+
+		std::shared_ptr<UISimpleButton> selectBridge = std::make_shared<UISimpleButton>();
+		selectBridge->font = uiFont;
+		selectBridge->text = "Cross bridge";
+		selectBridge->fontSize = 120.f;
+		selectBridge->transform.position = { -300.f, -100.f };
+		selectBridge->size = { 600.f, 200.f };
+		selectBridge->onPressed = [&]()
+		{
+			//set up the stage
+			auto newLevel = std::make_shared<BridgeLevel>(inputManager);
+			level = newLevel;
+			newLevel->bounds = { 10.f, 20.f };
+			newLevel->pointAmount = 5;
+			startLevel(newLevel, 2);
+		};
+
+		std::shared_ptr<UISimpleButton> backButton = std::make_shared<UISimpleButton>();
+		backButton->font = uiFont;
+		backButton->text = "Back";
+		backButton->fontSize = 100.f;
+		backButton->transform.position = { -300.f, 200.f };
+		backButton->size = { 600.f, 200.f };
+		backButton->onPressed = [&]()
+		{
+			ui.popTopFrame();
+		};
+
+		selectRingout->downElement = &*selectBridge;
+		selectBridge->upElement = &*selectRingout;
+		selectBridge->downElement = &*backButton;
+		backButton->upElement = &*selectBridge;
+
+		uiLevelSelect->addSelectable(selectRingout);
+		uiLevelSelect->addSelectable(selectBridge);
+		uiLevelSelect->addSelectable(backButton);
 	}
 }
 
@@ -83,41 +158,52 @@ secro::Game::Game(std::shared_ptr<InputManager> input)
 
 void secro::Game::update(float deltaTime)
 {
-	updateDeath(deltaTime);
 	inputManager->update();//netplay change
-	playerManager.update(deltaTime * dtScalar);
-	physicsManager.update(deltaTime * dtScalar);
-	hitboxManager.update(deltaTime * dtScalar);
 
-	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Z))
+	switch (gameState)
 	{
-		physicsManager.getPlayerBody(0)->SetTransform(b2Vec2(-5.f, -2.f), 0.f);
-		physicsManager.getPlayerBody(1)->SetTransform(b2Vec2(5.f, -2.f), 0.f);
+	case GameState::MainMenu:
+	{
+		ui.update(deltaTime);
+		ui.handleInput(*inputManager->getController(0));
+	} break;
+	case GameState::Gameplay:
+	{
+		level->update(deltaTime);
+		if (level->isGameOver())
+		{
+			gameState = GameState::MainMenu;
+		}
+		if (level->isGameOver())
+		{
+			gameState = GameState::MainMenu;
+		}
+	} break;
 	}
-	
-	//update the camera
-	std::vector<PlayerCharacter*> players { playerManager.getPlayer(0), playerManager.getPlayer(1) };
-	camera.update(deltaTime * dtScalar, players);
 
 	//update the debug menu
 	DebugOptions::update(deltaTime);
-
-	//update the ui
-	ui.update(deltaTime);
-	ui.handleInput(*inputManager->getController(0));
 }
 
 void secro::Game::render(sf::RenderWindow & window)
 {
-	physicsManager.debugRender(window);
-	playerManager.render(window);
+	switch (gameState)
+	{
+	case GameState::MainMenu:
+	{
+		//render ui
+		ui.render(window);
+	} break;
+	case GameState::Gameplay:
+	{
+		//render gameplay
+		level->render(window);
+	} break;
+	}
+
 
 	//TEMP
 	c.renderFrameDataEditor(window);
-	hitboxManager.render(window);
-
-	//camera
-	camera.render(window);
 
 	//render the debug menu
 	DebugOptions::render(window);
@@ -127,70 +213,14 @@ void secro::Game::render(sf::RenderWindow & window)
 
 	//render the input bot
 	//inputBot->render();
-
-	//render the score UI
-	renderScores(window);
-
-	//render ui
-	ui.render(window);
 }
 
-void secro::Game::renderScores(sf::RenderWindow & window)
+void secro::Game::startLevel(std::shared_ptr<Level> level, int amountOfPlayers)
 {
-	//capture the view and make a new one
-	auto resetView = window.getView();
-	sf::View view(sf::FloatRect{ 0.f, 0.f, 1920.f, 1080.f });
-	window.setView(view);
-
-	for (size_t i = 0; i < playerManager.size(); ++i)
+	for (int i = 0; i < amountOfPlayers; ++i)
 	{
-		auto& p = playerManager[i];
-		renderScore(window, { 640.f + 400.f * (float)i, 900.f }, &*p.player, p.stocks);
+		level->addPlayer(std::make_shared<CharacterDashette>());
 	}
-
-	//reset the view
-	window.setView(resetView);
-}
-
-void secro::Game::renderScore(sf::RenderWindow & window, sf::Vector2f position, PlayerCharacter * player, int stocks)
-{
-	float textSize = 115.f;
-	float stockSize = 25.f;
-	float padding = 20.f;
-	float stockPadding = 10.f;
-
-	sf::Text text;
-	text.setFont(uiFont);
-	text.setString(std::to_string((int)player->getDamage()) + "%");
-	text.setCharacterSize((unsigned int)textSize);
-	text.setFillColor(sf::Color::White);
-	text.setPosition(position);
-	window.draw(text);
-
-	for (int i = 0; i < stocks; ++i)
-	{
-		sf::CircleShape stock(stockSize);
-		stock.setPosition(position + sf::Vector2f((stockSize * 2.f + stockPadding) * (float)i, textSize / 2.f + stockSize + padding + stockSize));
-		stock.setFillColor(sf::Color::Red);
-		window.draw(stock);
-	}
-}
-
-void secro::Game::updateDeath(float deltaTime)
-{
-	if (playerManager.isGameDone() && dtScalar == 1.f)
-	{
-		dtScalar = deathSpeed;
-		deathTimer = deathDuration;
-	}
-
-	if (deathTimer >= 0.f)
-	{
-		deathTimer -= deltaTime;
-		if (deathTimer < 0.f)
-		{
-			dtScalar = 1.f;
-			playerManager.resetGame();
-		}
-	}
+	level->init();
+	gameState = GameState::Gameplay;
 }

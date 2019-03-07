@@ -6,7 +6,8 @@
 namespace secro {
 	class CharacterDashette : public PlayerCharacter {
 	public:
-		CharacterDashette(HitboxManager* hitboxManager, b2Body* body, std::shared_ptr<Controller> controller);
+		CharacterDashette(Level* level, HitboxManager* hitboxManager, b2Body* body, std::shared_ptr<Controller> controller);
+		CharacterDashette();
 
 		void init() override;
 		void setupStates(StateMachine& stateMachine) override;
@@ -44,6 +45,7 @@ namespace secro {
 		Animation animStand;
 		Animation animDash;
 		Animation animRun;
+		Animation animWalk;
 		Animation animJumpSquat;
 		Animation animInAir;
 		Animation animHitstun;
@@ -55,14 +57,22 @@ namespace secro {
 		Animation animFAir;
 		Animation animDAir;
 		Animation animBAir;
+		Animation animJab;
 		Animation animDTilt;
 		Animation animFTilt;
 		Animation animUTilt;
 		Animation animGrab;
 
+		//particles
+		Animation particleDash;
+		Animation particleJump;
 
-	private:
-		void addFrames(int amount, Animation& animation);
-		void loadAnimation(std::string fileName, int frames, bool loop, float speed, Animation& animation);
+
+	public:
+		static void addFrames(int amount, Animation& animation);
+		static void loadAnimation(std::string fileName, int frames, bool loop, float speed, Animation& animation);
+		
+		static void addFrames(float width, float height, int amount, Animation& animation);
+		static void loadAnimation(std::string fileName, float width, float height, int frames, bool loop, float speed, Animation& animation);
 	};
 }

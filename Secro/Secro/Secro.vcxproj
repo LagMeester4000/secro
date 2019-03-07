@@ -94,6 +94,8 @@
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
       <AdditionalIncludeDirectories>$(SolutionDir)./cereal/include/;$(ProjectDir)./source/;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <LanguageStandard>stdcpplatest</LanguageStandard>
+      <PreprocessorDefinitions>_SILENCE_ALL_CXX17_DEPRECATION_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
       <AdditionalDependencies>opengl32.lib;%(AdditionalDependencies)</AdditionalDependencies>
@@ -124,6 +126,8 @@
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
       <AdditionalIncludeDirectories>$(SolutionDir)./cereal/include/;$(ProjectDir)./source/;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <LanguageStandard>stdcpplatest</LanguageStandard>
+      <PreprocessorDefinitions>_SILENCE_ALL_CXX17_DEPRECATION_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
@@ -154,6 +158,8 @@
     <ClInclude Include="source\secro\framework\GameplaySettings.h" />
     <ClInclude Include="source\secro\framework\graphics\AnimatedSprite.h" />
     <ClInclude Include="source\secro\framework\graphics\Animation.h" />
+    <ClInclude Include="source\secro\framework\graphics\Particle.h" />
+    <ClInclude Include="source\secro\framework\graphics\ParticleSystem.h" />
     <ClInclude Include="source\secro\framework\input\Controller.h" />
     <ClInclude Include="source\secro\framework\input\ControllerSettings.h" />
     <ClInclude Include="source\secro\framework\input\InputManager.h" />
@@ -170,6 +176,7 @@
     <ClInclude Include="source\secro\framework\player\PlayerState.h" />
     <ClInclude Include="source\secro\framework\player\StateMachine.h" />
     <ClInclude Include="source\secro\framework\player\Timeline.h" />
+    <ClInclude Include="source\secro\framework\resource\ResourceManager.h" />
     <ClInclude Include="source\secro\framework\ui\UIButton.h" />
     <ClInclude Include="source\secro\framework\ui\UICursor.h" />
     <ClInclude Include="source\secro\framework\ui\UICursorButton.h" />
@@ -185,6 +192,8 @@
     <ClInclude Include="source\secro\gameplay\Camera.h" />
     <ClInclude Include="source\secro\gameplay\characters\CharacterDashette.h" />
     <ClInclude Include="source\secro\gameplay\characters\CharacterDashetteP2.h" />
+    <ClInclude Include="source\secro\gameplay\level\BridgeLevel.h" />
+    <ClInclude Include="source\secro\gameplay\level\RingOutLevel.h" />
     <ClInclude Include="source\secro\gameplay\PlayerManager.h" />
     <ClInclude Include="source\secro\gameplay\Rules.h" />
     <ClInclude Include="source\secro\IGame.h" />
@@ -207,6 +216,8 @@
     <ClCompile Include="source\secro\framework\GameplaySettings.cpp" />
     <ClCompile Include="source\secro\framework\graphics\AnimatedSprite.cpp" />
     <ClCompile Include="source\secro\framework\graphics\Animation.cpp" />
+    <ClCompile Include="source\secro\framework\graphics\Particle.cpp" />
+    <ClCompile Include="source\secro\framework\graphics\ParticleSystem.cpp" />
     <ClCompile Include="source\secro\framework\input\Controller.cpp" />
     <ClCompile Include="source\secro\framework\input\InputManager.cpp" />
     <ClCompile Include="source\secro\framework\input\InputTestBot.cpp" />
@@ -230,6 +241,8 @@
     <ClCompile Include="source\secro\gameplay\Camera.cpp" />
     <ClCompile Include="source\secro\gameplay\characters\CharacterDashette.cpp" />
     <ClCompile Include="source\secro\gameplay\characters\CharacterDashetteP2.cpp" />
+    <ClCompile Include="source\secro\gameplay\level\BridgeLevel.cpp" />
+    <ClCompile Include="source\secro\gameplay\level\RingOutLevel.cpp" />
     <ClCompile Include="source\secro\gameplay\PlayerManager.cpp" />
     <ClCompile Include="source\secro\main.cpp" />
     <ClCompile Include="source\secro\netplay\InputPacket.cpp" />

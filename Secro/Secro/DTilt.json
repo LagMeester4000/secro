@@ -1,14 +1,14 @@
 {
     "value0": {
         "amountOfHitboxes": 2,
-        "duration": 0.4000000059604645,
+        "duration": 0.20000000298023225,
         "landingLag": 0.0,
         "frames": [
             {
                 "time": 0.0,
                 "changes": [
                     {
-                        "cereal_class_version": 1,
+                        "cereal_class_version": 2,
                         "index": 0,
                         "position": {
                             "x": 0.0,
@@ -26,7 +26,8 @@
                         "knockbackPowerBase": 1.0,
                         "knockbackPowerGrowth": 1.0,
                         "hitstunAdjustment": 0.0,
-                        "isGrabBox": false
+                        "isGrabBox": false,
+                        "isShieldBox": false
                     },
                     {
                         "index": 1,
@@ -46,7 +47,8 @@
                         "knockbackPowerBase": 1.0,
                         "knockbackPowerGrowth": 1.0,
                         "hitstunAdjustment": 0.0,
-                        "isGrabBox": false
+                        "isGrabBox": false,
+                        "isShieldBox": false
                     }
                 ]
             },
@@ -71,7 +73,8 @@
                         "knockbackPowerBase": 14.0,
                         "knockbackPowerGrowth": 5.0,
                         "hitstunAdjustment": 0.0,
-                        "isGrabBox": false
+                        "isGrabBox": false,
+                        "isShieldBox": false
                     },
                     {
                         "index": 1,
@@ -91,12 +94,13 @@
                         "knockbackPowerBase": 14.0,
                         "knockbackPowerGrowth": 5.0,
                         "hitstunAdjustment": 0.0,
-                        "isGrabBox": false
+                        "isGrabBox": false,
+                        "isShieldBox": false
                     }
                 ]
             },
             {
-                "time": 0.23199999332427979,
+                "time": 0.1770000010728836,
                 "changes": [
                     {
                         "index": 0,
@@ -116,7 +120,8 @@
                         "knockbackPowerBase": 1.0,
                         "knockbackPowerGrowth": 1.0,
                         "hitstunAdjustment": 0.0,
-                        "isGrabBox": false
+                        "isGrabBox": false,
+                        "isShieldBox": false
                     },
                     {
                         "index": 1,
@@ -136,7 +141,8 @@
                         "knockbackPowerBase": 1.0,
                         "knockbackPowerGrowth": 1.0,
                         "hitstunAdjustment": 0.0,
-                        "isGrabBox": false
+                        "isGrabBox": false,
+                        "isShieldBox": false
                     }
                 ]
             }

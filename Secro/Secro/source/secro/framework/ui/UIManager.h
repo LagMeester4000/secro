@@ -1,6 +1,7 @@
 #pragma once
 #include <vector>
 #include <memory>
+#include <SFML/Graphics/View.hpp>
 
 namespace sf {
 	class RenderWindow;
@@ -9,10 +10,11 @@ namespace sf {
 namespace secro {
 	class UIElement;
 	class Controller;
+	class Game;
 
 	class UIManager {
 	public:
-		UIManager();
+		UIManager(Game* game);
 
 		void update(float deltaTime);
 		
@@ -25,7 +27,13 @@ namespace secro {
 		
 		std::shared_ptr<UIElement> getTopFrame();
 
+		void setView(sf::View newView);
+
+		Game* getGame();
+
 	private:
 		std::vector<std::shared_ptr<UIElement>> frames;
+		sf::View view;
+		Game* game;
 	};
 }

@@ -22,7 +22,7 @@ void secro::InputManager::init(int amountOfControllers)
 			continue;
 
 		controllers.push_back(
-			Controller::createController(i, false)
+			Controller::createController(controllers.size(), i, false)
 		);
 
 		std::cout << "Registered controller (" << foundControllers - 1 << ") with index " << i << std::endl;

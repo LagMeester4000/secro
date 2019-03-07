@@ -1,12 +1,17 @@
 #include "CharacterDashette.h"
 #include "secro/framework/detail/PlainVectorMath.h"
+#include "secro/framework/level/Level.h"
 #include <Box2D/Box2D.h>
 #include <functional>
 #include <SFML/Graphics.hpp>
 #include <tuple>
 
-secro::CharacterDashette::CharacterDashette(HitboxManager * hitboxManager, b2Body * body, std::shared_ptr<Controller> controller)
-	: PlayerCharacter(hitboxManager, body, controller)
+secro::CharacterDashette::CharacterDashette(Level* level, HitboxManager * hitboxManager, b2Body * body, std::shared_ptr<Controller> controller)
+	: PlayerCharacter(level, hitboxManager, body, controller)
+{
+}
+
+secro::CharacterDashette::CharacterDashette()
 {
 }
 
@@ -26,7 +31,8 @@ void secro::CharacterDashette::init()
 
 
 	//load animations
-	loadAnimation("Dashette-Run.png", 7, true, 0.1f, animRun);
+	loadAnimation("Dashette-Run.png", 7, true, 0.06f, animRun);
+	loadAnimation("Dashette-Run.png", 7, true, 0.1f, animWalk);
 	loadAnimation("Dashette-groundDash.png", 1, true, 0.1f, animDash);
 	loadAnimation("Dashette-base.png", 1, true, 0.1f, animStand);
 	loadAnimation("Dashette-InAir.png", 1, true, 0.1f, animInAir);
@@ -36,12 +42,18 @@ void secro::CharacterDashette::init()
 	loadAnimation("Dashette-FAir.png", 2, false, 0.1f, animFAir);
 	loadAnimation("Dashette-DAir.png", 2, false, 0.1f, animDAir);
 	loadAnimation("Dashette-BAir.png", 2, false, 0.1f, animBAir);
+	loadAnimation("Dashette-Jab.png", 5, false, 0.05f, animJab);
 	loadAnimation("Dashette-DTilt.png", 5, false, 0.05f, animDTilt);
-	loadAnimation("Dashette-FTilt.png", 6, false, 0.05f, animFTilt);
+	loadAnimation("Dashette-FTilt.png", 6, false, 0.03f, animFTilt);
 	loadAnimation("Dashette-UTilt.png", 7, false, 0.05f, animUTilt);
 	loadAnimation("Dashette-Grab.png", 4, false, 0.05f, animGrab);
 	loadAnimation("Dashette-DAir.png", 1, false, 0.05f, animHitstun);
 	loadAnimation("Dashette-FreeFall.png", 1, false, 0.05f, animFreeFall);
+
+	//particles
+	loadAnimation("DashDust.png", 21.f, 15.f, 7, false, 0.02f, particleDash);
+	loadAnimation("JumpDust.png", 7, false, 0.02f, particleJump);
+
 	animatedSprite.setAnimation(animRun);
 	
 	//load shield
@@ -141,6 +153,10 @@ void secro::CharacterDashette::setupStates(StateMachine & sm)
 	sm.addSetState(PlayerState::Run, [&](float f)
 	{
 		animatedSprite.setAnimation(animRun);
+	}); 
+	sm.addSetState(PlayerState::Walk, [&](float f)
+	{
+		animatedSprite.setAnimation(animWalk);
 	});
 	sm.addSetState(PlayerState::Stand, [&](float f)
 	{
@@ -170,7 +186,11 @@ void secro::CharacterDashette::setupStates(StateMachine & sm)
 	sm.addSetState(PlayerState::ABAir, [&](float f)
 	{
 		animatedSprite.setAnimation(animBAir);
-	}); 
+	});
+	sm.addSetState(PlayerState::AJab, [&](float f)
+	{
+		animatedSprite.setAnimation(animJab);
+	});
 	sm.addSetState(PlayerState::ADTilt, [&](float f)
 	{
 		animatedSprite.setAnimation(animDTilt);
@@ -184,6 +204,10 @@ void secro::CharacterDashette::setupStates(StateMachine & sm)
 		animatedSprite.setAnimation(animUTilt);
 	});
 	sm.addSetState(PlayerState::AGrab, [&](float f)
+	{
+		animatedSprite.setAnimation(animGrab);
+	}); 
+	sm.addSetState(PlayerState::AGrabAir, [&](float f)
 	{
 		animatedSprite.setAnimation(animGrab);
 	});
@@ -200,6 +224,55 @@ void secro::CharacterDashette::setupStates(StateMachine & sm)
 		animatedSprite.setAnimation(animFreeFall);
 	});
 
+
+	//particles
+	auto* lev = level;
+	sm.addSetState(PlayerState::Dash, [=](float f) 
+	{
+		auto pos = getPosition();
+		auto& particle = lev->getParticleSystem().spawnParticle();
+		particle.animation.setAnimation(particleDash);
+		particle.animation.setOrigin({ 10.5f, 7.5f });
+		if (getFacingDirection() == FacingDirection::Left)
+		{
+			particle.animation.setScale({ -0.05f, 0.05f });
+			particle.animation.setPosition({ pos.x + 0.5f, pos.y + 0.5f });
+		}
+		else
+		{
+			particle.animation.setScale({ 0.05f, 0.05f });
+			particle.animation.setPosition({ pos.x - 0.5f, pos.y + 0.5f });
+		}
+	});
+	sm.addSetState(PlayerState::JumpSquat, [=](float f)
+	{
+		auto pos = getPosition();
+		auto& particle = lev->getParticleSystem().spawnParticle();
+		particle.animation.setAnimation(particleJump);
+		particle.animation.setOrigin({ 32.f, 32.f });
+		particle.animation.setScale({ 0.03f, 0.03f });
+		particle.animation.setPosition({ pos.x, pos.y + 0.65f });
+	});
+	sm.addSetState(PlayerState::LandingLag, [=](float f)
+	{
+		{
+			auto pos = getPosition();
+			auto& particle = lev->getParticleSystem().spawnParticle();
+			particle.animation.setAnimation(particleDash);
+			particle.animation.setOrigin({ 10.5f, 7.5f });
+			particle.animation.setScale({ 0.04f, 0.04f });
+			particle.animation.setPosition({ pos.x - 0.5f, pos.y + 0.6f });
+		}
+		{
+			auto pos = getPosition();
+			auto& particle = lev->getParticleSystem().spawnParticle();
+			particle.animation.setAnimation(particleDash);
+			particle.animation.setOrigin({ 10.5f, 7.5f });
+			particle.animation.setScale({ -0.04f, 0.04f });
+			particle.animation.setPosition({ pos.x + 0.5f, pos.y + 0.6f });
+		}
+
+	});
 }
 
 void secro::CharacterDashette::setupAttacks(AttackCollection & atts)
@@ -212,6 +285,7 @@ void secro::CharacterDashette::setupAttacks(AttackCollection & atts)
 	atts.loadAttack("BAir.json", PlayerState::ABAir);
 	atts.loadAttack("D_DAir.json", PlayerState::ADAir);
 
+	atts.loadAttack("D_Jab.json", PlayerState::AJab);
 	atts.loadAttack("D_UTilt.json", PlayerState::AUTilt);
 	atts.loadAttack("FTilt.json", PlayerState::AFTilt);
 	atts.loadAttack("DTilt.json", PlayerState::ADTilt);
@@ -223,7 +297,9 @@ void secro::CharacterDashette::setupAttacks(AttackCollection & atts)
 void secro::CharacterDashette::update(float deltaTime)
 {
 	PlayerCharacter::update(deltaTime);
-	animatedSprite.update(sf::seconds(deltaTime));
+
+	if (!isInHitlag())
+		animatedSprite.update(sf::seconds(deltaTime));
 
 	if (movementState == MovementState::OnGround)
 	{
@@ -240,9 +316,11 @@ void secro::CharacterDashette::render(sf::RenderWindow & window)
 		scale = -1.f;
 
 	auto pos = physicsBody->GetPosition();
-	animatedSprite.setPosition(pos.x, pos.y + 0.15f);
+	animatedSprite.setPosition(pos.x, pos.y + 0.20f);
 	animatedSprite.setScale(sf::Vector2f(0.05f * scale, 0.05f));
 	animatedSprite.setOrigin(32.f, 32.f);
+	if (input->getPlayerIndex() == 1)
+		animatedSprite.setColor(sf::Color(255, 122, 122));
 	window.draw(animatedSprite);
 
 	if (getState() == PlayerState::Shield)
@@ -344,6 +422,29 @@ void secro::CharacterDashette::loadAnimation(std::string fileName, int frames, b
 	}
 	animation.setSpriteSheet(*tex);
 	addFrames(frames, animation);
+	animation.setLoops(loop);
+	animation.setSpeed(speed);
+}
+
+void secro::CharacterDashette::addFrames(float width, float height, int amount, Animation & animation)
+{
+	for (int i = 0; i < amount; ++i)
+	{
+		animation.addFrame(sf::IntRect(i * width, 0, width, height));
+	}
+}
+
+void secro::CharacterDashette::loadAnimation(std::string fileName, float width, float height, int frames, bool loop, float speed, Animation & animation)
+{
+	//TEMP
+	sf::Texture* tex = new sf::Texture();
+	if (!tex->loadFromFile(fileName))
+	{
+		std::cout << "could not load " << fileName << std::endl;
+		return;
+	}
+	animation.setSpriteSheet(*tex);
+	addFrames(width, height, frames, animation);
 	animation.setLoops(loop);
 	animation.setSpeed(speed);
 }

@@ -24,9 +24,10 @@ void secro::UISimpleButton::render(UITransform & transform, sf::RenderWindow & w
 		window.draw(rectangle);
 	}
 
-	sf::Text butText(text, font, 30.f * transform.scale.x);
+	sf::Text butText(text, font, fontSize * transform.scale.x);
 	butText.setPosition(transform.position);
-	sf::Vector2f textScale = { 0.01f, 0.01f };
-	butText.setScale(mul(transform.scale, textScale));
+	//sf::Vector2f textScale = { 1.f, 1.f };
+	//butText.setScale(mul(transform.scale, textScale));
+	butText.setScale(transform.scale);
 	window.draw(butText);
 }

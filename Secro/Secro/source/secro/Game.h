@@ -7,6 +7,7 @@
 #include "gameplay/Camera.h"
 #include "framework/input/InputTestBot.h"
 #include "framework/ui/UIManager.h"
+#include "gameplay/level/RingOutLevel.h"
 
 //TEMP
 #include "framework/collision/CollisionRenderer.h"
@@ -18,6 +19,11 @@ namespace sf {
 
 namespace secro {
 	class PlayerCharacter;
+
+	enum class GameState {
+		MainMenu,
+		Gameplay,
+	};
 
 	class Game {
 	public:
@@ -33,32 +39,22 @@ namespace secro {
 		//render the game
 		void render(sf::RenderWindow& window);
 
-	private:
-		void renderScores(sf::RenderWindow& window);
-		void renderScore(sf::RenderWindow& window, sf::Vector2f position, PlayerCharacter* player, int stocks);
+	public:
+		//start a level
+		void startLevel(std::shared_ptr<Level> level, int amountOfPlayers);
 
 	private:
-		PhysicsManager physicsManager;
 		std::shared_ptr<InputManager> inputManager;
-		PlayerManager playerManager;
-		HitboxManager hitboxManager;
-		Camera camera;
-
-	private: //debug
-		InputTestBot* inputBot;
+		std::shared_ptr<Level> level;
 
 	private: //TEMP
 		CollisionRenderer c;
 		sf::Font uiFont;
 
-	private: //death animation
-		void updateDeath(float deltaTime);
-		float dtScalar;
-		float deathSpeed;
-		float deathDuration;
-		float deathTimer;
-
 	private: //ui
 		UIManager ui;
+
+		//gamestate
+		GameState gameState;
 	};
 }

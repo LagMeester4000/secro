@@ -2,9 +2,11 @@
 #include "secro/framework/player/PlayerCharacter.h"
 
 namespace secro {
+	class Level;
+
 	class CharacterDashetteP2 : public PlayerCharacter {
 	public:
-		CharacterDashetteP2(HitboxManager* hitboxManager, b2Body* body, std::shared_ptr<Controller> controller);
+		CharacterDashetteP2(Level* level, HitboxManager* hitboxManager, b2Body* body, std::shared_ptr<Controller> controller);
 
 		void init() override;
 		void setupStates(StateMachine& stateMachine) override;

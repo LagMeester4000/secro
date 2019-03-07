@@ -11,9 +11,9 @@ namespace secro {
 		void render(UITransform& transform, sf::RenderWindow& window) override;
 
 	public:
-		float width = 6.f, height = 4.f;
-		sf::Vector2f size{ 6.f, 4.f };
+		sf::Vector2f size{ 60.f, 40.f };
 		sf::Font font;
+		float fontSize = 20.f;
 		std::string text;
 	};
 }

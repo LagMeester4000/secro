@@ -21,6 +21,8 @@ namespace secro {
 	//base class for any UI element
 	class UIElement {
 	public:
+		virtual ~UIElement() {}
+
 		//returns if the element is visable or not
 		virtual bool isVisable();
 

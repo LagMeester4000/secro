@@ -57,7 +57,7 @@ namespace secro {
 		};
 
 	public:
-		static std::shared_ptr<Controller> createController(int index, bool keyboard = false);
+		static std::shared_ptr<Controller> createController(int playerIndex, int index, bool keyboard = false);
 
 		//insert a fake controller
 		void interceptController(std::function<void(Input&)> function);
@@ -107,7 +107,7 @@ namespace secro {
 		bool jumpReleased() const;
 
 	private:
-		Controller(int index, bool keyboard);
+		Controller(int playerIndex, int index, bool keyboard);
 
 		//swap the input buffer to the back to make place for a new frame
 		void swapBack();
@@ -142,8 +142,12 @@ namespace secro {
 		//call this in button release rather than press, else it will be confused
 		bool findButton(ButtonIndex& button);
 
+	public: //other
+		int getPlayerIndex();
+
 	private:
 		int controllerIndex;
+		int playerIndex;
 		bool useKeyboard;
 		float deadzone = 20.f;
 
