@@ -36,6 +36,9 @@ void secro::Level::render(sf::RenderWindow & window)
 	//render stage
 	physicsManager.debugRender(window);
 
+	//render particles
+	particleSystem.renderBack(window);
+
 	//render players
 	for (auto& it : players)
 	{
@@ -43,7 +46,7 @@ void secro::Level::render(sf::RenderWindow & window)
 	}
 
 	//render particles
-	particleSystem.render(window);
+	particleSystem.renderFront(window);
 
 	//debug rendering of hitboxes
 	hitboxManager.render(window);

@@ -135,6 +135,9 @@ namespace secro {
 		//put the player in hitstun state
 		void putInHitstun(float duration);
 
+		//get the hitstun value
+		float getHitstun();
+
 	private: //states
 		void updateState(float deltaTime);
 

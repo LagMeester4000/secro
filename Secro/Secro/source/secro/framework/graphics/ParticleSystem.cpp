@@ -19,13 +19,26 @@ void secro::ParticleSystem::update(float deltaTime)
 	garbageCollect();
 }
 
-void secro::ParticleSystem::render(sf::RenderWindow & window)
+void secro::ParticleSystem::renderFront(sf::RenderWindow & window)
 {
 	for (auto& it : particles)
 	{
 		if (it.has_value())
 		{
-			it->render(window);
+			if (it->inFrontOfCharacter)
+				it->render(window);
+		}
+	}
+}
+
+void secro::ParticleSystem::renderBack(sf::RenderWindow & window)
+{
+	for (auto& it : particles)
+	{
+		if (it.has_value())
+		{
+			if (!it->inFrontOfCharacter)
+				it->render(window);
 		}
 	}
 }

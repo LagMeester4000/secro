@@ -1143,9 +1143,14 @@ void secro::PlayerCharacter::putInHitstun(float duration)
 	if (isInvincible())
 		return;
 
+	hitstun = duration;
 	stateMachine.changeState(this, PlayerState::Hitstun, 0.016f);
 	stateTimer = duration;
-	hitstun = duration;
+}
+
+float secro::PlayerCharacter::getHitstun()
+{
+	return hitstun;
 }
 
 void secro::PlayerCharacter::updateState(float deltaTime)

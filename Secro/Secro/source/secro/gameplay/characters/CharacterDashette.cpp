@@ -53,6 +53,7 @@ void secro::CharacterDashette::init()
 	//particles
 	loadAnimation("DashDust.png", 21.f, 15.f, 7, false, 0.02f, particleDash);
 	loadAnimation("JumpDust.png", 7, false, 0.02f, particleJump);
+	loadAnimation("KnockbackDust.png", 36.f, 35.f, 1, true, 0.02f, particleHit);
 
 	animatedSprite.setAnimation(animRun);
 	
@@ -271,7 +272,10 @@ void secro::CharacterDashette::setupStates(StateMachine & sm)
 			particle.animation.setScale({ -0.04f, 0.04f });
 			particle.animation.setPosition({ pos.x + 0.5f, pos.y + 0.6f });
 		}
-
+	});
+	sm.addSetState(PlayerState::Hitstun, [&](float f) 
+	{
+		particleHitHitstunTimer = getHitstun() * particleHitHitstunScalar;
 	});
 }
 
@@ -304,6 +308,34 @@ void secro::CharacterDashette::update(float deltaTime)
 	if (movementState == MovementState::OnGround)
 	{
 		airDashLeft = specialAmountOfAirDash;
+	}
+
+
+	//spawn hit particles
+	if (getState() == PlayerState::Hitstun)
+	{
+		particleHitHitstunTimer -= deltaTime;
+
+		//if (particleHitHitstunTimer >= 0.f)
+		{
+			particleHitTimer -= deltaTime;
+			if (particleHitTimer <= 0.f)
+			{
+				particleHitTimer = particleHitDuration;
+
+				//spawn new particle
+				auto pos = getPosition();
+				auto& part = level->getParticleSystem().spawnParticle();
+				part.animation.setAnimation(particleHit);
+				part.animation.setOrigin({ 18.f, 17.5f });
+				part.animation.setScale({ 0.04f, 0.04f });
+				part.animation.setPosition(pos.x, pos.y);
+				part.opacityOverTime = -200.f;
+				part.opacity = 70.f;
+				part.useAnimation = false;
+				part.inFrontOfCharacter = false;
+			}
+		}
 	}
 }
 

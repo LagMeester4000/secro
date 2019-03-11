@@ -17,6 +17,12 @@ namespace secro {
 		bool canBeDeleted();
 
 	public:
+		bool inFrontOfCharacter = true;
+
 		AnimatedSprite animation;
+		bool useAnimation = true;
+
+		float opacityOverTime = 0.f;
+		float opacity = 100.f;
 	};
 }

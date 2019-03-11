@@ -12,7 +12,8 @@ namespace secro {
 		void update(float deltaTime);
 
 		//render all of the particles
-		void render(sf::RenderWindow& window);
+		void renderFront(sf::RenderWindow& window);
+		void renderBack(sf::RenderWindow& window);
 
 		//spawn a particle in the world
 		Particle& spawnParticle();
