@@ -50,6 +50,7 @@ namespace secro {
 		Animation animInAir;
 		Animation animHitstun;
 		Animation animFreeFall;
+		Animation animLandingLag;
 
 		//attack
 		Animation animNAir;
@@ -62,6 +63,7 @@ namespace secro {
 		Animation animFTilt;
 		Animation animUTilt;
 		Animation animGrab;
+		Animation animSpDash;
 
 		//particles
 		Animation particleDash;

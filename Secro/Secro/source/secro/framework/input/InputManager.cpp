@@ -37,7 +37,7 @@ void secro::InputManager::init(int amountOfControllers)
 	for (int i = foundControllers; i < amountOfControllers; ++i)
 	{
 		controllers.push_back(
-			Controller::createController(8, false)
+			Controller::createController(-1, 0, false)
 		);
 	}
 }

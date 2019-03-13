@@ -263,7 +263,7 @@ void secro::Controller::manualUpdate(Input & push)
 
 secro::Controller::Input secro::Controller::readInput() const
 {
-	if (sf::Joystick::isConnected(controllerIndex))
+	if (playerIndex != -1 && sf::Joystick::isConnected(controllerIndex))
 	{
 		Input i;
 

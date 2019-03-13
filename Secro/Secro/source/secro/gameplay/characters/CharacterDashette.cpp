@@ -49,6 +49,8 @@ void secro::CharacterDashette::init()
 	loadAnimation("Dashette-Grab.png", 4, false, 0.05f, animGrab);
 	loadAnimation("Dashette-DAir.png", 1, false, 0.05f, animHitstun);
 	loadAnimation("Dashette-FreeFall.png", 1, false, 0.05f, animFreeFall);
+	loadAnimation("Dashette-dash.png", 1, false, 0.05f, animSpDash);
+	loadAnimation("Dashette-LandingLag.png", 1, false, 0.05f, animLandingLag);
 
 	//particles
 	loadAnimation("DashDust.png", 21.f, 15.f, 7, false, 0.02f, particleDash);
@@ -223,6 +225,25 @@ void secro::CharacterDashette::setupStates(StateMachine & sm)
 	sm.addSetState(PlayerState::SpecialFall, [&](float f)
 	{
 		animatedSprite.setAnimation(animFreeFall);
+	});
+	sm.addSetState(PlayerState::LandingLag, [&](float f)
+	{
+		animatedSprite.setAnimation(animLandingLag);
+	});
+	auto& spDir = specialDirection;
+	sm.addSetState(PlayerState::SpecialN, [&](float f)
+	{
+		animatedSprite.setAnimation(animSpDash);
+		auto newDir = spDir;
+		newDir.x = -newDir.x;
+		float rot = angleFromDirection(newDir);
+		if (getFacingDirection() == FacingDirection::Left)
+			rot = 180.f + rot;
+		animatedSprite.setRotation(rot);
+	});
+	sm.addUnsetState(PlayerState::SpecialN, [&](float f)
+	{
+		animatedSprite.setRotation(0.f);
 	});
 
 
@@ -399,7 +420,12 @@ void secro::CharacterDashette::stateStartSpecial()
 	auto stick = input->getMovement();
 	stick = normalise(stick);
 	stick = makeOctoDir(stick);
+
+	//set between value
+	specialDirection = { -stick.x, stick.y };
+
 	stick = mul(stick, specialSpeed);
+
 
 	useGravity = false;
 	physicsBody->SetLinearVelocity({ stick.x, stick.y });

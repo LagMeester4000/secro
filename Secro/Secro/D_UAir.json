@@ -2,13 +2,13 @@
     "value0": {
         "amountOfHitboxes": 1,
         "duration": 0.30000001192092898,
-        "landingLag": 0.0,
+        "landingLag": 0.11999999731779099,
         "frames": [
             {
                 "time": 0.0,
                 "changes": [
                     {
-                        "cereal_class_version": 1,
+                        "cereal_class_version": 2,
                         "index": 0,
                         "position": {
                             "x": 0.0,
@@ -26,7 +26,8 @@
                         "knockbackPowerBase": 1.0,
                         "knockbackPowerGrowth": 1.0,
                         "hitstunAdjustment": 0.0,
-                        "isGrabBox": false
+                        "isGrabBox": false,
+                        "isShieldBox": false
                     },
                     {
                         "index": 1,
@@ -46,7 +47,8 @@
                         "knockbackPowerBase": 1.0,
                         "knockbackPowerGrowth": 1.0,
                         "hitstunAdjustment": 0.0,
-                        "isGrabBox": false
+                        "isGrabBox": false,
+                        "isShieldBox": false
                     },
                     {
                         "index": 2,
@@ -66,7 +68,8 @@
                         "knockbackPowerBase": 1.0,
                         "knockbackPowerGrowth": 1.0,
                         "hitstunAdjustment": 0.0,
-                        "isGrabBox": false
+                        "isGrabBox": false,
+                        "isShieldBox": false
                     }
                 ]
             },
@@ -91,7 +94,8 @@
                         "knockbackPowerBase": 10.0,
                         "knockbackPowerGrowth": 14.0,
                         "hitstunAdjustment": 0.0,
-                        "isGrabBox": false
+                        "isGrabBox": false,
+                        "isShieldBox": false
                     }
                 ]
             },
@@ -116,7 +120,8 @@
                         "knockbackPowerBase": 10.0,
                         "knockbackPowerGrowth": 14.0,
                         "hitstunAdjustment": 0.0,
-                        "isGrabBox": false
+                        "isGrabBox": false,
+                        "isShieldBox": false
                     }
                 ]
             },
@@ -141,7 +146,8 @@
                         "knockbackPowerBase": 10.0,
                         "knockbackPowerGrowth": 14.0,
                         "hitstunAdjustment": 0.0,
-                        "isGrabBox": false
+                        "isGrabBox": false,
+                        "isShieldBox": false
                     }
                 ]
             },
@@ -166,7 +172,8 @@
                         "knockbackPowerBase": 10.0,
                         "knockbackPowerGrowth": 14.0,
                         "hitstunAdjustment": 0.0,
-                        "isGrabBox": false
+                        "isGrabBox": false,
+                        "isShieldBox": false
                     }
                 ]
             },
@@ -191,7 +198,8 @@
                         "knockbackPowerBase": 10.0,
                         "knockbackPowerGrowth": 14.0,
                         "hitstunAdjustment": 0.0,
-                        "isGrabBox": false
+                        "isGrabBox": false,
+                        "isShieldBox": false
                     }
                 ]
             },
@@ -216,7 +224,8 @@
                         "knockbackPowerBase": 10.0,
                         "knockbackPowerGrowth": 14.0,
                         "hitstunAdjustment": 0.0,
-                        "isGrabBox": false
+                        "isGrabBox": false,
+                        "isShieldBox": false
                     }
                 ]
             }
