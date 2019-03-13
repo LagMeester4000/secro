@@ -1,4 +1,5 @@
 #include "PhysicsManager.h"
+#include "secro/framework/DebugOptions.h"
 
 secro::PhysicsManager::PhysicsManager() : world(std::make_shared<b2World>(b2Vec2{0.f, 0.f}))
 {
@@ -15,10 +16,13 @@ void secro::PhysicsManager::update(float deltaTime)
 
 void secro::PhysicsManager::debugRender(sf::RenderWindow& window)
 {
+	if (!DebugOptions::getOptions().enablePhysicsRender)
+		return;
+
 	int i = 0;
 	for (auto& it : playersColliders)
 	{
-		//it.render(window, i);
+		it.render(window, i);
 		i++;
 	}
 

@@ -29,6 +29,8 @@ namespace secro {
 		//knock a player back
 		void knockbackPlayer(PlayerCharacter* player, FacingDirection direction);
 
+		b2Vec2 getKnockback(PlayerCharacter* player);
+
 	public://collision properties
 		//relative position
 		b2Vec2 position;

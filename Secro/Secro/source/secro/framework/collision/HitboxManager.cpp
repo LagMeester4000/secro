@@ -1,5 +1,6 @@
 #include "HitboxManager.h"
-#include "../player/PlayerCharacter.h"
+#include "secro/framework/player/PlayerCharacter.h"
+#include "secro/framework/DebugOptions.h"
 #include <algorithm>
 
 using namespace secro;
@@ -51,10 +52,11 @@ void secro::HitboxManager::update(float deltaTime)
 						}
 						
 						//hitlag
-						asPlayer->putInHitlag(0.12f);
+						float hitlag = 0.06f + 0.09f * (results.hits[0]->knockbackPowerGrowth / 15.f);
+						asPlayer->putInHitlag(hitlag);
 						if (auto* otherPlayer = dynamic_cast<PlayerCharacter*>(hit->getOwner()))
 						{
-							otherPlayer->putInHitlag(0.12f);
+							otherPlayer->putInHitlag(hitlag);
 
 							//has hit
 							otherPlayer->attackHasHit();
@@ -69,14 +71,17 @@ void secro::HitboxManager::update(float deltaTime)
 
 void secro::HitboxManager::render(sf::RenderWindow & window)
 {
+	if (!DebugOptions::getOptions().enableHitboxRender)
+		return;
+
 	for (auto& it : hitboxes)
 	{
-		//it->debugRender(window);
+		it->debugRender(window);
 	}
 
 	for (auto& it : hurtboxes)
 	{
-		//it->debugRender(window);
+		it->debugRender(window);
 	}
 }
 

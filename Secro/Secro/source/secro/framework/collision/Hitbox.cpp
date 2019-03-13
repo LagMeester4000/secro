@@ -38,3 +38,9 @@ void secro::Hitbox::knockbackPlayer(PlayerCharacter * player, FacingDirection di
 	player->putInHitstun(hitstun);
 	player->knockBack(knockback);
 }
+
+b2Vec2 secro::Hitbox::getKnockback(PlayerCharacter * player)
+{
+	float knockbackDist = GameplaySettings::calculateKnockback(player->getDamageScalar(), knockbackPowerBase, knockbackPowerGrowth);
+	return mul(directionFromAngle<b2Vec2>(knockbackAngle), knockbackDist);
+}

@@ -26,6 +26,13 @@ void secro::RingOutLevel::init()
 
 	//load font
 	uiFont = &*ResourceManager<sf::Font>::get("LemonMilk.otf");
+
+	//load ground
+	auto tex = ResourceManager<sf::Texture>::get("GroundTiles.png");
+	tex->setSmooth(false);
+	
+	groundTiles.setTexture(*tex);
+	groundTiles.setScale({ 0.05f, 0.05f });
 }
 
 void secro::RingOutLevel::update(float deltaTime)
@@ -49,6 +56,48 @@ void secro::RingOutLevel::update(float deltaTime)
 void secro::RingOutLevel::render(sf::RenderWindow & window)
 {
 	Level::render(window);
+
+	//render the stage
+	{
+		sf::Vector2f start = { -8.f, 2.f };
+		//top
+		renderTile(window, start, { 1, 1 }, { 0, 0 });
+		renderTile(window, tilePos(start, { 1, 0 }), { 18, 1 }, { 1, 0 });
+		renderTile(window, tilePos(start, { 19, 0 }), { 1, 1 }, { 2, 0 });
+		//mid
+		renderTile(window, tilePos(start, { 0, 1 }), { 1, 7 }, { 0, 1 });
+		renderTile(window, tilePos(start, { 19, 1 }), { 1, 7 }, { 2, 1 });
+		renderTile(window, tilePos(start, { 1, 1 }), { 18, 7 }, { 1, 1 });
+		//bottom
+		renderTile(window, tilePos(start, { 0, 8 }), { 1, 1 }, { 0, 2 });
+		renderTile(window, tilePos(start, { 1, 8 }), { 18, 1 }, { 1, 2 });
+		renderTile(window, tilePos(start, { 19, 8 }), { 1, 1 }, { 2, 2 });
+	}
+
+	{
+		sf::Vector2f start = { -2.f, -3.6f };
+		//platforms
+		renderTile(window, start, { 1, 1 }, { 0, 3 });
+		renderTile(window, tilePos(start, { 1, 0 }), { 3, 1 }, { 1, 3 });
+		renderTile(window, tilePos(start, { 4, 0 }), { 1, 1 }, { 2, 3 });
+	}
+
+	{
+		sf::Vector2f start = { 2.f, -0.9f };
+		//platforms
+		renderTile(window, start, { 1, 1 }, { 0, 3 });
+		renderTile(window, tilePos(start, { 1, 0 }), { 3, 1 }, { 1, 3 });
+		renderTile(window, tilePos(start, { 4, 0 }), { 1, 1 }, { 2, 3 });
+	}
+
+	{
+		sf::Vector2f start = { -6.f, -0.9f };
+		//platforms
+		renderTile(window, start, { 1, 1 }, { 0, 3 });
+		renderTile(window, tilePos(start, { 1, 0 }), { 3, 1 }, { 1, 3 });
+		renderTile(window, tilePos(start, { 4, 0 }), { 1, 1 }, { 2, 3 });
+	}
+
 	renderScores(window);
 	Level::cameraRender(window);
 }
@@ -104,5 +153,24 @@ void secro::RingOutLevel::renderScore(sf::RenderWindow & window, sf::Vector2f po
 		stock.setPosition(position + sf::Vector2f((stockSize * 2.f + stockPadding) * (float)i, textSize / 2.f + stockSize + padding + stockSize));
 		stock.setFillColor(sf::Color::Red);
 		window.draw(stock);
+	}
+}
+
+sf::Vector2f secro::RingOutLevel::tilePos(sf::Vector2f begin, sf::Vector2i offset)
+{
+	return { begin.x + (float)offset.x * 0.05f * 16.f, begin.y + (float)offset.y * 0.05f * 16.f };
+}
+
+void secro::RingOutLevel::renderTile(sf::RenderWindow & window, sf::Vector2f position, sf::Vector2i size, sf::Vector2i tileIndex)
+{
+	groundTiles.setTextureRect(sf::IntRect{ tileIndex * 16, { 16, 16 } });
+
+	for (int x = 0; x < size.x; ++x)
+	{
+		for (int y = 0; y < size.y; ++y)
+		{
+			groundTiles.setPosition(position.x + 0.05f * 16.f * (float)x, position.y + 0.05f * 16.f * (float)y);
+			window.draw(groundTiles);
+		}
 	}
 }
