@@ -37,6 +37,8 @@ namespace secro {
 		void stateStartSpecial();
 		void stateEndSpecial();
 		void stateStartHyperJump();
+		void stateStartShineSpecial();
+		void stateUpdateShineSpecial(float deltaTime);
 
 	public: //graphics
 		AnimatedSprite animatedSprite;
@@ -64,6 +66,7 @@ namespace secro {
 		Animation animUTilt;
 		Animation animGrab;
 		Animation animSpDash;
+		Animation animSpShine;
 
 		//particles
 		Animation particleDash;

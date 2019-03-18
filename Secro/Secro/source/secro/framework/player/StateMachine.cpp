@@ -30,10 +30,10 @@ void secro::StateMachine::update(float deltaTime, PlayerCharacter * player)
 
 	for (auto& it : trans->second)
 	{
-		if (it.second(deltaTime))
+		if (it.func(deltaTime))
 		{
 			//set the actual player state
-			player->state = it.first;
+			player->state = it.switchTo;
 
 			//call unset functions
 			auto& unsetFuncs = unsetState[(int)state];
@@ -41,7 +41,7 @@ void secro::StateMachine::update(float deltaTime, PlayerCharacter * player)
 				f(deltaTime);
 
 			//call set functions
-			auto setFuncs = setState[(int)it.first];
+			auto setFuncs = setState[(int)it.switchTo];
 			for (auto& f : setFuncs)
 				f(deltaTime);
 
@@ -53,7 +53,7 @@ void secro::StateMachine::update(float deltaTime, PlayerCharacter * player)
 
 void secro::StateMachine::addCondition(PlayerState from, PlayerState to, std::function<bool(float)> func)
 {
-	conditions[from][to] = func;
+	conditions[from].push_back({ to, func });
 }
 
 void secro::StateMachine::addSetState(PlayerState to, std::function<void(float)> func)

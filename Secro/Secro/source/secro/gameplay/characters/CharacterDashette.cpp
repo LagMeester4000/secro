@@ -49,8 +49,9 @@ void secro::CharacterDashette::init()
 	loadAnimation("Dashette-Grab.png", 4, false, 0.05f, animGrab);
 	loadAnimation("Dashette-DAir.png", 1, false, 0.05f, animHitstun);
 	loadAnimation("Dashette-FreeFall.png", 1, false, 0.05f, animFreeFall);
-	loadAnimation("Dashette-dash.png", 1, false, 0.05f, animSpDash);
+	loadAnimation("Dashette-dash.png", 1, false, 0.03f, animSpDash);
 	loadAnimation("Dashette-LandingLag.png", 1, false, 0.05f, animLandingLag);
+	loadAnimation("Dashette-Shine.png", 3, false, 0.017f, animSpShine);
 
 	//particles
 	loadAnimation("DashDust.png", 21.f, 15.f, 7, false, 0.02f, particleDash);
@@ -120,17 +121,17 @@ void secro::CharacterDashette::setupStates(StateMachine & sm)
 	});
 
 	//hyperjump
-	sm.addCondition(PlayerState::SpecialN, PlayerState::SpecialU, [&](float f) 
-	{
-		return getMovementState() == MovementState::OnGround && input->jumpPressed();
-	});
-	sm.addUnsetState(PlayerState::SpecialU, std::bind(&CharacterDashette::stateStartHyperJump, this));
-	sm.addCondition(PlayerState::SpecialU, PlayerState::Jump, [&](float f) 
-	{
-		return true;
-	});
+	//sm.addCondition(PlayerState::SpecialN, PlayerState::SpecialU, [&](float f) 
+	//{
+	//	return getMovementState() == MovementState::OnGround && input->jumpPressed();
+	//});
+	//sm.addUnsetState(PlayerState::SpecialU, std::bind(&CharacterDashette::stateStartHyperJump, this));
+	//sm.addCondition(PlayerState::SpecialU, PlayerState::Jump, [&](float f) 
+	//{
+	//	return true;
+	//});
 
-
+	//direction special
 	sm.addSetState(PlayerState::SpecialN, std::bind(&CharacterDashette::stateStartSpecial, this));
 	sm.addUnsetState(PlayerState::SpecialN, std::bind(&CharacterDashette::stateEndSpecial, this));
 	sm.addCondition(PlayerState::SpecialN, PlayerState::Jump, [&](float f) 
@@ -139,6 +140,42 @@ void secro::CharacterDashette::setupStates(StateMachine & sm)
 	});
 
 
+	//shine
+	auto condShine = [&](float f) 
+	{
+		auto dir = getInput()->getMovementDirection();
+		return dir == Direction::Neutral && getInput()->specialPressed();
+	};
+	sm.addCondition(PlayerState::Stand, PlayerState::SpecialD, condShine);
+	sm.addCondition(PlayerState::Dash, PlayerState::SpecialD, condShine);
+	sm.addCondition(PlayerState::Run, PlayerState::SpecialD, condShine);
+	sm.addCondition(PlayerState::Walk, PlayerState::SpecialD, condShine);
+	sm.addCondition(PlayerState::Jump, PlayerState::SpecialD, condShine);
+	sm.addCondition(PlayerState::SpecialD, PlayerState::Stand, [&](float f)
+	{
+		return IsStateTimerDone() && getMovementState() == MovementState::OnGround;
+	});
+	sm.addCondition(PlayerState::SpecialD, PlayerState::Jump, [&](float f)
+	{
+		return IsStateTimerDone() && getMovementState() == MovementState::InAir;
+	});
+	sm.addCondition(PlayerState::SpecialD, PlayerState::Jump, [&](float f) 
+	{
+		if (getInput()->jumpPressed() && getMovementState() == MovementState::InAir)
+		{
+			this->tryDoubleJump(f);
+			return true;
+		}
+		return false;
+	}); 
+	sm.addCondition(PlayerState::SpecialD, PlayerState::JumpSquat, [&](float f)
+	{
+		return getInput()->jumpPressed() && getMovementState() == MovementState::OnGround;
+	});
+	sm.addSetState(PlayerState::SpecialD, std::bind(&PlayerCharacter::stateStartNewAttack, this, PlayerState::SpecialD));
+	sm.addSetState(PlayerState::SpecialD, std::bind(&CharacterDashette::stateStartShineSpecial, this));
+	sm.addUnsetState(PlayerState::SpecialD, std::bind(&PlayerCharacter::endAttack, this));
+	sm.addUpdateState(PlayerState::SpecialD, std::bind(&CharacterDashette::stateUpdateShineSpecial, this, std::placeholders::_1));
 
 	//animations
 	sm.addSetState(PlayerState::Jump, [&](float f)
@@ -229,6 +266,10 @@ void secro::CharacterDashette::setupStates(StateMachine & sm)
 	sm.addSetState(PlayerState::LandingLag, [&](float f)
 	{
 		animatedSprite.setAnimation(animLandingLag);
+	}); 
+	sm.addSetState(PlayerState::SpecialD, [&](float f)
+	{
+		animatedSprite.setAnimation(animSpShine);
 	});
 	auto& spDir = specialDirection;
 	sm.addSetState(PlayerState::SpecialN, [&](float f)
@@ -317,6 +358,8 @@ void secro::CharacterDashette::setupAttacks(AttackCollection & atts)
 
 	atts.loadAttack("Grab.json", PlayerState::AGrab);
 	atts.loadAttack("Grab.json", PlayerState::AGrabAir);
+	
+	atts.loadAttack("FalShine.json", PlayerState::SpecialD);
 }
 
 void secro::CharacterDashette::update(float deltaTime)
@@ -363,6 +406,7 @@ void secro::CharacterDashette::update(float deltaTime)
 void secro::CharacterDashette::render(sf::RenderWindow & window)
 {
 	//PlayerCharacter::render(window);
+	//return;
 
 	float scale = 1.f;
 	if (facingDirection == FacingDirection::Left)
@@ -391,12 +435,20 @@ int secro::CharacterDashette::getAirDashLeft()
 
 bool secro::CharacterDashette::canBeginSpecial(float dt)
 {
+	auto dir = input->getMovementDirection();
+	if (dir == Direction::Neutral)
+		return false;
+
 	auto joy = input->getMovement();
 	return input->specialPressed() && getAirDashLeft() > 0 && length(joy) > 0.2f;
 }
 
 bool secro::CharacterDashette::canBeginSpecialFromAttack(float dt)
 {
+	auto dir = input->getMovementDirection();
+	if (dir == Direction::Neutral)
+		return false;
+
 	auto joy = input->getMovement();
 	return getHasAttackHit() && input->specialHeld() && length(joy) > 0.2f;
 }
@@ -433,7 +485,7 @@ void secro::CharacterDashette::stateStartSpecial()
 	setStateTimer(specialDuration);
 
 	//change friction
-	attributes.groundDeceleration = specialGroundFriction;
+	//attributes.groundDeceleration = specialGroundFriction;
 
 	//remove a dash
 	airDashLeft--;
@@ -459,6 +511,37 @@ void secro::CharacterDashette::stateStartHyperJump()
 	vel.y = -specialHyperJumpHeight;
 
 	physicsBody->SetLinearVelocity(vel);
+}
+
+void secro::CharacterDashette::stateStartShineSpecial()
+{
+	auto vel = physicsBody->GetLinearVelocity();
+	vel.y /= 3.f;
+
+	if (movementState == MovementState::OnGround)
+	{
+		vel.x /= 1.5f;
+	}
+	else
+	{
+		vel.x /= 3.f;
+	}
+
+	physicsBody->SetLinearVelocity(vel);
+	setStateTimer(0.2f);
+}
+
+void secro::CharacterDashette::stateUpdateShineSpecial(float deltaTime)
+{
+	auto dir = input->getMovementDirection();
+	if (dir == Direction::Left)
+	{
+		facingDirection = FacingDirection::Left;
+	}
+	else if (dir == Direction::Right)
+	{
+		facingDirection = FacingDirection::Right;
+	}
 }
 
 void secro::CharacterDashette::addFrames(int amount, Animation & animation)

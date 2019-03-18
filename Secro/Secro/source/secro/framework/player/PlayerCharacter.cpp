@@ -41,15 +41,15 @@ void secro::PlayerCharacter::init()
 
 	//setup testing attributes
 	auto& a = attributes;
-	a.airAcceleration = 30.f;
-	a.airDeceleration = 1.f;
-	a.airMaxSpeed = 10.f;
+	a.airAcceleration = 40.f;
+	a.airDeceleration = 10.f;
+	a.airMaxSpeed = 8.f;
 	a.dashDuration = 0.25f;
 	a.dashInitialSpeed = 11.5f;
 	a.doubleJumpSpeed = 20.f;
 	a.fallSpeed = 50.f;
 	a.fastfallSpeed = 10.f;
-	a.groundDeceleration = 30.f;
+	a.groundDeceleration = 40.f;
 	a.jumpAmount = 1;
 	a.jumpFullSpeed = 17.f;
 	a.jumpShortSpeed = 10.f;
@@ -513,6 +513,10 @@ void secro::PlayerCharacter::render(sf::RenderWindow & window)
 	{
 		c.setFillColor(sf::Color(0, 255, 0));
 	}
+	else if (state == PlayerState::Walk)
+	{
+		c.setFillColor(sf::Color(0, 255, 255));
+	}
 	else if (state == PlayerState::Stand)
 	{
 		c.setFillColor(sf::Color(0, 0, 255));
@@ -662,17 +666,18 @@ void secro::PlayerCharacter::updateMovement(float deltaTime)
 			//apply tracktion when needed
 			if (shouldHaveFriction)
 			{
-				if (input->getMovementDirection() == Direction::Neutral)
+				auto vel = physicsBody->GetLinearVelocity();
+				//if (input->getMovementDirection() == Direction::Neutral)
+				if (abs(vel.x) >= attributes.airMaxSpeed)
 				{
 					auto decelVal = attributes.airDeceleration * deltaTime/* * deltaTime*/;
-					auto vel = physicsBody->GetLinearVelocity();
 
-					if (vel.Length() > decelVal)
+					if (abs(vel.x) > decelVal)
 					{
-						auto adder = vel;
-						adder.Normalize();
+						auto adder = vel.x;
+						adder > 0 ? adder = 1.f : adder = -1.f;
 						adder *= decelVal;
-						vel -= adder;
+						vel.x -= adder;
 					}
 					else
 					{
@@ -1125,6 +1130,17 @@ void secro::PlayerCharacter::knockBack(b2Vec2 knockback)
 void secro::PlayerCharacter::setMovementState(MovementState m)
 {
 	movementState = m;
+}
+
+void secro::PlayerCharacter::tryDoubleJump(float deltaTime)
+{
+	if (input->jumpPressed() && jumpsLeft > 0)
+	{
+		jumpsLeft--;
+		b2Vec2 jumpVel = { 0.f, -attributes.doubleJumpSpeed };
+		physicsBody->SetLinearVelocity(jumpVel);
+		//stateMachine.changeState(this, PlayerState::Jump, 0.01666f);
+	}
 }
 
 void secro::PlayerCharacter::updateHitstun(float deltaTime)

@@ -91,8 +91,6 @@ namespace secro {
 		void stateStartDash();
 		void stateEndDash();
 		void stateStartWalk();
-		void endAttack();
-		void stateStartNewAttack(PlayerState attack);
 		void stateStartShield();
 		void stateEndShield();
 		void stateUpdateDash(float deltaTime);
@@ -118,6 +116,11 @@ namespace secro {
 
 		//knock the player back (no hitstun)
 		void knockBack(b2Vec2 knockback);
+
+	public:
+		void stateStartNewAttack(PlayerState attack);
+		void endAttack();
+		void tryDoubleJump(float deltaTime);
 
 	protected:
 		void setMovementState(MovementState m);

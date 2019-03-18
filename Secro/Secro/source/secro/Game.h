@@ -47,9 +47,10 @@ namespace secro {
 		std::shared_ptr<InputManager> inputManager;
 		std::shared_ptr<Level> level;
 
-	private: //TEMP
+	public: //TEMP
 		CollisionRenderer c;
 		sf::Font uiFont;
+		InputTestBot* inputBot;
 
 	private: //ui
 		UIManager ui;

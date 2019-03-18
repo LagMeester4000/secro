@@ -78,12 +78,12 @@ bool secro::Controller::grabReleased() const
 
 bool secro::Controller::jumpPressed() const
 {
-	return (current().jumpButton && !prev().jumpButton);
+	return current().jumpButton && !prev().jumpButton;
 }
 
 bool secro::Controller::jumpHeld() const
 {
-	return current().jumpButton || current().jumpButton;
+	return current().jumpButton;
 }
 
 bool secro::Controller::jumpReleased() const

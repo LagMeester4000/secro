@@ -38,14 +38,13 @@ namespace secro {
 		//other
 		AGrab,
 		AGrabAir,
-		ALastAttack,//NULL
 
 		//specials
 		SpecialU,
 		SpecialF,
 		SpecialD,
 		SpecialN,
-
+		ALastAttack,//NULL
 
 		//teching states
 		TechInPlace,

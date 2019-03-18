@@ -7,8 +7,12 @@
 
 namespace secro {
 	class StateMachine {
+		struct SwitchCondition {
+			PlayerState switchTo;
+			std::function<bool(float)> func;
+		};
 		using SwitchFuncList = std::array<std::vector<std::function<void(float)>>, (size_t)PlayerState::MaxState>;
-		using SwitchConditionList = std::map<PlayerState, std::map<PlayerState, std::function<bool(float)>>>;
+		using SwitchConditionList = std::map<PlayerState, std::vector<SwitchCondition>>;
 	public:
 		StateMachine();
 

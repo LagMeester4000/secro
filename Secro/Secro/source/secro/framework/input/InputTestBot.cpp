@@ -3,6 +3,7 @@
 #include "../player/PlayerCharacter.h"
 #include <imgui.h>
 #include <random>
+#include <iostream>
 
 secro::InputTestBot::InputTestBot(PlayerCharacter* player, Controller & controller, int input)
 {
@@ -16,6 +17,8 @@ void secro::InputTestBot::update(typename Controller::Input & input)
 {
 	input.shieldButton = holdShield;
 	
+	std::cout << (int)player->getState() << std::endl; 
+
 	if (player->IsInHitstun())
 	{
 		if (!randomDI)

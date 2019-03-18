@@ -1,0 +1,62 @@
+{
+    "value0": {
+        "amountOfHitboxes": 1,
+        "duration": 0.07999999821186066,
+        "landingLag": 0.0,
+        "frames": [
+            {
+                "time": 0.0,
+                "changes": [
+                    {
+                        "cereal_class_version": 2,
+                        "index": 0,
+                        "position": {
+                            "x": 0.0,
+                            "y": 0.0
+                        },
+                        "isActive": false,
+                        "isHitbox": true,
+                        "hitNumber": 0,
+                        "width": 1.0,
+                        "height": 1.0,
+                        "relativePriority": 0,
+                        "absolutePriority": 0,
+                        "damage": 1.0,
+                        "knockbackAngle": -45.0,
+                        "knockbackPowerBase": 1.0,
+                        "knockbackPowerGrowth": 1.0,
+                        "hitstunAdjustment": 0.0,
+                        "isGrabBox": false,
+                        "isShieldBox": false
+                    }
+                ]
+            },
+            {
+                "time": 0.05000000074505806,
+                "changes": [
+                    {
+                        "index": 0,
+                        "position": {
+                            "x": 0.0,
+                            "y": 0.0
+                        },
+                        "isActive": true,
+                        "isHitbox": true,
+                        "hitNumber": 0,
+                        "width": 0.800000011920929,
+                        "height": 1.0,
+                        "relativePriority": 0,
+                        "absolutePriority": 0,
+                        "damage": 4.0,
+                        "knockbackAngle": -80.0,
+                        "knockbackPowerBase": 15.0,
+                        "knockbackPowerGrowth": 3.0,
+                        "hitstunAdjustment": 0.0,
+                        "isGrabBox": false,
+                        "isShieldBox": false
+                    }
+                ]
+            }
+        ]
+    }
+}

@@ -17,6 +17,7 @@ namespace secro {
 
 	//level type that can have its own win condition
 	class Level {
+		friend class Game;
 	public:
 		Level(std::shared_ptr<InputManager> input);
 		virtual ~Level() {}
