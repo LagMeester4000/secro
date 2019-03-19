@@ -67,8 +67,8 @@ void secro::PlayerCharacter::init()
 	a.techInPlaceDuration = 0.2f;
 	a.techInPlaceInvDuration = 0.14f;
 	a.techRollDuration = 0.2f;
-	a.techRollInvDuration = 0.15f;
-	a.techRollSpeed = 14.f;
+	a.techRollInvDuration = 0.17f;
+	a.techRollSpeed = 8.f;
 		
 	state = PlayerState::Jump;
 	movementState = MovementState::InAir;

@@ -405,7 +405,7 @@ void secro::CharacterDashette::update(float deltaTime)
 
 void secro::CharacterDashette::render(sf::RenderWindow & window)
 {
-	//PlayerCharacter::render(window);
+	PlayerCharacter::render(window);
 	//return;
 
 	float scale = 1.f;
