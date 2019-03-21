@@ -201,6 +201,9 @@
     <ClInclude Include="source\secro\framework\graphics\Particle.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="source\secro\gameplay\characters\OkiCharacter.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="source\secro\main.cpp">
