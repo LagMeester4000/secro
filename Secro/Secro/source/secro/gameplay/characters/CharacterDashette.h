@@ -53,6 +53,8 @@ namespace secro {
 		Animation animHitstun;
 		Animation animFreeFall;
 		Animation animLandingLag;
+		Animation animTechLeft;
+		Animation animTechRight;
 
 		//attack
 		Animation animNAir;

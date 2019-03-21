@@ -52,6 +52,8 @@ void secro::CharacterDashette::init()
 	loadAnimation("Dashette-dash.png", 1, false, 0.03f, animSpDash);
 	loadAnimation("Dashette-LandingLag.png", 1, false, 0.05f, animLandingLag);
 	loadAnimation("Dashette-Shine.png", 3, false, 0.017f, animSpShine);
+	loadAnimation("Dashette-TechLeft.png", 8, false, 0.03f, animTechLeft);
+	loadAnimation("Dashette-TechRight.png", 8, false, 0.05f, animTechRight);
 
 	//particles
 	loadAnimation("DashDust.png", 21.f, 15.f, 7, false, 0.02f, particleDash);
@@ -271,6 +273,20 @@ void secro::CharacterDashette::setupStates(StateMachine & sm)
 	{
 		animatedSprite.setAnimation(animSpShine);
 	});
+	sm.addSetState(PlayerState::TechRollLeft, [&](float f)
+	{
+		if (getFacingDirection() == FacingDirection::Right)
+			animatedSprite.setAnimation(animTechLeft);
+		else
+			animatedSprite.setAnimation(animTechRight);
+	});
+	sm.addSetState(PlayerState::TechRollRight, [&](float f)
+	{
+		if (getFacingDirection() == FacingDirection::Right)
+			animatedSprite.setAnimation(animTechRight);
+		else
+			animatedSprite.setAnimation(animTechLeft);
+	});
 	auto& spDir = specialDirection;
 	sm.addSetState(PlayerState::SpecialN, [&](float f)
 	{
@@ -405,7 +421,7 @@ void secro::CharacterDashette::update(float deltaTime)
 
 void secro::CharacterDashette::render(sf::RenderWindow & window)
 {
-	PlayerCharacter::render(window);
+	//PlayerCharacter::render(window);
 	//return;
 
 	float scale = 1.f;
