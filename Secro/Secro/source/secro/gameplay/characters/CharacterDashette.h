@@ -75,9 +75,13 @@ namespace secro {
 		Animation particleJump;
 		Animation particleHit;
 		float particleHitDuration = 0.07f;
+		float particleHitDurationMax = 0.07f;
 		float particleHitTimer = 0.f;
 		float particleHitHitstunScalar = 0.5f;
 		float particleHitHitstunTimer = 0.f;
+		Animation particleFlyRing;
+		float particleFlyRingDuration = 0.27f;
+		float particleFlyRingTimer = 0.f;
 
 	public:
 		static void addFrames(int amount, Animation& animation);

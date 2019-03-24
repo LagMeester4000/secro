@@ -168,6 +168,7 @@
     <ClInclude Include="source\secro\framework\physics\Filters.h" />
     <ClInclude Include="source\secro\framework\physics\PhysicsManager.h" />
     <ClInclude Include="source\secro\framework\physics\PlayerCollision.h" />
+    <ClInclude Include="source\secro\framework\physics\PlayerContact.h" />
     <ClInclude Include="source\secro\framework\physics\StageCollision.h" />
     <ClInclude Include="source\secro\framework\player\AttackCollection.h" />
     <ClInclude Include="source\secro\framework\player\MovementState.h" />
@@ -225,6 +226,7 @@
     <ClCompile Include="source\secro\framework\level\Level.cpp" />
     <ClCompile Include="source\secro\framework\physics\PhysicsManager.cpp" />
     <ClCompile Include="source\secro\framework\physics\PlayerCollision.cpp" />
+    <ClCompile Include="source\secro\framework\physics\PlayerContact.cpp" />
     <ClCompile Include="source\secro\framework\physics\StageCollision.cpp" />
     <ClCompile Include="source\secro\framework\player\AttackCollection.cpp" />
     <ClCompile Include="source\secro\framework\player\PlayerAttributes.cpp" />

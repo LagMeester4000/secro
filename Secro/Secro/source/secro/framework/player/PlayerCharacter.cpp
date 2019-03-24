@@ -296,20 +296,34 @@ void secro::PlayerCharacter::setupStates(StateMachine & sm)
 	sm.addCondition(PlayerState::Stand, PlayerState::AUTilt, UTiltAttack);
 	sm.addCondition(PlayerState::Walk, PlayerState::AUTilt, UTiltAttack);
 	sm.addCondition(PlayerState::Run, PlayerState::AUTilt, UTiltAttack);
+	sm.addCondition(PlayerState::Dash, PlayerState::AUTilt, UTiltAttack);
 	sm.addSetState(PlayerState::AUTilt, std::bind(&PlayerCharacter::stateStartNewAttack, this, PlayerState::AUTilt));
 	sm.addUnsetState(PlayerState::AUTilt, std::bind(&PlayerCharacter::endAttack, this));
 	sm.addCondition(PlayerState::AUTilt, PlayerState::Stand, endGroundAttack);
 	//ftilt
+	auto& facingRef = facingDirection;
 	auto FTiltAttack = [&](float f)
 	{
 		auto input = getInput();
 		auto dir = input->getMovementDirection();
 		auto aDir = input->getDirAttackDirection();
-		return (isEqual(getFacingDirection(), dir) && input->attackPressed()) || isEqual(getFacingDirection(), aDir);
+		if (isOpposite(getFacingDirection(), aDir))
+		{
+			if (facingDirection == FacingDirection::Left)
+			{
+				facingDirection = FacingDirection::Right;
+			}
+			else if (facingDirection == FacingDirection::Right)
+			{
+				facingDirection = FacingDirection::Left;
+			}
+		}
+		return (isEqual(getFacingDirection(), dir) && input->attackPressed()) || isEqual(getFacingDirection(), aDir) || isOpposite(getFacingDirection(), aDir);
 	};
 	sm.addCondition(PlayerState::Stand, PlayerState::AFTilt, FTiltAttack);
 	sm.addCondition(PlayerState::Walk, PlayerState::AFTilt, FTiltAttack);
 	sm.addCondition(PlayerState::Run, PlayerState::AFTilt, FTiltAttack);
+	sm.addCondition(PlayerState::Dash, PlayerState::AFTilt, FTiltAttack);
 	sm.addSetState(PlayerState::AFTilt, std::bind(&PlayerCharacter::stateStartNewAttack, this, PlayerState::AFTilt));
 	sm.addUnsetState(PlayerState::AFTilt, std::bind(&PlayerCharacter::endAttack, this));
 	sm.addCondition(PlayerState::AFTilt, PlayerState::Stand, endGroundAttack);
@@ -324,6 +338,7 @@ void secro::PlayerCharacter::setupStates(StateMachine & sm)
 	sm.addCondition(PlayerState::Stand, PlayerState::ADTilt, DTiltAttack);
 	sm.addCondition(PlayerState::Walk, PlayerState::ADTilt, DTiltAttack);
 	sm.addCondition(PlayerState::Run, PlayerState::ADTilt, DTiltAttack);
+	sm.addCondition(PlayerState::Dash, PlayerState::ADTilt, DTiltAttack);
 	sm.addSetState(PlayerState::ADTilt, std::bind(&PlayerCharacter::stateStartNewAttack, this, PlayerState::ADTilt));
 	sm.addUnsetState(PlayerState::ADTilt, std::bind(&PlayerCharacter::endAttack, this));
 	sm.addCondition(PlayerState::ADTilt, PlayerState::Stand, endGroundAttack);

@@ -3,6 +3,7 @@
 #include <Box2D/Box2D.h>
 #include "PlayerCollision.h"
 #include "StageCollision.h"
+#include "PlayerContact.h"
 
 namespace sf {
 	class RenderWindow;
@@ -31,8 +32,13 @@ namespace secro {
 		b2Body* getPlayerBody(int index);
 		
 	private:
+		//actual physics world
 		std::shared_ptr<b2World> world;
 
+		//custom listener
+		PlayerContact listener;
+
+		//colliders
 		std::vector<PlayerCollision> playersColliders;
 		std::vector<StageCollision> stageColliders;
 	};

@@ -56,9 +56,10 @@ void secro::CharacterDashette::init()
 	loadAnimation("Dashette-TechRight.png", 8, false, 0.05f, animTechRight);
 
 	//particles
-	loadAnimation("DashDust.png", 21.f, 15.f, 7, false, 0.02f, particleDash);
+	loadAnimation("poof.png", 43.f, 37.f, 30, false, 0.01f, particleDash);
 	loadAnimation("JumpDust.png", 7, false, 0.02f, particleJump);
-	loadAnimation("KnockbackDust.png", 36.f, 35.f, 1, true, 0.02f, particleHit);
+	loadAnimation("hitstunPoof.png", 62.f, 45.f, 73, false, 0.0166f, particleHit);
+	loadAnimation("FlyRing.png", 19.f, 45.f, 20, false, 0.0166f, particleFlyRing);
 
 	animatedSprite.setAnimation(animRun);
 	
@@ -311,16 +312,16 @@ void secro::CharacterDashette::setupStates(StateMachine & sm)
 		auto pos = getPosition();
 		auto& particle = lev->getParticleSystem().spawnParticle();
 		particle.animation.setAnimation(particleDash);
-		particle.animation.setOrigin({ 10.5f, 7.5f });
+		particle.animation.setOrigin({ 21.5f, 18.5f });
 		if (getFacingDirection() == FacingDirection::Left)
 		{
 			particle.animation.setScale({ -0.05f, 0.05f });
-			particle.animation.setPosition({ pos.x + 0.5f, pos.y + 0.5f });
+			particle.animation.setPosition({ pos.x + 0.5f, pos.y + 0.2f });
 		}
 		else
 		{
 			particle.animation.setScale({ 0.05f, 0.05f });
-			particle.animation.setPosition({ pos.x - 0.5f, pos.y + 0.5f });
+			particle.animation.setPosition({ pos.x - 0.5f, pos.y + 0.2f });
 		}
 	});
 	sm.addSetState(PlayerState::JumpSquat, [=](float f)
@@ -394,11 +395,20 @@ void secro::CharacterDashette::update(float deltaTime)
 	//spawn hit particles
 	if (getState() == PlayerState::Hitstun)
 	{
+		auto vel = getPhysicsBody()->GetLinearVelocity();
+		auto speed = length(vel);
+		std::cout << speed << std::endl;
+		particleHitDuration = particleHitDurationMax / (speed / 10.f);
+		if (particleHitDuration > particleHitDurationMax)
+			particleHitDuration = particleHitDurationMax;
+
 		particleHitHitstunTimer -= deltaTime;
 
 		//if (particleHitHitstunTimer >= 0.f)
 		{
 			particleHitTimer -= deltaTime;
+			particleFlyRingTimer -= deltaTime;
+
 			if (particleHitTimer <= 0.f)
 			{
 				particleHitTimer = particleHitDuration;
@@ -407,11 +417,30 @@ void secro::CharacterDashette::update(float deltaTime)
 				auto pos = getPosition();
 				auto& part = level->getParticleSystem().spawnParticle();
 				part.animation.setAnimation(particleHit);
-				part.animation.setOrigin({ 18.f, 17.5f });
-				part.animation.setScale({ 0.04f, 0.04f });
+				part.animation.setOrigin({ 43.f, 22.5f });
+				part.animation.setScale({ 0.025f, 0.025f });
 				part.animation.setPosition(pos.x, pos.y);
+				part.animation.setRotation(angleFromDirection(getPhysicsBody()->GetLinearVelocity()));
 				part.opacityOverTime = -200.f;
-				part.opacity = 70.f;
+				part.opacity = 100.f;
+				part.useAnimation = true;
+				part.inFrontOfCharacter = false;
+			}
+
+			if (particleFlyRingTimer <= 0.f)
+			{
+				particleFlyRingTimer = particleFlyRingDuration;
+
+				//spawn new particle
+				auto pos = getPosition();
+				auto& part = level->getParticleSystem().spawnParticle();
+				part.animation.setAnimation(particleFlyRing);
+				part.animation.setOrigin({ 9.5f, 22.5f });
+				part.animation.setScale({ 0.05f, 0.05f });
+				part.animation.setPosition(pos.x, pos.y);
+				part.animation.setRotation(angleFromDirection(getPhysicsBody()->GetLinearVelocity()));
+				part.opacityOverTime = -200.f;
+				part.opacity = 100.f;
 				part.useAnimation = false;
 				part.inFrontOfCharacter = false;
 			}

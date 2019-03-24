@@ -113,7 +113,7 @@ secro::Game::Game(std::shared_ptr<InputManager> input)
 			startLevel(newLevel, 2);
 
 			//hack the input
-			//inputBot = new InputTestBot(&*level->players[1], *inputManager->getController(1), 1);
+			inputBot = new InputTestBot(&*level->players[1], *inputManager->getController(1), 1);
 		};
 
 		std::shared_ptr<UISimpleButton> selectBridge = std::make_shared<UISimpleButton>();

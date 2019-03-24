@@ -3,6 +3,7 @@
 
 secro::PhysicsManager::PhysicsManager() : world(std::make_shared<b2World>(b2Vec2{0.f, 0.f}))
 {
+	world->SetContactListener(&listener);
 }
 
 secro::PhysicsManager::~PhysicsManager()
