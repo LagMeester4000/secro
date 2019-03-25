@@ -418,13 +418,16 @@ void secro::CharacterDashette::update(float deltaTime)
 				auto& part = level->getParticleSystem().spawnParticle();
 				part.animation.setAnimation(particleHit);
 				part.animation.setOrigin({ 43.f, 22.5f });
-				part.animation.setScale({ 0.025f, 0.025f });
 				part.animation.setPosition(pos.x, pos.y);
 				part.animation.setRotation(angleFromDirection(getPhysicsBody()->GetLinearVelocity()));
 				part.opacityOverTime = -200.f;
-				part.opacity = 100.f;
+				part.opacity = 80.f;
 				part.useAnimation = true;
 				part.inFrontOfCharacter = false;
+				int rScale = rand() % 2;
+				if (rScale == 0)
+					rScale = -1;
+				part.animation.setScale({ 0.025f, 0.025f * (float)rScale });
 			}
 
 			if (particleFlyRingTimer <= 0.f)
