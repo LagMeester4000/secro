@@ -6,6 +6,7 @@
 #include "framework/GameplaySettings.h"
 #include "gameplay/characters/CharacterDashette.h"
 #include "gameplay/characters/CharacterDashetteP2.h"
+#include "gameplay/characters/CharacterOki.h"
 #include "gameplay/level/BridgeLevel.h"
 
 //ui
@@ -113,7 +114,7 @@ secro::Game::Game(std::shared_ptr<InputManager> input)
 			startLevel(newLevel, 2);
 
 			//hack the input
-			//inputBot = new InputTestBot(&*level->players[1], *inputManager->getController(1), 1);
+			inputBot = new InputTestBot(&*level->players[1], *inputManager->getController(1), 1);
 		};
 
 		std::shared_ptr<UISimpleButton> selectBridge = std::make_shared<UISimpleButton>();
@@ -220,7 +221,7 @@ void secro::Game::startLevel(std::shared_ptr<Level> level, int amountOfPlayers)
 {
 	for (int i = 0; i < amountOfPlayers; ++i)
 	{
-		level->addPlayer(std::make_shared<CharacterDashette>());
+		level->addPlayer(std::make_shared<CharacterOki>());
 	}
 	level->init();
 	gameState = GameState::Gameplay;

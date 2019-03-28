@@ -38,6 +38,9 @@ namespace secro {
 		//called from the game/menu select
 		virtual void addPlayer(std::shared_ptr<PlayerCharacter> newPlayer);
 
+		//adds an entity to the level
+		virtual void addEntity(std::shared_ptr<Entity> newEntity);
+
 		//returns if the game is over
 		//is virtual because each level can have their own win condition
 		virtual bool isGameOver();
@@ -57,5 +60,6 @@ namespace secro {
 
 		//entities
 		std::vector<std::shared_ptr<PlayerCharacter>> players;
+		std::vector<std::shared_ptr<Entity>> entities;
 	};
 }

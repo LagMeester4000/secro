@@ -14,5 +14,6 @@ namespace secro {
 		virtual b2Vec2 getPosition() { return { 0.f, 0.f }; }
 		virtual b2Vec2 getScale() { return { 1.f, 1.f }; }
 		virtual FacingDirection getFacingDirection() { return FacingDirection::Right; }
+		virtual bool canBeDestroyed() { return false; }
 	};
 }
