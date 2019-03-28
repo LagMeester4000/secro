@@ -423,6 +423,8 @@ void secro::CharacterDashette::update(float deltaTime)
 				part.animation.setRotation(angleFromDirection(getPhysicsBody()->GetLinearVelocity()));
 				part.opacityOverTime = -200.f;
 				part.opacity = 100.f;
+				part.scale = 0.025f;
+				part.scaleOverTime = -0.05f;
 				part.useAnimation = true;
 				part.inFrontOfCharacter = false;
 			}
@@ -441,6 +443,7 @@ void secro::CharacterDashette::update(float deltaTime)
 				part.animation.setRotation(angleFromDirection(getPhysicsBody()->GetLinearVelocity()));
 				part.opacityOverTime = -200.f;
 				part.opacity = 100.f;
+				part.scale = 0.05f;
 				part.useAnimation = false;
 				part.inFrontOfCharacter = false;
 			}

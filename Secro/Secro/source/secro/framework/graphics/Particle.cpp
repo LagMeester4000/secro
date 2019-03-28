@@ -9,10 +9,11 @@ void secro::Particle::update(float deltaTime)
 {
 	animation.update(sf::seconds(deltaTime));
 	
-	//update opacity
+	//update vals
 	opacity += opacityOverTime * deltaTime;
+	scale += scaleOverTime * deltaTime;
 
-	//udpate animation opacity
+	//udpate opacity
 	auto color = animation.getColor();
 	float newOpac = opacity;
 	if (newOpac > 100.f)
@@ -21,6 +22,10 @@ void secro::Particle::update(float deltaTime)
 		newOpac = 0.f;
 	color.a = 255 * (newOpac / 100.f);
 	animation.setColor(color);
+
+	//update scale
+	float newScale = scale;
+	animation.setScale(newScale, newScale);
 }
 
 void secro::Particle::render(sf::RenderWindow & window)
@@ -31,5 +36,5 @@ void secro::Particle::render(sf::RenderWindow & window)
 bool secro::Particle::canBeDeleted()
 {
 	auto color = animation.getColor();
-	return (!animation.isPlaying() && useAnimation) || opacity < 0.f || opacity > 100.f;
+	return (!animation.isPlaying() && useAnimation) || opacity < 0.f || opacity > 100.f || scale <= 0.f;
 }

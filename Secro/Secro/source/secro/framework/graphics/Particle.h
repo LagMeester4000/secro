@@ -24,5 +24,8 @@ namespace secro {
 
 		float opacityOverTime = 0.f;
 		float opacity = 100.f;
+
+		float scaleOverTime = 0.f;
+		float scale = 0.05f;
 	};
 }
