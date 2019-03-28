@@ -1,4 +1,4 @@
-#include "CharacterDashette.h"
+#include "CharacterOki.h"
 #include "secro/framework/detail/PlainVectorMath.h"
 #include "secro/framework/level/Level.h"
 #include <Box2D/Box2D.h>
@@ -6,19 +6,19 @@
 #include <SFML/Graphics.hpp>
 #include <tuple>
 
-secro::CharacterDashette::CharacterDashette(Level* level, HitboxManager * hitboxManager, b2Body * body, std::shared_ptr<Controller> controller)
+secro::CharacterOki::CharacterOki(Level* level, HitboxManager * hitboxManager, b2Body * body, std::shared_ptr<Controller> controller)
 	: PlayerCharacter(level, hitboxManager, body, controller)
 {
 }
 
-secro::CharacterDashette::CharacterDashette()
+secro::CharacterOki::CharacterOki()
 {
 }
 
-void secro::CharacterDashette::init()
+void secro::CharacterOki::init()
 {
 	PlayerCharacter::init();
-	
+
 	specialDuration = 0.20f;
 	specialSpeed = 15.f;
 	specialRemainSpeed = 0.4f;
@@ -49,9 +49,7 @@ void secro::CharacterDashette::init()
 	loadAnimation("Dashette-Grab.png", 4, false, 0.05f, animGrab);
 	loadAnimation("Dashette-DAir.png", 1, false, 0.05f, animHitstun);
 	loadAnimation("Dashette-FreeFall.png", 1, false, 0.05f, animFreeFall);
-	loadAnimation("Dashette-dash.png", 1, false, 0.03f, animSpDash);
 	loadAnimation("Dashette-LandingLag.png", 1, false, 0.05f, animLandingLag);
-	loadAnimation("Dashette-Shine.png", 3, false, 0.017f, animSpShine);
 	loadAnimation("Dashette-TechLeft.png", 8, false, 0.03f, animTechLeft);
 	loadAnimation("Dashette-TechRight.png", 8, false, 0.05f, animTechRight);
 
@@ -62,7 +60,7 @@ void secro::CharacterDashette::init()
 	loadAnimation("FlyRing.png", 19.f, 45.f, 20, false, 0.0166f, particleFlyRing);
 
 	animatedSprite.setAnimation(animRun);
-	
+
 	//load shield
 	sf::Texture* shieldTexTemp = new sf::Texture();
 	shieldTexTemp->loadFromFile("Shield.png");
@@ -70,115 +68,9 @@ void secro::CharacterDashette::init()
 	shieldSprite.setOrigin(32.f, 32.f);
 }
 
-void secro::CharacterDashette::setupStates(StateMachine & sm)
+void secro::CharacterOki::setupStates(StateMachine & sm)
 {
 	PlayerCharacter::setupStates(sm);
-
-	sm.addCondition(PlayerState::Jump, PlayerState::SpecialN, std::bind(&CharacterDashette::canBeginSpecial, this, std::placeholders::_1));
-	sm.addCondition(PlayerState::Stand, PlayerState::SpecialN, std::bind(&CharacterDashette::canBeginSpecial, this, std::placeholders::_1));
-	sm.addCondition(PlayerState::Walk, PlayerState::SpecialN, std::bind(&CharacterDashette::canBeginSpecial, this, std::placeholders::_1));
-	sm.addCondition(PlayerState::Dash, PlayerState::SpecialN, std::bind(&CharacterDashette::canBeginSpecial, this, std::placeholders::_1));
-	sm.addCondition(PlayerState::Run, PlayerState::SpecialN, std::bind(&CharacterDashette::canBeginSpecial, this, std::placeholders::_1));
-
-	//attack into special cancel
-	sm.addCondition(PlayerState::AUTilt, PlayerState::SpecialN, std::bind(&CharacterDashette::canBeginSpecialFromAttack, this, std::placeholders::_1));
-	sm.addCondition(PlayerState::AFTilt, PlayerState::SpecialN, std::bind(&CharacterDashette::canBeginSpecialFromAttack, this, std::placeholders::_1));
-	sm.addCondition(PlayerState::ADTilt, PlayerState::SpecialN, std::bind(&CharacterDashette::canBeginSpecialFromAttack, this, std::placeholders::_1));
-	sm.addCondition(PlayerState::AUAir, PlayerState::SpecialN, std::bind(&CharacterDashette::canBeginSpecialFromAttack, this, std::placeholders::_1));
-	sm.addCondition(PlayerState::AFAir, PlayerState::SpecialN, std::bind(&CharacterDashette::canBeginSpecialFromAttack, this, std::placeholders::_1));
-	sm.addCondition(PlayerState::ABAir, PlayerState::SpecialN, std::bind(&CharacterDashette::canBeginSpecialFromAttack, this, std::placeholders::_1));
-	sm.addCondition(PlayerState::ADAir, PlayerState::SpecialN, std::bind(&CharacterDashette::canBeginSpecialFromAttack, this, std::placeholders::_1));
-	sm.addCondition(PlayerState::ANAir, PlayerState::SpecialN, std::bind(&CharacterDashette::canBeginSpecialFromAttack, this, std::placeholders::_1));
-	sm.addCondition(PlayerState::AGrab, PlayerState::SpecialN, std::bind(&CharacterDashette::canBeginSpecialFromAttack, this, std::placeholders::_1));
-	sm.addCondition(PlayerState::AGrabAir, PlayerState::SpecialN, std::bind(&CharacterDashette::canBeginSpecialFromAttack, this, std::placeholders::_1));
-
-	//instant attack
-	sm.addCondition(PlayerState::SpecialN, PlayerState::ANAir, [&](float f) 
-	{
-		auto dir = input->getMovementDirection();
-		return dir == Direction::Neutral && input->attackPressed();
-	});
-	sm.addCondition(PlayerState::SpecialN, PlayerState::AUAir, [&](float f)
-	{
-		auto dir = input->getMovementDirection();
-		auto adir = input->getDirAttackDirection();
-		return dir == Direction::Up && input->attackPressed() || adir == Direction::Up;
-	});
-	sm.addCondition(PlayerState::SpecialN, PlayerState::AFAir, [&](float f)
-	{
-		auto dir = input->getMovementDirection();
-		auto adir = input->getDirAttackDirection();
-		return isEqual(getFacingDirection(), dir) && input->attackPressed() || isEqual(getFacingDirection(), adir);
-	});
-	sm.addCondition(PlayerState::SpecialN, PlayerState::ABAir, [&](float f)
-	{
-		auto dir = input->getMovementDirection();
-		auto adir = input->getDirAttackDirection();
-		return isOpposite(getFacingDirection(), dir) && input->attackPressed() || isOpposite(getFacingDirection(), adir);
-	});
-	sm.addCondition(PlayerState::SpecialN, PlayerState::ADAir, [&](float f)
-	{
-		auto dir = input->getMovementDirection();
-		auto adir = input->getDirAttackDirection();
-		return dir == Direction::Down && input->attackPressed() || adir == Direction::Down;
-	});
-
-	//hyperjump
-	//sm.addCondition(PlayerState::SpecialN, PlayerState::SpecialU, [&](float f) 
-	//{
-	//	return getMovementState() == MovementState::OnGround && input->jumpPressed();
-	//});
-	//sm.addUnsetState(PlayerState::SpecialU, std::bind(&CharacterDashette::stateStartHyperJump, this));
-	//sm.addCondition(PlayerState::SpecialU, PlayerState::Jump, [&](float f) 
-	//{
-	//	return true;
-	//});
-
-	//direction special
-	sm.addSetState(PlayerState::SpecialN, std::bind(&CharacterDashette::stateStartSpecial, this));
-	sm.addUnsetState(PlayerState::SpecialN, std::bind(&CharacterDashette::stateEndSpecial, this));
-	sm.addCondition(PlayerState::SpecialN, PlayerState::Jump, [&](float f) 
-	{
-		return IsStateTimerDone();
-	});
-
-
-	//shine
-	auto condShine = [&](float f) 
-	{
-		auto dir = getInput()->getMovementDirection();
-		return dir == Direction::Neutral && getInput()->specialPressed();
-	};
-	sm.addCondition(PlayerState::Stand, PlayerState::SpecialD, condShine);
-	sm.addCondition(PlayerState::Dash, PlayerState::SpecialD, condShine);
-	sm.addCondition(PlayerState::Run, PlayerState::SpecialD, condShine);
-	sm.addCondition(PlayerState::Walk, PlayerState::SpecialD, condShine);
-	sm.addCondition(PlayerState::Jump, PlayerState::SpecialD, condShine);
-	sm.addCondition(PlayerState::SpecialD, PlayerState::Stand, [&](float f)
-	{
-		return IsStateTimerDone() && getMovementState() == MovementState::OnGround;
-	});
-	sm.addCondition(PlayerState::SpecialD, PlayerState::Jump, [&](float f)
-	{
-		return IsStateTimerDone() && getMovementState() == MovementState::InAir;
-	});
-	sm.addCondition(PlayerState::SpecialD, PlayerState::Jump, [&](float f) 
-	{
-		if (getInput()->jumpPressed() && getMovementState() == MovementState::InAir)
-		{
-			this->tryDoubleJump(f);
-			return true;
-		}
-		return false;
-	}); 
-	sm.addCondition(PlayerState::SpecialD, PlayerState::JumpSquat, [&](float f)
-	{
-		return getInput()->jumpPressed() && getMovementState() == MovementState::OnGround;
-	});
-	sm.addSetState(PlayerState::SpecialD, std::bind(&PlayerCharacter::stateStartNewAttack, this, PlayerState::SpecialD));
-	sm.addSetState(PlayerState::SpecialD, std::bind(&CharacterDashette::stateStartShineSpecial, this));
-	sm.addUnsetState(PlayerState::SpecialD, std::bind(&PlayerCharacter::endAttack, this));
-	sm.addUpdateState(PlayerState::SpecialD, std::bind(&CharacterDashette::stateUpdateShineSpecial, this, std::placeholders::_1));
 
 	//animations
 	sm.addSetState(PlayerState::Jump, [&](float f)
@@ -196,7 +88,7 @@ void secro::CharacterDashette::setupStates(StateMachine & sm)
 	sm.addSetState(PlayerState::Run, [&](float f)
 	{
 		animatedSprite.setAnimation(animRun);
-	}); 
+	});
 	sm.addSetState(PlayerState::Walk, [&](float f)
 	{
 		animatedSprite.setAnimation(animWalk);
@@ -249,7 +141,7 @@ void secro::CharacterDashette::setupStates(StateMachine & sm)
 	sm.addSetState(PlayerState::AGrab, [&](float f)
 	{
 		animatedSprite.setAnimation(animGrab);
-	}); 
+	});
 	sm.addSetState(PlayerState::AGrabAir, [&](float f)
 	{
 		animatedSprite.setAnimation(animGrab);
@@ -269,10 +161,6 @@ void secro::CharacterDashette::setupStates(StateMachine & sm)
 	sm.addSetState(PlayerState::LandingLag, [&](float f)
 	{
 		animatedSprite.setAnimation(animLandingLag);
-	}); 
-	sm.addSetState(PlayerState::SpecialD, [&](float f)
-	{
-		animatedSprite.setAnimation(animSpShine);
 	});
 	sm.addSetState(PlayerState::TechRollLeft, [&](float f)
 	{
@@ -289,25 +177,11 @@ void secro::CharacterDashette::setupStates(StateMachine & sm)
 			animatedSprite.setAnimation(animTechLeft);
 	});
 	auto& spDir = specialDirection;
-	sm.addSetState(PlayerState::SpecialN, [&](float f)
-	{
-		animatedSprite.setAnimation(animSpDash);
-		auto newDir = spDir;
-		newDir.x = -newDir.x;
-		float rot = angleFromDirection(newDir);
-		if (getFacingDirection() == FacingDirection::Left)
-			rot = 180.f + rot;
-		animatedSprite.setRotation(rot);
-	});
-	sm.addUnsetState(PlayerState::SpecialN, [&](float f)
-	{
-		animatedSprite.setRotation(0.f);
-	});
 
 
 	//particles
 	auto* lev = level;
-	sm.addSetState(PlayerState::Dash, [=](float f) 
+	sm.addSetState(PlayerState::Dash, [=](float f)
 	{
 		auto pos = getPosition();
 		auto& particle = lev->getParticleSystem().spawnParticle();
@@ -352,13 +226,13 @@ void secro::CharacterDashette::setupStates(StateMachine & sm)
 			particle.animation.setPosition({ pos.x + 0.5f, pos.y + 0.6f });
 		}
 	});
-	sm.addSetState(PlayerState::Hitstun, [&](float f) 
+	sm.addSetState(PlayerState::Hitstun, [&](float f)
 	{
 		particleHitHitstunTimer = getHitstun() * particleHitHitstunScalar;
 	});
 }
 
-void secro::CharacterDashette::setupAttacks(AttackCollection & atts)
+void secro::CharacterOki::setupAttacks(AttackCollection & atts)
 {
 	//PlayerCharacter::setupAttacks(attacks);
 
@@ -375,11 +249,11 @@ void secro::CharacterDashette::setupAttacks(AttackCollection & atts)
 
 	atts.loadAttack("Grab.json", PlayerState::AGrab);
 	atts.loadAttack("Grab.json", PlayerState::AGrabAir);
-	
+
 	atts.loadAttack("FalShine.json", PlayerState::SpecialD);
 }
 
-void secro::CharacterDashette::update(float deltaTime)
+void secro::CharacterOki::update(float deltaTime)
 {
 	PlayerCharacter::update(deltaTime);
 
@@ -421,9 +295,7 @@ void secro::CharacterDashette::update(float deltaTime)
 				part.animation.setPosition(pos.x, pos.y);
 				part.animation.setRotation(angleFromDirection(getPhysicsBody()->GetLinearVelocity()));
 				part.opacityOverTime = -200.f;
-				part.opacity = 100.f;
-				part.scale = 0.025f;
-				part.scaleOverTime = -0.05f;
+				part.opacity = 80.f;
 				part.useAnimation = true;
 				part.inFrontOfCharacter = false;
 				int rScale = rand() % 2;
@@ -446,7 +318,6 @@ void secro::CharacterDashette::update(float deltaTime)
 				part.animation.setRotation(angleFromDirection(getPhysicsBody()->GetLinearVelocity()));
 				part.opacityOverTime = -200.f;
 				part.opacity = 100.f;
-				part.scale = 0.05f;
 				part.useAnimation = false;
 				part.inFrontOfCharacter = false;
 			}
@@ -454,7 +325,7 @@ void secro::CharacterDashette::update(float deltaTime)
 	}
 }
 
-void secro::CharacterDashette::render(sf::RenderWindow & window)
+void secro::CharacterOki::render(sf::RenderWindow & window)
 {
 	//PlayerCharacter::render(window);
 	//return;
@@ -479,123 +350,7 @@ void secro::CharacterDashette::render(sf::RenderWindow & window)
 	}
 }
 
-int secro::CharacterDashette::getAirDashLeft()
-{
-	return airDashLeft;
-}
-
-bool secro::CharacterDashette::canBeginSpecial(float dt)
-{
-	auto dir = input->getMovementDirection();
-	if (dir == Direction::Neutral)
-		return false;
-
-	auto joy = input->getMovement();
-	return input->specialPressed() && getAirDashLeft() > 0 && length(joy) > 0.2f;
-}
-
-bool secro::CharacterDashette::canBeginSpecialFromAttack(float dt)
-{
-	auto dir = input->getMovementDirection();
-	if (dir == Direction::Neutral)
-		return false;
-
-	auto joy = input->getMovement();
-	return getHasAttackHit() && input->specialHeld() && length(joy) > 0.2f;
-}
-
-secro::Joystick makeOctoDir(secro::Joystick j)
-{
-	float pi = 3.14159265359f;
-
-	float angle = atan2(j.x, j.y);
-	int octant = int(8 * angle / (2 * pi) + 8.5) % 8;
-	float newAngle = octant * 45.f + 90.f;
-
-	secro::Joystick ret;
-	ret.x = -cos(newAngle / 180.f * pi);
-	ret.y = sin(newAngle / 180.f * pi);
-	return ret;
-}
-
-void secro::CharacterDashette::stateStartSpecial()
-{
-	auto stick = input->getMovement();
-	stick = normalise(stick);
-	stick = makeOctoDir(stick);
-
-	//set between value
-	specialDirection = { -stick.x, stick.y };
-
-	stick = mul(stick, specialSpeed);
-
-
-	useGravity = false;
-	physicsBody->SetLinearVelocity({ stick.x, stick.y });
-	setMovementState(MovementState::InAir);
-	setStateTimer(specialDuration);
-
-	//change friction
-	//attributes.groundDeceleration = specialGroundFriction;
-
-	//remove a dash
-	airDashLeft--;
-}
-
-void secro::CharacterDashette::stateEndSpecial()
-{
-	useGravity = true;
-	auto vel = physicsBody->GetLinearVelocity();
-	physicsBody->SetLinearVelocity(mul(vel, specialRemainSpeed));
-
-	//reset friction
-	attributes.groundDeceleration = normalFriction;
-}
-
-void secro::CharacterDashette::stateStartHyperJump()
-{
-	movementState = MovementState::InAir;
-	
-	auto vel = physicsBody->GetLinearVelocity();
-	vel.y = 0.f;
-	vel = mul(vel, specialHyperJumpPower);
-	vel.y = -specialHyperJumpHeight;
-
-	physicsBody->SetLinearVelocity(vel);
-}
-
-void secro::CharacterDashette::stateStartShineSpecial()
-{
-	auto vel = physicsBody->GetLinearVelocity();
-	vel.y /= 3.f;
-
-	if (movementState == MovementState::OnGround)
-	{
-		vel.x /= 1.5f;
-	}
-	else
-	{
-		vel.x /= 3.f;
-	}
-
-	physicsBody->SetLinearVelocity(vel);
-	setStateTimer(0.2f);
-}
-
-void secro::CharacterDashette::stateUpdateShineSpecial(float deltaTime)
-{
-	auto dir = input->getMovementDirection();
-	if (dir == Direction::Left)
-	{
-		facingDirection = FacingDirection::Left;
-	}
-	else if (dir == Direction::Right)
-	{
-		facingDirection = FacingDirection::Right;
-	}
-}
-
-void secro::CharacterDashette::addFrames(int amount, Animation & animation)
+void secro::CharacterOki::addFrames(int amount, Animation & animation)
 {
 	for (int i = 0; i < amount; ++i)
 	{
@@ -603,7 +358,7 @@ void secro::CharacterDashette::addFrames(int amount, Animation & animation)
 	}
 }
 
-void secro::CharacterDashette::loadAnimation(std::string fileName, int frames, bool loop, float speed, Animation & animation)
+void secro::CharacterOki::loadAnimation(std::string fileName, int frames, bool loop, float speed, Animation & animation)
 {
 	//TEMP
 	sf::Texture* tex = new sf::Texture();
@@ -618,7 +373,7 @@ void secro::CharacterDashette::loadAnimation(std::string fileName, int frames, b
 	animation.setSpeed(speed);
 }
 
-void secro::CharacterDashette::addFrames(float width, float height, int amount, Animation & animation)
+void secro::CharacterOki::addFrames(float width, float height, int amount, Animation & animation)
 {
 	for (int i = 0; i < amount; ++i)
 	{
@@ -626,7 +381,7 @@ void secro::CharacterDashette::addFrames(float width, float height, int amount, 
 	}
 }
 
-void secro::CharacterDashette::loadAnimation(std::string fileName, float width, float height, int frames, bool loop, float speed, Animation & animation)
+void secro::CharacterOki::loadAnimation(std::string fileName, float width, float height, int frames, bool loop, float speed, Animation & animation)
 {
 	//TEMP
 	sf::Texture* tex = new sf::Texture();

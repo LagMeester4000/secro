@@ -6,6 +6,7 @@
 #include "framework/GameplaySettings.h"
 #include "gameplay/characters/CharacterDashette.h"
 #include "gameplay/characters/CharacterDashetteP2.h"
+#include "gameplay/characters/CharacterOki.h"
 #include "gameplay/level/BridgeLevel.h"
 
 //ui
@@ -220,7 +221,7 @@ void secro::Game::startLevel(std::shared_ptr<Level> level, int amountOfPlayers)
 {
 	for (int i = 0; i < amountOfPlayers; ++i)
 	{
-		level->addPlayer(std::make_shared<CharacterDashette>());
+		level->addPlayer(std::make_shared<CharacterOki>());
 	}
 	level->init();
 	gameState = GameState::Gameplay;

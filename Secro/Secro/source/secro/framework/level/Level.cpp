@@ -65,6 +65,10 @@ void secro::Level::addPlayer(std::shared_ptr<PlayerCharacter> newPlayer)
 	newPlayer->reset({ 0.f, 0.f });
 }
 
+void secro::Level::addEntity(std::shared_ptr<Entity> newEntity)
+{
+}
+
 bool secro::Level::isGameOver()
 {
 	return false;

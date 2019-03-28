@@ -193,7 +193,7 @@
     <ClInclude Include="source\secro\gameplay\Camera.h" />
     <ClInclude Include="source\secro\gameplay\characters\CharacterDashette.h" />
     <ClInclude Include="source\secro\gameplay\characters\CharacterDashetteP2.h" />
-    <ClInclude Include="source\secro\gameplay\characters\OkiCharacter.h" />
+    <ClInclude Include="source\secro\gameplay\characters\CharacterOki.h" />
     <ClInclude Include="source\secro\gameplay\level\BridgeLevel.h" />
     <ClInclude Include="source\secro\gameplay\level\RingOutLevel.h" />
     <ClInclude Include="source\secro\gameplay\PlayerManager.h" />
@@ -244,6 +244,7 @@
     <ClCompile Include="source\secro\gameplay\Camera.cpp" />
     <ClCompile Include="source\secro\gameplay\characters\CharacterDashette.cpp" />
     <ClCompile Include="source\secro\gameplay\characters\CharacterDashetteP2.cpp" />
+    <ClCompile Include="source\secro\gameplay\characters\CharacterOki.cpp" />
     <ClCompile Include="source\secro\gameplay\level\BridgeLevel.cpp" />
     <ClCompile Include="source\secro\gameplay\level\RingOutLevel.cpp" />
     <ClCompile Include="source\secro\gameplay\PlayerManager.cpp" />

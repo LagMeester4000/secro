@@ -201,10 +201,10 @@
     <ClInclude Include="source\secro\framework\graphics\Particle.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="source\secro\gameplay\characters\OkiCharacter.h">
+    <ClInclude Include="source\secro\framework\physics\PlayerContact.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="source\secro\framework\physics\PlayerContact.h">
+    <ClInclude Include="source\secro\gameplay\characters\CharacterOki.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -345,6 +345,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="source\secro\framework\physics\PlayerContact.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="source\secro\gameplay\characters\CharacterOki.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
