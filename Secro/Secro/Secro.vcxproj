@@ -139,7 +139,10 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="source\editor\Editor.h" />
+    <ClInclude Include="source\editor\Scene.h" />
     <ClInclude Include="source\imgui\imgui-SFML.h" />
+    <ClInclude Include="source\secro\framework\ai\AIController.h" />
     <ClInclude Include="source\secro\framework\collision\Attack.h" />
     <ClInclude Include="source\secro\framework\collision\Box.h" />
     <ClInclude Include="source\secro\framework\collision\BoxHitbox.h" />
@@ -202,6 +205,19 @@
     <ClInclude Include="source\secro\netplay\Essentials.h" />
     <ClInclude Include="source\secro\netplay\InputPacket.h" />
     <ClInclude Include="source\secro\netplay\NetplayGame.h" />
+    <ClInclude Include="source\sen\Component.h" />
+    <ClInclude Include="source\sen\ComponentManager.h" />
+    <ClInclude Include="source\sen\Entity.h" />
+    <ClInclude Include="source\sen\EntityManager.h" />
+    <ClInclude Include="source\sen\Factory.h" />
+    <ClInclude Include="source\sen\FilterPath.h" />
+    <ClInclude Include="source\sen\Inspector.h" />
+    <ClInclude Include="source\sen\IUpdatable.h" />
+    <ClInclude Include="source\sen\Level.h" />
+    <ClInclude Include="source\sen\MemberRef.h" />
+    <ClInclude Include="source\sen\Meta.h" />
+    <ClInclude Include="source\sen\Serializer.h" />
+    <ClInclude Include="source\sen\Transform.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="source\imgui\imgui-SFML.cpp" />
@@ -251,6 +267,11 @@
     <ClCompile Include="source\secro\main.cpp" />
     <ClCompile Include="source\secro\netplay\InputPacket.cpp" />
     <ClCompile Include="source\secro\netplay\NetplayGame.cpp" />
+    <ClCompile Include="source\sen\Component.cpp" />
+    <ClCompile Include="source\sen\ComponentManager.cpp" />
+    <ClCompile Include="source\sen\Entity.cpp" />
+    <ClCompile Include="source\sen\EntityManager.cpp" />
+    <ClCompile Include="source\sen\FilterPath.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

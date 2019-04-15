@@ -221,7 +221,7 @@ void secro::Game::startLevel(std::shared_ptr<Level> level, int amountOfPlayers)
 {
 	for (int i = 0; i < amountOfPlayers; ++i)
 	{
-		level->addPlayer(std::make_shared<CharacterOki>());
+		level->addPlayer(std::make_shared<CharacterDashette>());
 	}
 	level->init();
 	gameState = GameState::Gameplay;
