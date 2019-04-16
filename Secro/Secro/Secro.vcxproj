@@ -217,6 +217,9 @@
     <ClInclude Include="source\sen\MemberRef.h" />
     <ClInclude Include="source\sen\Meta.h" />
     <ClInclude Include="source\sen\Serializer.h" />
+    <ClInclude Include="source\sen\SerializerLoad.h" />
+    <ClInclude Include="source\sen\SerializeSave.h" />
+    <ClInclude Include="source\sen\Test.h" />
     <ClInclude Include="source\sen\Transform.h" />
   </ItemGroup>
   <ItemGroup>
@@ -272,6 +275,8 @@
     <ClCompile Include="source\sen\Entity.cpp" />
     <ClCompile Include="source\sen\EntityManager.cpp" />
     <ClCompile Include="source\sen\FilterPath.cpp" />
+    <ClCompile Include="source\sen\SerializeSave.cpp" />
+    <ClCompile Include="source\sen\Test.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
@@ -284,6 +289,7 @@
     <Import Project="..\packages\sfml_graphics.2.5.1\build\native\sfml_graphics.targets" Condition="Exists('..\packages\sfml_graphics.2.5.1\build\native\sfml_graphics.targets')" />
     <Import Project="..\packages\sfml_network.redist.2.5.1\build\native\sfml_network.redist.targets" Condition="Exists('..\packages\sfml_network.redist.2.5.1\build\native\sfml_network.redist.targets')" />
     <Import Project="..\packages\sfml_network.2.5.1\build\native\sfml_network.targets" Condition="Exists('..\packages\sfml_network.2.5.1\build\native\sfml_network.targets')" />
+    <Import Project="..\packages\rapidjson.1.0.2\build\native\rapidjson.targets" Condition="Exists('..\packages\rapidjson.1.0.2\build\native\rapidjson.targets')" />
   </ImportGroup>
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
     <PropertyGroup>
@@ -298,5 +304,6 @@
     <Error Condition="!Exists('..\packages\sfml_graphics.2.5.1\build\native\sfml_graphics.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\sfml_graphics.2.5.1\build\native\sfml_graphics.targets'))" />
     <Error Condition="!Exists('..\packages\sfml_network.redist.2.5.1\build\native\sfml_network.redist.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\sfml_network.redist.2.5.1\build\native\sfml_network.redist.targets'))" />
     <Error Condition="!Exists('..\packages\sfml_network.2.5.1\build\native\sfml_network.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\sfml_network.2.5.1\build\native\sfml_network.targets'))" />
+    <Error Condition="!Exists('..\packages\rapidjson.1.0.2\build\native\rapidjson.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\rapidjson.1.0.2\build\native\rapidjson.targets'))" />
   </Target>
 </Project>

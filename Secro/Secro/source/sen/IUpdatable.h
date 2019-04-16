@@ -1,4 +1,5 @@
 #pragma once
+#include <string>
 
 namespace sen {
 	class IUpdatable {
@@ -8,5 +9,6 @@ namespace sen {
 		virtual void start() {}
 		virtual void update() {}
 		virtual void inspect() {}
+		virtual std::string getName() { return ""; }
 	};
 }

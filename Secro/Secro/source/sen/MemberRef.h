@@ -9,6 +9,12 @@ namespace sen {
 		const std::string name;
 		
 		using Attributes = TypeList<Atts...>;
+
+		template<typename T>
+		void serialize(T& t)
+		{
+			t.member(name, ref);
+		}
 	};
 
 	template<typename T, typename ... Atts>

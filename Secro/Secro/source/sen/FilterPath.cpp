@@ -1,13 +1,28 @@
 #include "FilterPath.h"
 #include <algorithm>
 
+using namespace sen;
+
 sen::FilterPath::FilterPath()
 {
+	path = "";
 }
 
 sen::FilterPath::FilterPath(std::string fullPath)
 {
+	path = fullPath;
+}
 
+FilterPath & sen::FilterPath::operator=(const FilterPath & other)
+{
+	path = other.path;
+	return *this;
+}
+
+FilterPath & sen::FilterPath::operator=(const std::string & other)
+{
+	path = other;
+	return *this;
 }
 
 void sen::FilterPath::setFullPath(std::string fullPath)

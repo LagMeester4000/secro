@@ -3,6 +3,7 @@
 #include <imgui/imgui-SFML.h>
 #include <imgui.h>
 #include "Game.h"
+#include "sen/Test.h"
 #include "framework/input/InputManager.h"
 
 void SetImGuiStyle()
@@ -76,6 +77,8 @@ const float FPS = 60.0f; //The desired FPS. (The number of updates each second).
 
 int main()
 {
+	//test SEN library
+	sen::test();
 
 	bool redraw = true;      //Do I redraw everything on the screen?
 

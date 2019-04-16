@@ -1,8 +1,8 @@
 #pragma once
 
 namespace sen {
-	template<typename T, typename ... Other>
-	constexpr bool HasType;
+	template<typename ... Other>
+	constexpr bool HasType = false;
 	template<typename T>
 	constexpr bool HasType<T> = false;
 	template<typename T, typename ... Other>

@@ -1,4 +1,5 @@
 #include "Entity.h"
+#include "Level.h"
 
 using namespace sen;
 
@@ -20,7 +21,7 @@ Level * sen::Entity::getLevel()
 
 float sen::Entity::getDeltaTime()
 {
-	return 0.0f;
+	return level->getDeltaTime();
 }
 
 void sen::Entity::destroy()
@@ -31,4 +32,19 @@ void sen::Entity::destroy()
 bool sen::Entity::isMarkedAsDestroyed()
 {
 	return destroyed;
+}
+
+std::string sen::Entity::getName()
+{
+	return name;
+}
+
+void sen::Entity::setName(std::string name)
+{
+	this->name = name;
+}
+
+FilterPath & sen::Entity::getFilterPath()
+{
+	return filterPath;
 }

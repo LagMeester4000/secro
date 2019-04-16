@@ -255,6 +255,15 @@
     <ClInclude Include="source\sen\FilterPath.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="source\sen\Test.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="source\sen\SerializeSave.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="source\sen\SerializerLoad.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="source\secro\main.cpp">
@@ -411,6 +420,12 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="source\sen\FilterPath.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="source\sen\Test.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="source\sen\SerializeSave.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

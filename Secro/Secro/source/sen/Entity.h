@@ -1,5 +1,6 @@
 #pragma once
 #include "ComponentManager.h"
+#include "FilterPath.h"
 #include <string>
 
 namespace sen {
@@ -22,25 +23,30 @@ namespace sen {
 		bool isMarkedAsDestroyed();
 
 		//get the name of the entity
-		std::string getName();
+		std::string getName() override;
 
 		//set the name of the entity
 		void setName(std::string name);
 
-		//get the filter path
-		std::string getFilterPath();
+		//get the filter path ref
+		FilterPath& getFilterPath();
 
 		//setup values for the entity
-		friend static void _initEntity(Entity* entity, Level* level, std::string name, std::string filterPath);
+		friend void _initEntity(Entity* entity, Level* level, std::string name, std::string filterPath);
 
 		template<typename T>
-		void serialize() {}
+		void serialize(T& t) {
+			t(
+				MEMBER(name), 
+				MEMBER(filterPath)
+			);
+		}
 
 	private:
 		Level* level;
 		bool destroyed;
 
 		std::string name;
-		std::string filterPath;
+		FilterPath filterPath;
 	};
 }
