@@ -26,6 +26,6 @@ namespace secro {
 		float opacity = 100.f;
 
 		float scaleOverTime = 0.f;
-		float scale = 0.05f;
+		sf::Vector2f scale = { 0.05f, 0.05f };
 	};
 }

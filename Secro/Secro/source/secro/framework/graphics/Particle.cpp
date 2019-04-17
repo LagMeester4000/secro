@@ -1,4 +1,5 @@
 #include "Particle.h"
+#include "secro/framework/detail/PlainVectorMath.h"
 #include <SFML/Graphics.hpp>
 
 secro::Particle::Particle()
@@ -11,7 +12,8 @@ void secro::Particle::update(float deltaTime)
 	
 	//update vals
 	opacity += opacityOverTime * deltaTime;
-	scale += scaleOverTime * deltaTime;
+	auto normScale = normalise(scale);
+	scale += normScale * scaleOverTime * deltaTime;
 
 	//udpate opacity
 	auto color = animation.getColor();
@@ -24,8 +26,7 @@ void secro::Particle::update(float deltaTime)
 	animation.setColor(color);
 
 	//update scale
-	float newScale = scale;
-	animation.setScale(newScale, newScale);
+	animation.setScale(scale);
 }
 
 void secro::Particle::render(sf::RenderWindow & window)
@@ -36,5 +37,5 @@ void secro::Particle::render(sf::RenderWindow & window)
 bool secro::Particle::canBeDeleted()
 {
 	auto color = animation.getColor();
-	return (!animation.isPlaying() && useAnimation) || opacity < 0.f || opacity > 100.f || scale <= 0.f;
+	return (!animation.isPlaying() && useAnimation) || opacity < 0.f || opacity > 100.f;
 }

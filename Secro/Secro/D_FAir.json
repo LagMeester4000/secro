@@ -49,8 +49,8 @@
                         "absolutePriority": 0,
                         "damage": 15.0,
                         "knockbackAngle": -45.0,
-                        "knockbackPowerBase": 5.0,
-                        "knockbackPowerGrowth": 20.0,
+                        "knockbackPowerBase": 10.0,
+                        "knockbackPowerGrowth": 30.0,
                         "hitstunAdjustment": 0.0,
                         "isGrabBox": false,
                         "isShieldBox": false

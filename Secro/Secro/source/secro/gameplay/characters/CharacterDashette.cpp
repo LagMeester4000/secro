@@ -422,14 +422,14 @@ void secro::CharacterDashette::update(float deltaTime)
 				part.animation.setRotation(angleFromDirection(getPhysicsBody()->GetLinearVelocity()));
 				part.opacityOverTime = -200.f;
 				part.opacity = 100.f;
-				part.scale = 0.025f;
-				part.scaleOverTime = -0.05f;
+				//part.scale = { 0.2f, 0.2f };
+				part.scaleOverTime = -0.1f;
 				part.useAnimation = true;
 				part.inFrontOfCharacter = false;
 				int rScale = rand() % 2;
 				if (rScale == 0)
 					rScale = -1;
-				part.animation.setScale({ 0.025f, 0.025f * (float)rScale });
+				part.scale = { 0.04f, 0.04f * (float)rScale };
 			}
 
 			if (particleFlyRingTimer <= 0.f)
@@ -446,7 +446,7 @@ void secro::CharacterDashette::update(float deltaTime)
 				part.animation.setRotation(angleFromDirection(getPhysicsBody()->GetLinearVelocity()));
 				part.opacityOverTime = -200.f;
 				part.opacity = 100.f;
-				part.scale = 0.05f;
+				part.scale = { 0.05f, 0.05f };
 				part.useAnimation = false;
 				part.inFrontOfCharacter = false;
 			}
