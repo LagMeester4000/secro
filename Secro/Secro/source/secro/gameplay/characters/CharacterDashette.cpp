@@ -56,7 +56,7 @@ void secro::CharacterDashette::init()
 	loadAnimation("Dashette-TechRight.png", 8, false, 0.05f, animTechRight);
 
 	//particles
-	loadAnimation("poof.png", 43.f, 37.f, 30, false, 0.01f, particleDash);
+	loadAnimation("P_dash.png", 192, 192, 32.f, 32.f, 36, false, 0.0166666f, particleDash);
 	loadAnimation("JumpDust.png", 7, false, 0.02f, particleJump);
 	loadAnimation("hitstunPoof.png", 62.f, 45.f, 73, false, 0.0166f, particleHit);
 	loadAnimation("FlyRing.png", 19.f, 45.f, 20, false, 0.0166f, particleFlyRing);
@@ -312,15 +312,18 @@ void secro::CharacterDashette::setupStates(StateMachine & sm)
 		auto pos = getPosition();
 		auto& particle = lev->getParticleSystem().spawnParticle();
 		particle.animation.setAnimation(particleDash);
-		particle.animation.setOrigin({ 21.5f, 18.5f });
+		particle.animation.setOrigin({ 16.f, 16.f });
 		if (getFacingDirection() == FacingDirection::Left)
 		{
-			particle.animation.setScale({ -0.05f, 0.05f });
+			//particle.animation.setScale({ -0.05f, 0.05f });
+			//particle.setScale({})
+			particle.scale = { 0.05f, 0.05f };
 			particle.animation.setPosition({ pos.x + 0.5f, pos.y + 0.2f });
 		}
 		else
 		{
-			particle.animation.setScale({ 0.05f, 0.05f });
+			//particle.animation.setScale({ 0.05f, 0.05f });
+			particle.scale = { -0.05f, 0.05f };
 			particle.animation.setPosition({ pos.x - 0.5f, pos.y + 0.2f });
 		}
 	});
@@ -637,6 +640,31 @@ void secro::CharacterDashette::loadAnimation(std::string fileName, float width, 
 	}
 	animation.setSpriteSheet(*tex);
 	addFrames(width, height, frames, animation);
+	animation.setLoops(loop);
+	animation.setSpeed(speed);
+}
+
+void secro::CharacterDashette::addFrames(int imgWidth, int imgHeight, float width, float height, int amount, Animation & animation)
+{
+	int framesWidth = imgWidth / width;
+	for (int i = 0; i < amount; ++i)
+	{
+		animation.addFrame(sf::IntRect(i % framesWidth * width, i / framesWidth * height, width, height));
+	}
+}
+
+
+void secro::CharacterDashette::loadAnimation(std::string fileName, int imgWidth, int imgHeight, float width, float height, int frames, bool loop, float speed, Animation & animation)
+{
+	//TEMP
+	sf::Texture* tex = new sf::Texture();
+	if (!tex->loadFromFile(fileName))
+	{
+		std::cout << "could not load " << fileName << std::endl;
+		return;
+	}
+	animation.setSpriteSheet(*tex);
+	addFrames(imgWidth, imgHeight, width, height, frames, animation);
 	animation.setLoops(loop);
 	animation.setSpeed(speed);
 }

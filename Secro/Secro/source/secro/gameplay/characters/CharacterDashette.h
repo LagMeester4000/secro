@@ -89,5 +89,8 @@ namespace secro {
 		
 		static void addFrames(float width, float height, int amount, Animation& animation);
 		static void loadAnimation(std::string fileName, float width, float height, int frames, bool loop, float speed, Animation& animation);
+
+		static void addFrames(int imgWidth, int imgHeight, float width, float height, int amount, Animation& animation);
+		static void loadAnimation(std::string fileName, int imgWidth, int imgHeight, float width, float height, int frames, bool loop, float speed, Animation & animation);
 	};
 }
