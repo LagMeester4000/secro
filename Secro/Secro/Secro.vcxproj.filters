@@ -428,5 +428,8 @@
     <ClCompile Include="source\sen\SerializeSave.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="source\sen\SerializerLoad.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>
