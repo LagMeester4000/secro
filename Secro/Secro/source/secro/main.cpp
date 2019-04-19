@@ -138,7 +138,7 @@ int main()
 		if (redraw)
 		{
 			redraw = false;
-			window.clear(sf::Color(107, 183, 255));
+			window.clear(sf::Color(0, 102, 204));
 
 			//draw things here
 			ImGui::SFML::Update(window, dtClock);

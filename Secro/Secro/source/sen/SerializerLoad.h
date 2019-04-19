@@ -7,6 +7,13 @@
 #include "MemberRef.h"
 
 namespace sen {
+	struct SerializeStackObj {
+		rapidjson::Value* value = nullptr;
+		std::string memberFound = "";
+		bool isArray = false;
+		int arrayIndex = 0;
+	};
+
 	class SerializerLoad {
 	public:
 		template<typename ... TT>
@@ -26,7 +33,16 @@ namespace sen {
 		template<typename T>
 		void execute(T&& val)
 		{
-			val.serialize(*this);
+			if (std::is_base_of_v<sen::Entity, std::remove_reference_t<T>>)
+			{
+				arrayStart();
+				val.serialize(*this);
+				arrayEnd();
+			}
+			else
+			{
+				val.serialize(*this);
+			}
 		}
 
 		template<typename T, typename ... TT>
@@ -35,9 +51,12 @@ namespace sen {
 			if (!top().HasMember(mem.name.c_str()))
 				return;
 
-			push(top()[mem.name.c_str()]);
+			//push(top()[mem.name.c_str()]);
+			//execute(mem.ref);
+			//pop();
+			topRaw().memberFound = mem.name;
 			execute(mem.ref);
-			pop();
+			//top().Accept()
 		}
 
 		template<typename T>
@@ -68,35 +87,50 @@ namespace sen {
 
 		void execute(int& val)
 		{
-			val = top().GetInt();
+			auto& readVal = (*topRaw().value)[topRaw().memberFound.c_str()];
+			val = readVal.GetInt();
 		}
 
 		void execute(float& val)
 		{
-			val = top().GetDouble();
+			auto& readVal = (*topRaw().value)[topRaw().memberFound.c_str()];
+			val = readVal.GetDouble();
 		}
 
 		void execute(std::string& val)
 		{
-			val = top().GetString();
+			auto& readVal = (*topRaw().value)[topRaw().memberFound.c_str()];
+			val = readVal.GetString();
 		}
 
 		void pop();
 		void push(rapidjson::Value& val);
+		void push(SerializeStackObj& val);
 		rapidjson::Value& top();
+		SerializeStackObj& topRaw();
+		
+		void objectStart();
+		void objectEnd();
+		void arrayStart();
+		void arrayEnd();
 
 	public:
 		rapidjson::Document document;
-		std::vector<rapidjson::Value*> stack;
+		std::vector<SerializeStackObj> stack;
 	};
 
 	template<typename ...TT>
 	inline void SerializerLoad::operator()(TT && ...args)
 	{
+		objectStart();
+		int ex[] = { this->ex(args)... };
+		objectEnd();
 	}
 
 	template<typename T>
 	inline void SerializerLoad::member(const std::string & name, T & val)
 	{
+		topRaw().memberFound = name;
+		execute(val);
 	}
 }

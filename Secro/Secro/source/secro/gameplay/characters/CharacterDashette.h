@@ -74,6 +74,7 @@ namespace secro {
 		Animation particleDash;
 		Animation particleJump;
 		Animation particleHit;
+		Animation particleGrab;
 		float particleHitDuration = 0.07f;
 		float particleHitDurationMax = 0.07f;
 		float particleHitTimer = 0.f;

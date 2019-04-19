@@ -60,6 +60,7 @@ void secro::CharacterDashette::init()
 	loadAnimation("JumpDust.png", 7, false, 0.02f, particleJump);
 	loadAnimation("hitstunPoof.png", 62.f, 45.f, 73, false, 0.0166f, particleHit);
 	loadAnimation("FlyRing.png", 19.f, 45.f, 20, false, 0.0166f, particleFlyRing);
+	loadAnimation("P_grab_effect.png", 96, 96, 32.f, 32.f, 9, false, 0.025f, particleGrab);
 
 	animatedSprite.setAnimation(animRun);
 	
@@ -358,6 +359,23 @@ void secro::CharacterDashette::setupStates(StateMachine & sm)
 	sm.addSetState(PlayerState::Hitstun, [&](float f) 
 	{
 		particleHitHitstunTimer = getHitstun() * particleHitHitstunScalar;
+	});
+	sm.addSetState(PlayerState::AGrab, [=](float f) 
+	{
+		auto pos = getPosition();
+		auto& particle = lev->getParticleSystem().spawnParticle();
+		particle.animation.setAnimation(particleGrab);
+		particle.animation.setOrigin({ 16.f, 16.f });
+		particle.animation.setScale({ 0.05f, 0.05f });
+		particle.animation.setColor({ 255, 179, 128 });
+		if (getFacingDirection() == FacingDirection::Right)
+		{
+			particle.animation.setPosition({ pos.x + 0.8f, pos.y + 0.2f });
+		}
+		else 
+		{
+			particle.animation.setPosition({ pos.x - 0.8f, pos.y + 0.2f });
+		}
 	});
 }
 
