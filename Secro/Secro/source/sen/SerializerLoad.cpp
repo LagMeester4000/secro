@@ -2,6 +2,16 @@
 
 using namespace sen;
 
+sen::SerializerLoad::SerializerLoad()
+{
+}
+
+void sen::SerializerLoad::parse(const char * json)
+{
+	document.Parse(json);
+	push(document);
+}
+
 void sen::SerializerLoad::pop()
 {
 	stack.pop_back();

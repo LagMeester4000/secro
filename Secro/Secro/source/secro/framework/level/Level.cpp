@@ -1,7 +1,6 @@
 #include "Level.h"
 #include "secro/framework/player/PlayerCharacter.h"
 #include "secro/framework/input/InputManager.h"
-#include "..\..\..\sen\Level.h"
 
 using namespace secro;
 
@@ -83,9 +82,4 @@ std::shared_ptr<PlayerCharacter> secro::Level::getWinningPlayer()
 ParticleSystem & secro::Level::getParticleSystem()
 {
 	return particleSystem;
-}
-
-float sen::Level::getDeltaTime()
-{
-	return deltaTime;
 }

@@ -3,6 +3,8 @@
 #include "MemberRef.h"
 #include "Entity.h"
 #include <type_traits>
+#include <vector>
+#include <memory>
 
 namespace sen {
 	class Entity;
@@ -28,7 +30,9 @@ namespace sen {
 		template<typename T>
 		void execute(T&& val)
 		{
-			if (std::is_base_of_v<sen::Entity, std::remove_reference_t<T>>)
+			if (std::is_base_of_v<sen::Entity, std::remove_reference_t<T>> ||
+				std::is_base_of_v<sen::Level, std::remove_reference_t<T>> ||
+				std::is_base_of_v<sen::Component, std::remove_reference_t<T>>)
 			{
 				writer.StartArray();
 				val.serialize(*this);
@@ -47,6 +51,25 @@ namespace sen {
 			writer.StartObject();
 			execute(mem.ref);
 			writer.EndObject();
+		}
+
+		template<typename T>
+		void execute(std::vector<T>&& val)
+		{
+			writer.StartArray();
+			for (auto& it : val)
+			{
+				writer.StartObject();
+				execute(it);
+				writer.EndObject();
+			}
+			writer.EndArray();
+		}
+
+		template<typename T>
+		void execute(std::shared_ptr<T>& val)
+		{
+			execute(*val);
 		}
 
 		void execute(int val)

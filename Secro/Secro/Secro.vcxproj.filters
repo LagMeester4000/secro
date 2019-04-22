@@ -264,6 +264,9 @@
     <ClInclude Include="source\sen\SerializerLoad.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="source\sen\Construct.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="source\secro\main.cpp">
@@ -429,6 +432,12 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="source\sen\SerializerLoad.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="source\sen\Construct.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="source\sen\Level.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

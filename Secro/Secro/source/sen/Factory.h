@@ -52,7 +52,7 @@ namespace sen {
 		virtual void inspect(Base* obj, Inspector& inspector)
 		{
 			T* asT = (T*)obj;
-			asT->serialize(serializer);
+			asT->serialize(inspector);
 		}
 	};
 
@@ -72,7 +72,7 @@ namespace sen {
 
 		FactoryObject<Base>& get(TypeIndex index)
 		{
-			return types[index];
+			return *types[index];
 		}
 
 		TypeIndex getType(Base* base)
@@ -116,7 +116,9 @@ int callRegister_##ClassName = register_##ClassName();
 #define REGISTER_ENTITY_CPP(ClassName) \
 int register_##ClassName() \
 { \
-	sen::Factory<sen::Entity>::registerType(std::make_shared<sen::FactoryObjImpl<ClassName>>(#ClassName)); \
+	auto reg = std::make_shared<sen::FactoryObjectImpl<sen::Entity, ClassName>>(); \
+	reg->name = #ClassName; \
+	sen::Factory<sen::Entity>::getInstance().registerType(reg); \
 	return 0; \
 } \
 \

@@ -3,11 +3,17 @@
 
 using namespace sen;
 
-void sen::_initEntity(Entity * entity, Level * level, std::string name, std::string filterPath)
+void sen::_initEntity(Entity * entity, Level * level, std::string type, std::string name, std::string filterPath)
 {
 	entity->level = level;
 	entity->name = name;
 	entity->filterPath = filterPath;
+	entity->type = type;
+}
+
+void sen::_initEntityPostSerialization(Entity * entity, Level * level)
+{
+	entity->level = level;
 }
 
 sen::Entity::Entity()

@@ -6,6 +6,10 @@ namespace sen {
 	public:
 		ComponentManager();
 
-
+		template<typename T>
+		void serialize(T& t)
+		{
+			//t()
+		}
 	};
 }

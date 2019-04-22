@@ -27,7 +27,14 @@ void sen::Component::destroy()
 	destroyed = true;
 }
 
-void sen::_setupComponent(Component * component, Entity * owner)
+void sen::_setupComponent(Component * component, Entity * owner, std::string type, std::string name)
+{
+	component->owner = owner;
+	component->type = type;
+	component->name = name;
+}
+
+void sen::_setupComponentPostSerialization(Component * component, Entity * owner)
 {
 	component->owner = owner;
 }

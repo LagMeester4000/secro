@@ -93,7 +93,7 @@
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(SolutionDir)./cereal/include/;$(ProjectDir)./source/;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)./cereal/include/;$(ProjectDir)./source/;$(SolutionDir)./rapidjson/include/;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpplatest</LanguageStandard>
       <PreprocessorDefinitions>_SILENCE_ALL_CXX17_DEPRECATION_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
@@ -125,7 +125,7 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(SolutionDir)./cereal/include/;$(ProjectDir)./source/;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)./cereal/include/;$(ProjectDir)./source/;$(SolutionDir)./rapidjson/include/;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpplatest</LanguageStandard>
       <PreprocessorDefinitions>_SILENCE_ALL_CXX17_DEPRECATION_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
@@ -207,6 +207,7 @@
     <ClInclude Include="source\secro\netplay\NetplayGame.h" />
     <ClInclude Include="source\sen\Component.h" />
     <ClInclude Include="source\sen\ComponentManager.h" />
+    <ClInclude Include="source\sen\Construct.h" />
     <ClInclude Include="source\sen\Entity.h" />
     <ClInclude Include="source\sen\EntityManager.h" />
     <ClInclude Include="source\sen\Factory.h" />
@@ -272,9 +273,11 @@
     <ClCompile Include="source\secro\netplay\NetplayGame.cpp" />
     <ClCompile Include="source\sen\Component.cpp" />
     <ClCompile Include="source\sen\ComponentManager.cpp" />
+    <ClCompile Include="source\sen\Construct.cpp" />
     <ClCompile Include="source\sen\Entity.cpp" />
     <ClCompile Include="source\sen\EntityManager.cpp" />
     <ClCompile Include="source\sen\FilterPath.cpp" />
+    <ClCompile Include="source\sen\Level.cpp" />
     <ClCompile Include="source\sen\SerializerLoad.cpp" />
     <ClCompile Include="source\sen\SerializeSave.cpp" />
     <ClCompile Include="source\sen\Test.cpp" />
@@ -290,7 +293,6 @@
     <Import Project="..\packages\sfml_graphics.2.5.1\build\native\sfml_graphics.targets" Condition="Exists('..\packages\sfml_graphics.2.5.1\build\native\sfml_graphics.targets')" />
     <Import Project="..\packages\sfml_network.redist.2.5.1\build\native\sfml_network.redist.targets" Condition="Exists('..\packages\sfml_network.redist.2.5.1\build\native\sfml_network.redist.targets')" />
     <Import Project="..\packages\sfml_network.2.5.1\build\native\sfml_network.targets" Condition="Exists('..\packages\sfml_network.2.5.1\build\native\sfml_network.targets')" />
-    <Import Project="..\packages\rapidjson.1.0.2\build\native\rapidjson.targets" Condition="Exists('..\packages\rapidjson.1.0.2\build\native\rapidjson.targets')" />
   </ImportGroup>
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
     <PropertyGroup>
@@ -305,6 +307,5 @@
     <Error Condition="!Exists('..\packages\sfml_graphics.2.5.1\build\native\sfml_graphics.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\sfml_graphics.2.5.1\build\native\sfml_graphics.targets'))" />
     <Error Condition="!Exists('..\packages\sfml_network.redist.2.5.1\build\native\sfml_network.redist.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\sfml_network.redist.2.5.1\build\native\sfml_network.redist.targets'))" />
     <Error Condition="!Exists('..\packages\sfml_network.2.5.1\build\native\sfml_network.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\sfml_network.2.5.1\build\native\sfml_network.targets'))" />
-    <Error Condition="!Exists('..\packages\rapidjson.1.0.2\build\native\rapidjson.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\rapidjson.1.0.2\build\native\rapidjson.targets'))" />
   </Target>
 </Project>

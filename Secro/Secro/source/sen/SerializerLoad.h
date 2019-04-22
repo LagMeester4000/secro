@@ -5,6 +5,7 @@
 #include <memory>
 #include "rapidjson/document.h"
 #include "MemberRef.h"
+#include "Construct.h"
 
 namespace sen {
 	struct SerializeStackObj {
@@ -16,6 +17,10 @@ namespace sen {
 
 	class SerializerLoad {
 	public:
+		SerializerLoad();
+
+		void parse(const char* json);
+
 		template<typename ... TT>
 		void operator()(TT&&... args);
 
@@ -77,11 +82,35 @@ namespace sen {
 		}
 
 		template<typename T>
-		void execute(std::shared_ptr<T>&& val)
+		void execute(std::shared_ptr<T>& val)
 		{
-			if (std::is_base_of_v<Entity, T>)
+			//load virtual type
+			if constexpr (std::is_base_of_v<sen::Entity, T>)
 			{
-
+				arrayStart();
+				auto& first = top()[0];
+				const char* type = first["type"].GetString();
+				auto* ent = sen::constructAndLoadEntity(type, *this);
+				val = std::static_pointer_cast<T>(std::shared_ptr<sen::Entity>(ent));
+				arrayEnd();
+			}
+			if constexpr (std::is_base_of_v<sen::Level, T>)
+			{
+				arrayStart();
+				auto& first = top()[0];
+				const char* type = first["type"].GetString();
+				auto* ent = sen::constructAndLoadLevel(type, *this);
+				val = std::static_pointer_cast<T>(std::shared_ptr<sen::Level>(ent));
+				arrayEnd();
+			}
+			if constexpr (std::is_base_of_v<sen::Component, T>)
+			{
+				arrayStart();
+				auto& first = top()[0];
+				const char* type = first["type"].GetString();
+				auto* ent = sen::constructAndLoadComponent(type, *this);
+				val = std::static_pointer_cast<T>(std::shared_ptr<sen::Component>(ent));
+				arrayEnd();
 			}
 		}
 
@@ -122,9 +151,15 @@ namespace sen {
 	template<typename ...TT>
 	inline void SerializerLoad::operator()(TT && ...args)
 	{
-		objectStart();
+		bool isRoot = stack.size() == 1;
+		
+		if (!isRoot)
+			objectStart();
+
 		int ex[] = { this->ex(args)... };
-		objectEnd();
+		
+		if (!isRoot)
+			objectEnd();
 	}
 
 	template<typename T>

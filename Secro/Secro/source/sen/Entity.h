@@ -32,14 +32,18 @@ namespace sen {
 		FilterPath& getFilterPath();
 
 		//setup values for the entity
-		friend void _initEntity(Entity* entity, Level* level, std::string name, std::string filterPath);
+		friend void _initEntity(Entity* entity, Level* level, std::string type, std::string name, std::string filterPath);
+		friend void _initEntityPostSerialization(Entity* entity, Level* level);
 
 		template<typename T>
 		void serialize(T& t) {
 			t(
 				MEMBER(name), 
-				MEMBER(filterPath)
+				MEMBER(filterPath),
+				MEMBER(type)
 			);
+
+			ComponentManager::serialize(t);
 		}
 
 	private:
@@ -48,5 +52,7 @@ namespace sen {
 
 		std::string name;
 		FilterPath filterPath;
+
+		std::string type;
 	};
 }
