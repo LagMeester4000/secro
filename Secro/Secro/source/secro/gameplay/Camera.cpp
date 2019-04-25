@@ -18,15 +18,27 @@ secro::Camera::Camera()
 	//setup frustum
 	frustumWidth = 5.f;
 	frustumHeight = 5.f;
+
+	shakeRadius = 0.f;
+	shakeRadiusChange = 0.f;
 }
 
 void secro::Camera::update(float deltaTime, std::vector<PlayerCharacter*> players)
 {
+	int randX = rand() % 200 - 100;
+	int randY = rand() % 200 - 100;
+	sf::Vector2f shake((float)randX / 100.f, (float)randY / 100.f);
+	shake *= shakeRadius;
+
+	shakeRadius -= shakeRadiusChange * deltaTime;
+	if (shakeRadius <= 0.f)
+		shakeRadius = 0.f;
+
 	sf::Vector2f avg = getPlayerAveragePosition(players);
 	float newZoom = getTargetZoom(players);
 
 	auto mov = avg - position;
-	position = position + mov * speed * deltaTime * deltaTime;
+	position = position + mov * speed * deltaTime * deltaTime + shake;
 	zoom = zoom + (newZoom - zoom) * zoomSpeed * deltaTime;
 
 	clamp();

@@ -51,6 +51,9 @@ namespace secro {
 		//get the particle system
 		ParticleSystem& getParticleSystem();
 
+		//get the camera
+		Camera& getCamera();
+
 	protected:
 		PhysicsManager physicsManager;
 		std::shared_ptr<InputManager> inputManager;

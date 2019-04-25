@@ -25,7 +25,7 @@ namespace secro {
 		float getTargetZoom(std::vector<PlayerCharacter*>& players);
 		void clamp();
 
-	private: //tweakable
+	public: //tweakable
 		//speed of the camera movement
 		float speed;
 
@@ -37,6 +37,10 @@ namespace secro {
 		
 		float minZoomIn, maxZoomIn;
 		float zoomSpeed;
+
+		//camera shake
+		float shakeRadius;
+		float shakeRadiusChange;
 
 	private: //consts
 		float screenWidth, screenHeight;

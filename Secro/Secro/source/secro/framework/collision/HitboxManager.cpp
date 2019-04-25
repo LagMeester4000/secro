@@ -1,6 +1,7 @@
 #include "HitboxManager.h"
 #include "secro/framework/player/PlayerCharacter.h"
 #include "secro/framework/DebugOptions.h"
+#include "secro/framework/level/Level.h"
 #include <algorithm>
 
 using namespace secro;
@@ -9,7 +10,7 @@ secro::HitboxManager::HitboxManager()
 {
 }
 
-void secro::HitboxManager::update(float deltaTime)
+void secro::HitboxManager::update(float deltaTime, Level& level)
 {
 	//remove dirty hitboxes
 	deleteMarked();
@@ -60,6 +61,13 @@ void secro::HitboxManager::update(float deltaTime)
 
 							//has hit
 							otherPlayer->attackHasHit();
+
+							//camera shake
+							level.getCamera().shakeRadius = hitlag;
+							level.getCamera().shakeRadiusChange = 0.5f;
+
+							//good
+							//level.getCamera().shakeRadius = hitlag / 1.5f;
 						}
 					}
 				}

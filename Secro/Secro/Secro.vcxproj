@@ -277,7 +277,7 @@
     <ClCompile Include="source\sen\Entity.cpp" />
     <ClCompile Include="source\sen\EntityManager.cpp" />
     <ClCompile Include="source\sen\FilterPath.cpp" />
-    <ClCompile Include="source\sen\Level.cpp" />
+    <ClCompile Include="source\sen\SenLevel.cpp" />
     <ClCompile Include="source\sen\SerializerLoad.cpp" />
     <ClCompile Include="source\sen\SerializeSave.cpp" />
     <ClCompile Include="source\sen\Test.cpp" />

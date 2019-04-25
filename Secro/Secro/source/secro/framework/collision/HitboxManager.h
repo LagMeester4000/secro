@@ -3,6 +3,7 @@
 
 namespace secro {
 	struct FrameData;
+	class Level;
 
 	//manager that holds all the hit and hurtboxes from the player used for damaging
 	//this is separate from the physics
@@ -12,7 +13,7 @@ namespace secro {
 
 		//check for collisions
 		//delete marked hitboxes
-		void update(float deltaTime);
+		void update(float deltaTime, Level& level);
 
 		//render the hitboxes in the scene
 		void render(sf::RenderWindow& window);

@@ -437,7 +437,7 @@
     <ClCompile Include="source\sen\Construct.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="source\sen\Level.cpp">
+    <ClCompile Include="source\sen\SenLevel.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

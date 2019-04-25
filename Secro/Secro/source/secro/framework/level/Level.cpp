@@ -24,7 +24,7 @@ void secro::Level::update(float deltaTime)
 		it->update(deltaTime);
 	}
 	physicsManager.update(deltaTime);
-	hitboxManager.update(deltaTime);
+	hitboxManager.update(deltaTime, *this);
 	particleSystem.update(deltaTime);
 
 	std::vector<PlayerCharacter*> p = { &*players[0], &*players[1] };
@@ -82,4 +82,9 @@ std::shared_ptr<PlayerCharacter> secro::Level::getWinningPlayer()
 ParticleSystem & secro::Level::getParticleSystem()
 {
 	return particleSystem;
+}
+
+Camera & secro::Level::getCamera()
+{
+	return camera;
 }
