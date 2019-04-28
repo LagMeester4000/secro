@@ -2,6 +2,7 @@
 #include "secro/framework/player/PlayerCharacter.h"
 #include "secro/framework/DebugOptions.h"
 #include "secro/framework/level/Level.h"
+#include "secro/framework/GameplaySettings.h"
 #include <algorithm>
 
 using namespace secro;
@@ -63,8 +64,10 @@ void secro::HitboxManager::update(float deltaTime, Level& level)
 							otherPlayer->attackHasHit();
 
 							//camera shake
-							level.getCamera().shakeRadius = hitlag;
-							level.getCamera().shakeRadiusChange = 0.5f;
+							auto& currentHit = results.hits[0];
+							float shake = GameplaySettings::calculateKnockback(asPlayer->getDamageScalar(), currentHit->knockbackPowerBase, currentHit->knockbackPowerGrowth);
+							level.getCamera().shakeRadius = shake / 100.f;
+							level.getCamera().shakeRadiusChange = level.getCamera().shakeRadius / hitlag;
 
 							//good
 							//level.getCamera().shakeRadius = hitlag / 1.5f;
@@ -72,7 +75,7 @@ void secro::HitboxManager::update(float deltaTime, Level& level)
 					}
 				}
 
-			}				
+			}
 		}
 	}
 }

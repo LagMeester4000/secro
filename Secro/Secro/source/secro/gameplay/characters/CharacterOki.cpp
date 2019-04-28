@@ -1,6 +1,7 @@
 #include "CharacterOki.h"
 #include "secro/framework/detail/PlainVectorMath.h"
 #include "secro/framework/level/Level.h"
+#include "secro/framework/input/Controller.h"
 #include <Box2D/Box2D.h>
 #include <functional>
 #include <SFML/Graphics.hpp>
@@ -19,15 +20,15 @@ void secro::CharacterOki::init()
 {
 	PlayerCharacter::init();
 
-	specialDuration = 0.20f;
-	specialSpeed = 15.f;
-	specialRemainSpeed = 0.4f;
-	specialGroundFriction = -100.f;
-	specialHyperJumpPower = 3.f;
-	specialHyperJumpHeight = 14.f;
-	specialAmountOfAirDash = 3;
-
-	normalFriction = attributes.groundDeceleration;
+	//specialDuration = 0.20f;
+	//specialSpeed = 15.f;
+	//specialRemainSpeed = 0.4f;
+	//specialGroundFriction = -100.f;
+	//specialHyperJumpPower = 3.f;
+	//specialHyperJumpHeight = 14.f;
+	//specialAmountOfAirDash = 3;
+	//
+	//normalFriction = attributes.groundDeceleration;
 
 
 	//load animations
@@ -176,7 +177,14 @@ void secro::CharacterOki::setupStates(StateMachine & sm)
 		else
 			animatedSprite.setAnimation(animTechLeft);
 	});
-	auto& spDir = specialDirection;
+	//auto& spDir = specialDirection;
+
+	//specials 
+	auto condHook = [&](float f) {
+		auto dir = getInput()->getMovementDirection();
+		return getInput()->specialPressed() && dir != Direction::Neutral;
+	};
+	//sm.addCondition(,)
 
 
 	//particles
@@ -259,11 +267,6 @@ void secro::CharacterOki::update(float deltaTime)
 
 	if (!isInHitlag())
 		animatedSprite.update(sf::seconds(deltaTime));
-
-	if (movementState == MovementState::OnGround)
-	{
-		airDashLeft = specialAmountOfAirDash;
-	}
 
 
 	//spawn hit particles

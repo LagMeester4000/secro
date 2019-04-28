@@ -16,17 +16,29 @@ namespace secro {
 		void render(sf::RenderWindow& window) override;
 
 	private: //special
-		b2Vec2 specialDirection;
-		float specialSpeed;
-		float specialDuration;
-		float specialRemainSpeed;
-		float specialGroundFriction;
-		float specialHyperJumpPower;
-		float specialHyperJumpHeight;
-		int specialAmountOfAirDash;
+		//b2Vec2 specialDirection;
+		//float specialSpeed;
+		//float specialDuration;
+		//float specialRemainSpeed;
+		//float specialGroundFriction;
+		//float specialHyperJumpPower;
+		//float specialHyperJumpHeight;
+		//int specialAmountOfAirDash;
+		//
+		//float normalFriction;
+		//int airDashLeft;
 
-		float normalFriction;
-		int airDashLeft;
+	private: //new special
+		//tweakable
+		float hookRange;
+		float hookDettachRange;
+		float hookPullForce;
+
+		//internal
+		bool isHookOut;
+		b2Vec2 hookPosition;
+		float hookStartLength;
+
 
 	public: //graphics
 		AnimatedSprite animatedSprite;
