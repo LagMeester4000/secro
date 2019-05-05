@@ -28,6 +28,11 @@ namespace secro {
 		float doubleJumpSpeed;
 		float jumpSquatDuration;
 
+		//airdash
+		float airDashSpeed;
+		float airDashInputTimeFrame;
+		float airDashCooldown;
+
 		//dash (not the character dash, but the dash on the ground)
 		float dashDuration;
 		float dashInitialSpeed;

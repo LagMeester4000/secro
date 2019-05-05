@@ -252,6 +252,8 @@
     <ClCompile Include="source\secro\framework\player\PlayerAttributes.cpp" />
     <ClCompile Include="source\secro\framework\player\PlayerCharacter.cpp" />
     <ClCompile Include="source\secro\framework\player\StateMachine.cpp" />
+    <ClCompile Include="source\secro\framework\player\TimerManager.cpp" />
+    <ClCompile Include="source\secro\framework\player\TimerManager.h" />
     <ClCompile Include="source\secro\framework\ui\UIButton.cpp" />
     <ClCompile Include="source\secro\framework\ui\UIElement.cpp" />
     <ClCompile Include="source\secro\framework\ui\UIManager.cpp" />

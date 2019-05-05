@@ -304,5 +304,17 @@ namespace secro {
 	public:
 		//get the DI in degrees
 		float getDI(float angle);
+
+	private: //air dash
+		float airDashTimer = 0.f;
+		Direction airDashPreviousDirection;
+		Direction airDashDirection;
+		bool canAirDash = false;
+		bool isAirDashUsed = false;
+
+	protected:
+		void updateAirDashTimer(float deltaTime);
+		void conditionAirDash();
+		void resetAirDashTimer();
 	};
 }

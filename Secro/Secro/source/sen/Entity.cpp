@@ -54,3 +54,8 @@ FilterPath & sen::Entity::getFilterPath()
 {
 	return filterPath;
 }
+
+const std::string & sen::Entity::getType()
+{
+	return type;
+}

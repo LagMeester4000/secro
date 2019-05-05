@@ -3,6 +3,13 @@
 #include "Factory.h"
 #include <string>
 
+void sen::saveEntity(Entity * entity, SerializerSave & serializer)
+{
+	auto& type = entity->getType();
+	auto& factory = Factory<Entity>::getInstance();
+	factory.get(factory.getType(type)).serializeSave(entity, serializer);
+}
+
 sen::Entity * sen::constructEntity(const char * type)
 {
 	auto& factory = Factory<Entity>::getInstance();
@@ -18,6 +25,10 @@ sen::Entity * sen::constructAndLoadEntity(const char * type, sen::SerializerLoad
 	return ret;
 }
 
+void sen::saveLevel(Level * level, SerializerSave & serializer)
+{
+}
+
 sen::Level * sen::constructLevel(const char * type)
 {
 	auto& factory = Factory<Level>::getInstance();
@@ -31,6 +42,10 @@ sen::Level * sen::constructAndLoadLevel(const char * type, SerializerLoad & seri
 	auto* ret = facObj.construct();
 	facObj.serializeLoad(ret, serializer);
 	return ret;
+}
+
+void sen::saveComponent(Component * component, SerializerSave & serializer)
+{
 }
 
 sen::Component * sen::constructComponent(const char * type)

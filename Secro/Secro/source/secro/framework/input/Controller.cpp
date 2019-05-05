@@ -111,7 +111,7 @@ void secro::Controller::swapBack()
 	}
 }
 
-Direction secro::Controller::getDirection(const Joystick & stick) const
+Direction secro::Controller::getDirection(const Joystick & stick)
 {
 	if (stick.x > 70.7f)
 	{

@@ -126,7 +126,7 @@ namespace secro {
 
 	public:
 		//get the direction of a joystick
-		Direction getDirection(const Joystick& stick) const;
+		static Direction getDirection(const Joystick& stick);
 
 		//get const ref to most recent input
 		const Input& getInput(size_t index);

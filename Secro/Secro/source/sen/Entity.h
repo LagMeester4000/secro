@@ -31,6 +31,9 @@ namespace sen {
 		//get the filter path ref
 		FilterPath& getFilterPath();
 
+		//get the type of the entity
+		const std::string& getType();
+
 		//setup values for the entity
 		friend void _initEntity(Entity* entity, Level* level, std::string type, std::string name, std::string filterPath);
 		friend void _initEntityPostSerialization(Entity* entity, Level* level);

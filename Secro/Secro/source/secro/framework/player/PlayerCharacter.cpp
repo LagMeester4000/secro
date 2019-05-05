@@ -9,6 +9,7 @@
 #include "../detail/PlainVectorMath.h"
 #include "../DebugOptions.h"
 #include "../GameplaySettings.h"
+#include "secro/framework/level/Level.h"
 
 using namespace secro;
 
@@ -69,6 +70,10 @@ void secro::PlayerCharacter::init()
 	a.techRollDuration = 0.2f;
 	a.techRollInvDuration = 0.17f;
 	a.techRollSpeed = 8.f;
+	//airdash
+	a.airDashCooldown = 1.f;
+	a.airDashSpeed = 10.f;
+	a.airDashInputTimeFrame = 0.5f;
 		
 	state = PlayerState::Jump;
 	movementState = MovementState::InAir;
@@ -470,6 +475,10 @@ void secro::PlayerCharacter::setupStates(StateMachine & sm)
 	sm.addUnsetState(PlayerState::TechRollLeft, std::bind(&PlayerCharacter::stateTechEnd, this));
 	sm.addUnsetState(PlayerState::TechRollRight, std::bind(&PlayerCharacter::stateTechEnd, this));
 	sm.addUnsetState(PlayerState::TechInPlace, std::bind(&PlayerCharacter::stateTechEnd, this));
+
+
+
+	sm.addUpdateState(PlayerState::Jump, std::bind(&PlayerCharacter::conditionAirDash, this));
 }
 
 void secro::PlayerCharacter::setupAttacks(AttackCollection & atts)
@@ -492,6 +501,7 @@ void secro::PlayerCharacter::update(float deltaTime)
 {
 	updateDI(deltaTime);
 	updateHitlag(deltaTime);
+	updateAirDashTimer(deltaTime);
 
 	if (!isInHitlag())
 	{
@@ -1565,4 +1575,57 @@ float secro::PlayerCharacter::getDI(float angle)
 			return DI * GameplaySettings::DIInfluence;
 		}
 	}
+}
+
+void secro::PlayerCharacter::updateAirDashTimer(float deltaTime)
+{
+	if (movementState == MovementState::OnGround)
+		isAirDashUsed = false;
+
+	airDashTimer += deltaTime;
+	if (airDashTimer > attributes.airDashInputTimeFrame)
+	{
+		resetAirDashTimer();
+	}
+
+	canAirDash = false;
+	auto d0 = input->getMovementDirection();
+	auto d1 = Controller::getDirection(input->getInput(1).leftStick);
+	if (d1 == Direction::Neutral && (d0 == Direction::Left || d0 == Direction::Right))
+	{
+		if (airDashPreviousDirection == d0)
+		{
+			resetAirDashTimer();
+			airDashDirection = d0;
+			canAirDash = true;
+		}
+		else
+		{
+			resetAirDashTimer();
+			airDashPreviousDirection = d0;
+		}
+	}
+}
+
+void secro::PlayerCharacter::conditionAirDash()
+{
+	if (canAirDash && !isAirDashUsed)
+	{
+		//start the air dash
+		b2Vec2 dir = { 1.f, -0.3f };
+		if (airDashDirection == Direction::Left)
+			dir.x = -1.f;
+
+		physicsBody->SetLinearVelocity(mul(dir, attributes.airDashSpeed));
+
+		//airdash can no longer be used
+		isAirDashUsed = true;
+	}
+}
+
+void secro::PlayerCharacter::resetAirDashTimer()
+{
+	canAirDash = false;
+	airDashPreviousDirection = Direction::Neutral;
+	airDashTimer = 0.f;
 }
