@@ -20,7 +20,7 @@ namespace secro {
 	private:
 		FrameData frameData;
 
-		float time;
+		float time = 0.f;
 		int selectedFrame;
 		int selectedChange;
 		int selectedHitbox;

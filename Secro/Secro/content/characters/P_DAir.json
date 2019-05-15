@@ -1,0 +1,88 @@
+{
+    "value0": {
+        "amountOfHitboxes": 1,
+        "duration": 0.44999998807907107,
+        "landingLag": 0.1599999964237213,
+        "frames": [
+            {
+                "time": 0.0,
+                "changes": [
+                    {
+                        "cereal_class_version": 2,
+                        "index": 0,
+                        "position": {
+                            "x": 0.0,
+                            "y": 0.0
+                        },
+                        "isActive": false,
+                        "isHitbox": true,
+                        "hitNumber": 0,
+                        "width": 1.0,
+                        "height": 1.0,
+                        "relativePriority": 0,
+                        "absolutePriority": 0,
+                        "damage": 1.0,
+                        "knockbackAngle": -45.0,
+                        "knockbackPowerBase": 1.0,
+                        "knockbackPowerGrowth": 1.0,
+                        "hitstunAdjustment": 0.0,
+                        "isGrabBox": false,
+                        "isShieldBox": false
+                    }
+                ]
+            },
+            {
+                "time": 0.17100000381469727,
+                "changes": [
+                    {
+                        "index": 0,
+                        "position": {
+                            "x": 0.0,
+                            "y": 0.5299999713897705
+                        },
+                        "isActive": true,
+                        "isHitbox": true,
+                        "hitNumber": 0,
+                        "width": 0.5,
+                        "height": 1.0,
+                        "relativePriority": 0,
+                        "absolutePriority": 0,
+                        "damage": 1.0,
+                        "knockbackAngle": 75.0,
+                        "knockbackPowerBase": 10.0,
+                        "knockbackPowerGrowth": 10.0,
+                        "hitstunAdjustment": 0.0,
+                        "isGrabBox": false,
+                        "isShieldBox": false
+                    }
+                ]
+            },
+            {
+                "time": 0.2759999930858612,
+                "changes": [
+                    {
+                        "index": 0,
+                        "position": {
+                            "x": 0.0,
+                            "y": 0.0
+                        },
+                        "isActive": false,
+                        "isHitbox": true,
+                        "hitNumber": 0,
+                        "width": 1.0,
+                        "height": 1.0,
+                        "relativePriority": 0,
+                        "absolutePriority": 0,
+                        "damage": 1.0,
+                        "knockbackAngle": -45.0,
+                        "knockbackPowerBase": 1.0,
+                        "knockbackPowerGrowth": 1.0,
+                        "hitstunAdjustment": 0.0,
+                        "isGrabBox": false,
+                        "isShieldBox": false
+                    }
+                ]
+            }
+        ]
+    }
+}

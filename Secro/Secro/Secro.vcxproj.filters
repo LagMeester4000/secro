@@ -267,6 +267,12 @@
     <ClInclude Include="source\sen\Construct.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="source\secro\gameplay\characters\PlayerGraphicsCharacter.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="source\secro\gameplay\characters\CharacterPsycho.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="source\secro\main.cpp">
@@ -444,6 +450,12 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="source\secro\framework\player\TimerManager.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="source\secro\gameplay\characters\PlayerGraphicsCharacter.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="source\secro\gameplay\characters\CharacterPsycho.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

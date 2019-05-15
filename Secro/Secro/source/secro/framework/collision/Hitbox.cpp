@@ -23,6 +23,8 @@ void secro::Hitbox::update(HitboxChange & change)
 
 	isGrabBox = change.isGrabBox;
 	isShieldBox = change.isShieldBox;
+
+	extraFreezeFrames = change.extraFreezeFrames;
 }
 
 void secro::Hitbox::knockbackPlayer(PlayerCharacter * player, FacingDirection direction)

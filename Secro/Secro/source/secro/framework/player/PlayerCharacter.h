@@ -118,11 +118,17 @@ namespace secro {
 		void knockBack(b2Vec2 knockback);
 
 	public:
+		//function used to start and load a new attack state
 		void stateStartNewAttack(PlayerState attack);
+
+		//function called when an attack state is ended
 		void endAttack();
+
+		//function to try and double jump
 		void tryDoubleJump(float deltaTime);
 
 	protected:
+		//set the current movement state
 		void setMovementState(MovementState m);
 
 	private: //hitstun

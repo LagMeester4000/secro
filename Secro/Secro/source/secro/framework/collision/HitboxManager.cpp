@@ -54,7 +54,7 @@ void secro::HitboxManager::update(float deltaTime, Level& level)
 						}
 						
 						//hitlag
-						float hitlag = 0.06f + 0.09f * (results.hits[0]->knockbackPowerGrowth / 15.f);
+						float hitlag = 0.06f + 0.09f * (results.hits[0]->knockbackPowerGrowth / 15.f) + results.hits[0]->extraFreezeFrames;
 						asPlayer->putInHitlag(hitlag);
 						if (auto* otherPlayer = dynamic_cast<PlayerCharacter*>(hit->getOwner()))
 						{

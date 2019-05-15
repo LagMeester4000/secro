@@ -72,6 +72,9 @@ namespace secro {
 		//flat amount of hitstun that is added (or removed) when the opponent is hit
 		float hitstunAdjustment;
 
+		//extra freezeframes
+		float extraFreezeFrames;
+
 		//extra functionality for special hit events
 		std::function<void(PlayerCharacter*, Hitbox&)> hitEvent;
 

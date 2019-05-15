@@ -68,13 +68,23 @@ void secro::CollisionRenderer::render(sf::RenderWindow & window, FrameData & fra
 	}
 }
 
-static char filePath[32];
+#include "secro/framework/graphics/Animation.h"
+#include "secro/framework/graphics/AnimatedSprite.h"
+static char filePath[128];
+static char animationFilePath[128];
+static float animationSpeed = 0.05f;
+static int animationFrames = 1;
+static Animation previewAnimation;
+static AnimatedSprite previewSprite;
+static bool isAnimationLoaded = false;
+
 
 #include <iostream>
 #include <fstream>
 #include <istream>
 #include <experimental/filesystem>
 #include <cereal/archives/json.hpp>
+#include "secro/gameplay/characters/PlayerGraphicsCharacter.h"
 std::string asFrames(float time)
 {
 	std::string frames = std::to_string((int)(time / 0.0166f));
@@ -92,7 +102,7 @@ void secro::CollisionRenderer::renderFrameDataEditor(sf::RenderWindow & window)
 
 	if (ImGui::Begin("Frame Data Editor"))
 	{
-		ImGui::InputText("File", filePath, 32);
+		ImGui::InputText("File", filePath, 128);
 
 		if (ImGui::Button("Save"))
 		{
@@ -130,6 +140,30 @@ void secro::CollisionRenderer::renderFrameDataEditor(sf::RenderWindow & window)
 			{
 				std::cout << "file '" << filePath << "' doesn't exist" << std::endl;
 			}
+		}
+
+		ImGui::Separator();
+
+		ImGui::InputText("Preview Animation", animationFilePath, 128);
+		ImGui::InputFloat("Preview Speed", &animationSpeed);
+		ImGui::InputInt("Preview Frames", &animationFrames);
+		
+		if (ImGui::Button("Load Animation"))
+		{
+			PlayerGraphicsCharacter::loadAnimation(std::string(animationFilePath), animationFrames, true, animationSpeed, previewAnimation);
+			isAnimationLoaded = true;
+			previewSprite.setAnimation(previewAnimation);
+			previewSprite.setScale({ 0.05f, 0.05f });
+			previewSprite.setFrameTime(sf::seconds(time));
+			previewSprite.setPosition({ -32.f * 0.05f, -32.f * 0.05f });
+		}
+
+		if (isAnimationLoaded)
+		{
+			previewSprite.setFrame((int)(time / animationSpeed) % animationFrames);
+			//previewSprite.setFrameTime(sf::seconds(time));
+			//previewSprite.update(sf::seconds(0.001f));
+			window.draw(previewSprite);
 		}
 
 		ImGui::Separator();
@@ -259,6 +293,7 @@ void secro::CollisionRenderer::renderFrameDataEditor(sf::RenderWindow & window)
 				ImGui::InputFloat("KnockbackPowerBase", &selectedC.knockbackPowerBase);
 				ImGui::InputFloat("KnockbackPowerGrowth", &selectedC.knockbackPowerGrowth);
 				ImGui::InputFloat("HitstunAdjustment", &selectedC.hitstunAdjustment);
+				ImGui::InputFloat("ExtraFreezeframes", &selectedC.extraFreezeFrames);
 			}
 		}
 	}
