@@ -11,6 +11,9 @@ secro::InputTestBot::InputTestBot(PlayerCharacter* player, Controller & controll
 	this->player = player;
 	this->inputNumber = input;
 	controller.interceptController(std::bind(&InputTestBot::update, this, std::placeholders::_1));
+	Controller::Input inp;
+	controller.manualUpdate(inp);
+
 }
 
 void secro::InputTestBot::update(typename Controller::Input & input)
