@@ -15,5 +15,7 @@ namespace secro {
 		virtual b2Vec2 getScale() { return { 1.f, 1.f }; }
 		virtual FacingDirection getFacingDirection() { return FacingDirection::Right; }
 		virtual bool canBeDestroyed() { return false; }
+		virtual void onReceiveHit(const Hitbox& hit, Entity* other) {}
+		virtual void onSuccessfulHit(const Hitbox& hit, Entity* other) {}
 	};
 }
