@@ -1273,11 +1273,6 @@ float secro::PlayerCharacter::getAttackTimer()
 	return attackTimer;
 }
 
-int & secro::PlayerCharacter::getLastHitId()
-{
-	return lastHitId;
-}
-
 void secro::PlayerCharacter::attackHasHit()
 {
 	if ((int)state > (int)PlayerState::AFirstAttack && (int)state < (int)PlayerState::ALastAttack)

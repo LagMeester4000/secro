@@ -1,5 +1,6 @@
 #pragma once
 #include "secro/framework/level/Level.h"
+#include "secro/framework/graphics/ParallaxElement.h"
 #include <SFML/Graphics/Sprite.hpp>
 
 namespace sf {
@@ -28,6 +29,7 @@ namespace secro {
 
 	private: 
 		sf::Sprite groundTiles;
+		ParallaxElement background;
 
 	public: //gamemode rules
 		b2Vec2 boundsMin, boundsMax;

@@ -3,6 +3,9 @@
 #include "collision/FacingDirection.h"
 
 namespace secro {
+	class Hitbox;
+
+	//entity for gameplay purposes
 	class Entity {
 	public:
 		virtual ~Entity() {}
@@ -17,5 +20,14 @@ namespace secro {
 		virtual bool canBeDestroyed() { return false; }
 		virtual void onReceiveHit(const Hitbox& hit, Entity* other) {}
 		virtual void onSuccessfulHit(const Hitbox& hit, Entity* other) {}
+
+		//get the last hit ID
+		int& getLastHitId();
+
+	protected:
+		//the id the player got hit by last
+		int lastHitId = -1;
+
+		//
 	};
 }

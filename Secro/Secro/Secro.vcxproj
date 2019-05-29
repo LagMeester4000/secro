@@ -161,6 +161,7 @@
     <ClInclude Include="source\secro\framework\GameplaySettings.h" />
     <ClInclude Include="source\secro\framework\graphics\AnimatedSprite.h" />
     <ClInclude Include="source\secro\framework\graphics\Animation.h" />
+    <ClInclude Include="source\secro\framework\graphics\ParallaxElement.h" />
     <ClInclude Include="source\secro\framework\graphics\Particle.h" />
     <ClInclude Include="source\secro\framework\graphics\ParticleSystem.h" />
     <ClInclude Include="source\secro\framework\input\Controller.h" />
@@ -240,6 +241,7 @@
     <ClCompile Include="source\secro\framework\GameplaySettings.cpp" />
     <ClCompile Include="source\secro\framework\graphics\AnimatedSprite.cpp" />
     <ClCompile Include="source\secro\framework\graphics\Animation.cpp" />
+    <ClCompile Include="source\secro\framework\graphics\ParallaxElement.cpp" />
     <ClCompile Include="source\secro\framework\graphics\Particle.cpp" />
     <ClCompile Include="source\secro\framework\graphics\ParticleSystem.cpp" />
     <ClCompile Include="source\secro\framework\input\Controller.cpp" />

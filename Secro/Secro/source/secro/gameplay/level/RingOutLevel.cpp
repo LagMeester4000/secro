@@ -33,6 +33,17 @@ void secro::RingOutLevel::init()
 	
 	groundTiles.setTexture(*tex);
 	groundTiles.setScale({ 0.05f, 0.05f });
+
+	//load background
+	auto groundTex = ResourceManager<sf::Texture>::get("content/levels/Background1.png");
+	tex->setSmooth(false);
+
+	background.sprite.setTexture(*groundTex);
+	background.sprite.setScale({ 0.05f, 0.05f });
+	background.width = 20;
+	background.height = 20;
+	background.cameraFactor.x = 0.2f;
+	background.cameraFactor.y = 0.1f;
 }
 
 void secro::RingOutLevel::update(float deltaTime)
@@ -51,10 +62,16 @@ void secro::RingOutLevel::update(float deltaTime)
 			playerStocks[i]--;
 		}
 	}
+
+	//update background
+	background.update(camera);
 }
 
 void secro::RingOutLevel::render(sf::RenderWindow & window)
 {
+	//render the background
+	background.render(window);
+
 	Level::render(window);
 
 	//render the stage

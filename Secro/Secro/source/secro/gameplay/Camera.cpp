@@ -60,6 +60,11 @@ void secro::Camera::render(sf::RenderWindow & window)
 	window.setView(view);
 }
 
+sf::Vector2f secro::Camera::getPosition() const
+{
+	return position;
+}
+
 sf::Vector2f secro::Camera::getPlayerAveragePosition(std::vector<PlayerCharacter*>& players)
 {
 	float divi = (float)players.size();

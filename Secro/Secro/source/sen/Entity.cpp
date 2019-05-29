@@ -1,5 +1,6 @@
 #include "Entity.h"
 #include "Level.h"
+#include "..\secro\framework\Entity.h"
 
 using namespace sen;
 
@@ -58,4 +59,9 @@ FilterPath & sen::Entity::getFilterPath()
 const std::string & sen::Entity::getType()
 {
 	return type;
+}
+
+int & secro::Entity::getLastHitId()
+{
+	return lastHitId;
 }

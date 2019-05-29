@@ -225,18 +225,12 @@ namespace secro {
 		//the player's hurtbox
 		std::shared_ptr<HitboxCollection> hurtbox;
 
-		//the id the player got hit by last
-		int lastHitId = -1;
-
 		//to check if the attack has connected
 		bool hasAttackHit;
 
 	public:
 		//get the attack timer value
 		float getAttackTimer();
-
-		//get last hit id
-		int& getLastHitId();
 
 		//set the hasAttackHit
 		void attackHasHit();

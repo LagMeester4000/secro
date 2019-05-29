@@ -19,8 +19,8 @@ void secro::CharacterPsycho::loadAnimations()
 	loadAnimation("content/characters/psycho/BigBoi.png", 1, true, 1.f, animStand);
 	loadAnimation("content/characters/psycho/BigBoi_jump.png", 1, true, 1.f, animInAir);
 	loadAnimation("content/characters/psycho/BigBoi_crouch.png", 1, true, 1.f, animJumpSquat);
-	loadAnimation("content/characters/psycho/BigBoi_run.png", 4, true, 0.05f, animRun);
-	loadAnimation("content/characters/psycho/BigBoi_run.png", 4, true, 0.1f, animWalk);
+	loadAnimation("content/characters/psycho/BigBoi_run.png", 4, true, 0.1f, animRun);
+	loadAnimation("content/characters/psycho/BigBoi_run.png", 4, true, 0.13f, animWalk);
 	loadAnimation("content/characters/psycho/BigBoi_DTilt.png", 5, false, 0.05f, animDTilt);
 	loadAnimation("content/characters/psycho/BigBoi_UTilt.png", 4, false, 0.05f, animUTilt);
 	loadAnimation("content/characters/psycho/BigBoi_FTilt.png", 4, false, 0.05f, animFTilt);

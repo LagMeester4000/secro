@@ -19,6 +19,9 @@ namespace secro {
 		//render the debug gui and change the viewport
 		void render(sf::RenderWindow& window);
 
+		//get the current camera position
+		sf::Vector2f getPosition() const;
+
 	private:
 		sf::Vector2f getPlayerAveragePosition(std::vector<PlayerCharacter*>& players);
 		sf::Vector2f getMaxWidthAndHeightDiff(std::vector<PlayerCharacter*>& players);
