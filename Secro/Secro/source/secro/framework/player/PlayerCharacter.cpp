@@ -524,6 +524,9 @@ void secro::PlayerCharacter::render(sf::RenderWindow & window)
 	if (DebugOptions::getOptions().enablePlayerAttributeEditor)
 		debugRenderAttributes(window);
 
+	if (!DebugOptions::getOptions().enablePhysicsRender)
+		return;
+
 	sf::CircleShape c(0.4f);
 	auto pos = getPosition();
 	c.setPosition({ pos.x - 0.4f, pos.y - 0.4f });
@@ -693,7 +696,7 @@ void secro::PlayerCharacter::updateMovement(float deltaTime)
 			{
 				auto vel = physicsBody->GetLinearVelocity();
 				//if (input->getMovementDirection() == Direction::Neutral)
-				if (abs(vel.x) >= attributes.airMaxSpeed)
+				if (abs(vel.x) >= attributes.airMaxSpeed || !keepRunning() || state != PlayerState::Hitstun)
 				{
 					auto decelVal = attributes.airDeceleration * deltaTime/* * deltaTime*/;
 
@@ -706,7 +709,7 @@ void secro::PlayerCharacter::updateMovement(float deltaTime)
 					}
 					else
 					{
-						vel = { 0.f, 0.f };
+						vel = { 0.f, vel.y };
 					}
 
 					physicsBody->SetLinearVelocity(vel);

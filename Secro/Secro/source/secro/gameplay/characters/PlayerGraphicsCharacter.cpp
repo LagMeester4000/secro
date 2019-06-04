@@ -295,7 +295,7 @@ void secro::PlayerGraphicsCharacter::update(float deltaTime)
 
 void secro::PlayerGraphicsCharacter::render(sf::RenderWindow & window)
 {
-	//PlayerCharacter::render(window);
+	PlayerCharacter::render(window);
 	//return;
 
 	float scale = 1.f;

@@ -1,4 +1,5 @@
 #include "CharacterPsycho.h"
+#include <Box2D.h>
 
 secro::CharacterPsycho::CharacterPsycho()
 {
@@ -58,4 +59,46 @@ void secro::CharacterPsycho::setupAttacks(AttackCollection & atts)
 	atts.loadAttack("Grab.json", PlayerState::AGrabAir);
 
 	atts.loadAttack("FalShine.json", PlayerState::SpecialD);
+}
+
+void secro::CharacterPsycho::setupStates(StateMachine & sm)
+{
+	PlayerGraphicsCharacter::setupStates(sm);
+
+	sm.addCondition(PlayerState::Jump, PlayerState::SpecialU, std::bind(&CharacterPsycho::ConditionUpSpecial, this, std::placeholders::_1));
+	sm.addCondition(PlayerState::Stand, PlayerState::SpecialU, std::bind(&CharacterPsycho::ConditionUpSpecial, this, std::placeholders::_1));
+	sm.addCondition(PlayerState::Run, PlayerState::SpecialU, std::bind(&CharacterPsycho::ConditionUpSpecial, this, std::placeholders::_1));
+	sm.addCondition(PlayerState::Dash, PlayerState::SpecialU, std::bind(&CharacterPsycho::ConditionUpSpecial, this, std::placeholders::_1));
+	sm.addCondition(PlayerState::Walk, PlayerState::SpecialU, std::bind(&CharacterPsycho::ConditionUpSpecial, this, std::placeholders::_1));
+
+	sm.addSetState(PlayerState::SpecialU, std::bind(&CharacterPsycho::BeginUpSpecial, this, std::placeholders::_1));
+	sm.addCondition(PlayerState::SpecialU, PlayerState::Jump, [&](float f) 
+	{
+		return getMovementState() == MovementState::InAir;
+	});
+	sm.addCondition(PlayerState::SpecialU, PlayerState::Stand, [&](float f)
+	{
+		return getMovementState() == MovementState::OnGround;
+	});
+}
+
+void secro::CharacterPsycho::update(float deltaTime)
+{
+	PlayerGraphicsCharacter::update(deltaTime);
+
+	if (getMovementState() == MovementState::OnGround)
+	{
+		CanNeutralSpecial = true;
+	}
+}
+
+bool secro::CharacterPsycho::ConditionUpSpecial(float deltaTime)
+{
+	return input->getMovementDirection() == Direction::Up && input->specialPressed() && CanNeutralSpecial;
+}
+
+void secro::CharacterPsycho::BeginUpSpecial(float deltaTime)
+{
+	CanNeutralSpecial = false;
+	physicsBody->SetLinearVelocity({ 0.f, -UpSpecialSpeed });
 }

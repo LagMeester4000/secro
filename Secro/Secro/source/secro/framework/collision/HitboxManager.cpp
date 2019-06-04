@@ -33,15 +33,21 @@ void secro::HitboxManager::update(float deltaTime, Level& level)
 				{
 					Entity* otherEnt = hit->getOwner();
 					Entity* hitEnt = hurt->getOwner();
+
+					//check if the hit is valid
+					//ignore if it is the same hitbox
+					if (hitEnt->getLastHitId() == it->hitNumber + hit->getHitId())
+						continue;
+
+					//make sure the player doesnt get hit twice by the same attack
+					hitEnt->getLastHitId() = it->hitNumber + hit->getHitId();
+
+					//call callback functions
+					hitEnt->onReceiveHit(*results.hits[0], otherEnt);
+					otherEnt->onSuccessfulHit(*results.hits[0], hitEnt);
+
 					if (auto* asPlayer = dynamic_cast<PlayerCharacter*>(hitEnt))
 					{
-						//ignore if it is the same hitbox
-						if (asPlayer->getLastHitId() == it->hitNumber + hit->getHitId())
-							continue;
-
-						//make sure the player doesnt get hit twice by the same attack
-						asPlayer->getLastHitId() = it->hitNumber + hit->getHitId();
-
 						//actual knockback
 						//flip if player is on other side
 						if (!results.hurts[0]->isShieldBox || (results.hurts[0]->isShieldBox && results.hits[0]->isGrabBox))
