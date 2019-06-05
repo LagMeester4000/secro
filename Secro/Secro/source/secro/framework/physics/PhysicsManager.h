@@ -10,7 +10,7 @@ namespace sf {
 }
 
 namespace secro {
-	class PhysicsManager{
+	class PhysicsManager {
 	public:
 		PhysicsManager();
 		~PhysicsManager();

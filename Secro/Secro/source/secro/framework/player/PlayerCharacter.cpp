@@ -900,6 +900,14 @@ bool secro::PlayerCharacter::snapToGround(float distance, bool startAtBottom)
 	return false;
 }
 
+void secro::PlayerCharacter::resizeVelocity(float newSize)
+{
+	auto vel = physicsBody->GetLinearVelocity();
+	vel.Normalize();
+	vel *= newSize;
+	physicsBody->SetLinearVelocity(vel);
+}
+
 bool secro::PlayerCharacter::keepRunning()
 {
 	auto joy = input->getMovement();
@@ -1320,6 +1328,19 @@ void secro::PlayerCharacter::putInHitlag(float duration)
 	hitlag = duration;
 	hitlagVelocity = physicsBody->GetLinearVelocity();
 	physicsBody->SetLinearVelocity(b2Vec2(0.f, 0.f));
+	freezeShake = duration * freezeShakePerHitlag + freezeShakeBase;
+}
+
+b2Vec2 secro::PlayerCharacter::calcFreezeShake()
+{
+	if (isInHitlag() && getState() == PlayerState::Hitstun)
+	{
+		float r1 = 0.5f - static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
+		float r2 = 0.5f - static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
+		b2Vec2 ret = { r1, r2 };
+		return mul(ret, freezeShake * 2);
+	}
+	return { 0.f, 0.f };
 }
 
 void secro::PlayerCharacter::stateStartNewAttack(PlayerState attack)
@@ -1502,6 +1523,30 @@ void secro::PlayerCharacter::stateAirdodgeEnd()
 
 void secro::PlayerCharacter::stateUpdateAirdodge(float deltaTime)
 {
+	auto vel = physicsBody->GetLinearVelocity();
+	if (vel.y > -0.1f)
+	{
+		if (snapToGround(0.5f, false))
+		{
+			setMovementState(MovementState::OnGround);
+		}
+	}
+
+	auto airdodgeFunc = [&](float I)
+	{
+		//return -I * I + 1.f;
+		return -I * 0.6f + 1.f;
+		
+		/*if (I <= 1.f)
+		{
+			return sqrtf(1.f - I * I);
+		}
+		return 0.f;*/
+	};
+
+	float alpha = (attributes.airdodgeDuration - stateTimer) / attributes.airdodgeDuration;
+	resizeVelocity(airdodgeFunc(alpha) * attributes.airdodgeSpeed);
+
 	//give invincibility once needed
 	//only happens once during the airdodge
 	if (attributes.airdodgeDuration - previousStateTimer < attributes.airdodgeInvStart &&

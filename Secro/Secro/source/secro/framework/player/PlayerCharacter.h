@@ -43,6 +43,7 @@ namespace secro {
 	private: //movement
 		void updateMovement(float deltaTime);
 		bool snapToGround(float distance, bool startAtBottom = false);
+		void resizeVelocity(float newSize);
 
 	public:
 		//to test if the character should keep running forward, or stop adding velocity
@@ -251,12 +252,24 @@ namespace secro {
 		//the velocity before the hit
 		b2Vec2 hitlagVelocity;
 
+		//range of freezeShake
+		float freezeShake = 0.1f;
+
+		//how much freezeShake per hitlag
+		float freezeShakePerHitlag = 0.5f;
+
+		//how much base freezeShake
+		float freezeShakeBase = 0.05f;
+
 	public:
 		//check if the player is in hitlag
 		bool isInHitlag();
 
 		//put the player in hitlag
 		void putInHitlag(float duration);
+
+		//returns random freezeshake radius
+		b2Vec2 calcFreezeShake();
 
 	public: //teching
 		bool stateCanTech();
