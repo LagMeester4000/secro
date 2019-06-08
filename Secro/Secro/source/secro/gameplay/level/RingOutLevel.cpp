@@ -42,8 +42,8 @@ void secro::RingOutLevel::init()
 	background.sprite.setScale({ 0.05f, 0.05f });
 	background.width = 20;
 	background.height = 20;
-	background.cameraFactor.x = 0.2f;
-	background.cameraFactor.y = 0.1f;
+	background.cameraFactor.x = -0.4f;
+	background.cameraFactor.y = -0.2f;
 }
 
 void secro::RingOutLevel::update(float deltaTime)

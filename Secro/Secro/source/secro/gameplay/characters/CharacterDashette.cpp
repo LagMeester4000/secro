@@ -485,6 +485,8 @@ void secro::CharacterDashette::render(sf::RenderWindow & window)
 		scale = -1.f;
 
 	auto pos = physicsBody->GetPosition();
+	auto sh = calcFreezeShake();
+	pos += sh;
 	animatedSprite.setPosition(pos.x, pos.y + 0.22f);
 	animatedSprite.setScale(sf::Vector2f(0.05f * scale, 0.05f));
 	animatedSprite.setOrigin(32.f, 32.f);

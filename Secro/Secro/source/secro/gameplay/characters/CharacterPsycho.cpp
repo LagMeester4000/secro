@@ -13,6 +13,9 @@ secro::CharacterPsycho::CharacterPsycho(Level * level, HitboxManager * hitboxMan
 void secro::CharacterPsycho::init()
 {
 	PlayerGraphicsCharacter::init();
+
+	attributes.airdodgeSpeed = 15.f;
+	attributes.jumpFullSpeed = 19.f;
 }
 
 void secro::CharacterPsycho::loadAnimations()
