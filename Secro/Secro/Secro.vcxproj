@@ -169,6 +169,7 @@
     <ClInclude Include="source\secro\framework\input\InputManager.h" />
     <ClInclude Include="source\secro\framework\input\InputTestBot.h" />
     <ClInclude Include="source\secro\framework\level\Level.h" />
+    <ClInclude Include="source\secro\framework\math\Curve.h" />
     <ClInclude Include="source\secro\framework\physics\Filters.h" />
     <ClInclude Include="source\secro\framework\physics\PhysicsManager.h" />
     <ClInclude Include="source\secro\framework\physics\PlayerCollision.h" />
@@ -248,6 +249,7 @@
     <ClCompile Include="source\secro\framework\input\InputManager.cpp" />
     <ClCompile Include="source\secro\framework\input\InputTestBot.cpp" />
     <ClCompile Include="source\secro\framework\level\Level.cpp" />
+    <ClCompile Include="source\secro\framework\math\Curve.cpp" />
     <ClCompile Include="source\secro\framework\physics\PhysicsManager.cpp" />
     <ClCompile Include="source\secro\framework\physics\PlayerCollision.cpp" />
     <ClCompile Include="source\secro\framework\physics\PlayerContact.cpp" />

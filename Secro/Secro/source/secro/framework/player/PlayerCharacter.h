@@ -280,6 +280,12 @@ namespace secro {
 		void stateTechRightBegin();
 		void stateTechInPlaceBegin();
 		void stateTechEnd();
+		bool stateCanKnockDown();
+		void stateKnocdownBegin();
+		void stateKnockdownEnd();
+		bool stateCanKnockdownRollLeft();
+
+		
 
 	private: //airdodge
 		bool stateCanAirdodge();

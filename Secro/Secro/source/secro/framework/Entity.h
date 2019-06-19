@@ -25,7 +25,7 @@ namespace secro {
 		int& getLastHitId();
 
 	protected:
-		//the id the player got hit by last
+		//the id the entity got hit by last
 		int lastHitId = -1;
 
 		//

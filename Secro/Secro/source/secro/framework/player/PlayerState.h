@@ -38,6 +38,7 @@ namespace secro {
 		//other
 		AGrab,
 		AGrabAir,
+		KnockdownGetupAttack,
 
 		//specials
 		SpecialU,
@@ -51,6 +52,11 @@ namespace secro {
 		TechRollLeft,
 		TechRollRight,
 
+		//knockdonw states
+		Knockdown,
+		KnockdownGetup,
+		KnockdownRollLeft,
+		KnockdownRollRight,
 
 		//should always be the last state
 		MaxState,
