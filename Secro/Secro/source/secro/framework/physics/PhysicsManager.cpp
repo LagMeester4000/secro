@@ -5,6 +5,7 @@
 #include <imgui.h>
 #include <secro/framework/math/Curve.h>
 secro::Curve curve;
+secro::Curve curve2;
 
 secro::PhysicsManager::PhysicsManager() : world(std::make_shared<b2World>(b2Vec2{0.f, 0.f}))
 {
@@ -14,6 +15,9 @@ secro::PhysicsManager::PhysicsManager() : world(std::make_shared<b2World>(b2Vec2
 	curve.resultMultiplicant = -0.5f;
 	curve.resultAdd = 1.f;
 	curve.setFormula(Linear());
+	curve2.resultMultiplicant = -0.5f;
+	curve2.resultAdd = 1.f;
+	curve2.setFormula(Exponent());
 }
 
 secro::PhysicsManager::~PhysicsManager()
@@ -35,6 +39,7 @@ void secro::PhysicsManager::debugRender(sf::RenderWindow& window)
 		ImGui::Begin("TEST");
 
 		curve.renderCurveEditor();
+		curve2.renderCurveEditor();
 
 		ImGui::End();
 	}

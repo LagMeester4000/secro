@@ -48,7 +48,7 @@ secro::Curve::Curve()
 	currentFormula = curveTypes[0];
 }
 
-float secro::Curve::calculate(float input)
+float secro::Curve::calculate(float input, bool clamp)
 {
 	float result = 0.f;
 	input *= inputMultiplicant;
@@ -61,23 +61,29 @@ float secro::Curve::calculate(float input)
 	result *= resultMultiplicant;
 	result += resultAdd;
 
+	if (clamp)
+	{
+		if (result > 1.f)
+			result = 1.f;
+		else if (result < 0.f)
+			result = 0.f;
+	}
+
 	return result;
 }
 
 void secro::Curve::renderCurveEditor(int precision)
 {
+	ImGui::PushID(this);
+
 	float lineThickness = 2.f;
 	float size = 250.f;
 
 	auto* drawList = ImGui::GetWindowDrawList();
 
-	//??
-	drawList->PushClipRectFullScreen();
-
-
 	//draw lines
 	{
-		ImGui::BeginChild((ImGuiID)this, ImVec2(size, size), true);
+		ImGui::BeginChild("CurveGraph", ImVec2(size, size), true);
 
 		auto pos = ImGui::GetWindowPos();
 
@@ -98,7 +104,10 @@ void secro::Curve::renderCurveEditor(int precision)
 			else if (result < 0.f)
 				result = 0.f;
 
-			drawList->AddLine(ImVec2(pos.x + previousInVal * size, pos.y + previousResult * size),
+			auto v1 = ImVec2(pos.x + previousInVal * size, pos.y + previousResult * size);
+			auto winSize = ImGui::GetWindowSize();
+
+			drawList->AddLine(v1,
 				ImVec2(pos.x + inVal * size, pos.y + result * size), ImColor(1.f, 0.f, 0.f), lineThickness);
 
 			//update previous vars
@@ -160,5 +169,7 @@ void secro::Curve::renderCurveEditor(int precision)
 		ImGui::InputFloat("Input Add", &inputAdd);
 		ImGui::InputFloat("Input Multiplier", &inputMultiplicant);
 	}
+
+	ImGui::PopID();
 }
 

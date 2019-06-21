@@ -42,6 +42,8 @@ namespace secro {
 
 	private: //movement
 		void updateMovement(float deltaTime);
+
+	protected:
 		bool snapToGround(float distance, bool startAtBottom = false);
 		void resizeVelocity(float newSize);
 
@@ -101,8 +103,10 @@ namespace secro {
 		bool groundSpeedTooHigh();
 		bool canDropThroughPlatform();
 
+	protected:
 		//debug
 		void debugRenderAttributes(sf::RenderWindow& window);
+		virtual void renderAttributes(sf::RenderWindow& window);
 
 	public:
 		MovementState getMovementState();
@@ -173,6 +177,9 @@ namespace secro {
 	protected:
 		//set the frame timer
 		void setStateTimer(float seconds);
+
+	public:
+		float getStateTimer();
 
 	protected: //input
 		//input object

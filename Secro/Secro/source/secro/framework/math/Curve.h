@@ -31,7 +31,7 @@ namespace secro {
 		Curve();
 
 		//calculate the value from the curve
-		float calculate(float input);
+		float calculate(float input, bool clamp = true);
 
 		//set the formula to a new function object
 		template<typename T>

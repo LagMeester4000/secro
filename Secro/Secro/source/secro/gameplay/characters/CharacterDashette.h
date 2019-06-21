@@ -1,6 +1,7 @@
 #pragma once
 #include "PlayerGraphicsCharacter.h"
 #include "secro/framework/graphics/AnimatedSprite.h"
+#include "secro/framework/math/Curve.h"
 #include <SFML/Graphics/Sprite.hpp>
 
 namespace secro {
@@ -16,6 +17,9 @@ namespace secro {
 		void update(float deltaTime) override;
 		void render(sf::RenderWindow& window) override;
 
+	protected:
+		void renderAttributes(sf::RenderWindow& window) override;
+
 	private: //special
 		b2Vec2 specialDirection;
 		float specialSpeed;
@@ -29,6 +33,8 @@ namespace secro {
 		float normalFriction;
 		int airDashLeft;
 
+		Curve dashSpeedCurve;
+
 	public:
 		int getAirDashLeft();
 
@@ -37,6 +43,7 @@ namespace secro {
 		bool canBeginSpecialFromAttack(float dt);
 		void stateStartSpecial();
 		void stateEndSpecial();
+		void stateUpdateSpecial();
 		void stateStartHyperJump();
 		void stateStartShineSpecial();
 		void stateUpdateShineSpecial(float deltaTime);

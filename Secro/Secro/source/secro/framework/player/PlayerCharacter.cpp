@@ -868,7 +868,8 @@ bool secro::PlayerCharacter::snapToGround(float distance, bool startAtBottom)
 		float32 m_fraction;
 		bool firstHit = true;
 		bool ignorePlatforms = false;
-	};
+	};
+
 	auto* world = physicsBody->GetWorld();
 
 	auto callBack = IgnorePlayerRay();
@@ -1106,9 +1107,15 @@ void secro::PlayerCharacter::debugRenderAttributes(sf::RenderWindow & window)
 		ImGui::InputFloat("TechRollDuration", &attributes.techRollDuration);
 		ImGui::InputFloat("TechRollSpeed", &attributes.techRollSpeed);
 
+		//render other attributes
+		renderAttributes(window);
 	}
 	ImGui::End();
 	ImGui::PopID();
+}
+
+void secro::PlayerCharacter::renderAttributes(sf::RenderWindow & window)
+{
 }
 
 MovementState secro::PlayerCharacter::getMovementState()
@@ -1227,6 +1234,11 @@ bool secro::PlayerCharacter::IsStateTimerDone()
 void secro::PlayerCharacter::setStateTimer(float seconds)
 {
 	stateTimer = seconds;
+}
+
+float secro::PlayerCharacter::getStateTimer()
+{
+	return stateTimer;
 }
 
 std::shared_ptr<Controller> secro::PlayerCharacter::getInput()

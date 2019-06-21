@@ -5,6 +5,7 @@
 #include <functional>
 #include <SFML/Graphics.hpp>
 #include <tuple>
+#include <imgui.h>
 
 secro::CharacterDashette::CharacterDashette(Level* level, HitboxManager * hitboxManager, b2Body * body, std::shared_ptr<Controller> controller)
 	: PlayerGraphicsCharacter(level, hitboxManager, body, controller)
@@ -28,6 +29,14 @@ void secro::CharacterDashette::init()
 	specialAmountOfAirDash = 3;
 
 	normalFriction = attributes.groundDeceleration;
+
+	dashSpeedCurve.inputMultiplicant = -1.f;
+	dashSpeedCurve.inputAdd = 1.f;
+	dashSpeedCurve.resultMultiplicant = -1.f;
+	dashSpeedCurve.resultAdd = 1.f;
+	Circle c;
+	c.exponent = 1.5f;
+	dashSpeedCurve.setFormula(c);
 }
 
 void secro::CharacterDashette::loadAnimations()
@@ -128,7 +137,7 @@ void secro::CharacterDashette::setupStates(StateMachine & sm)
 	{
 		return IsStateTimerDone();
 	});
-
+	sm.addUpdateState(PlayerState::SpecialN, std::bind(&CharacterDashette::stateUpdateSpecial, this));
 
 	//shine
 	auto condShine = [&](float f) 
@@ -225,6 +234,14 @@ void secro::CharacterDashette::render(sf::RenderWindow & window)
 	PlayerGraphicsCharacter::render(window);
 }
 
+void secro::CharacterDashette::renderAttributes(sf::RenderWindow & window)
+{
+	ImGui::Separator();
+
+	ImGui::InputFloat("Special Dash Speed", &specialSpeed);
+	dashSpeedCurve.renderCurveEditor();
+}
+
 int secro::CharacterDashette::getAirDashLeft()
 {
 	return airDashLeft;
@@ -296,6 +313,13 @@ void secro::CharacterDashette::stateEndSpecial()
 
 	//reset friction
 	attributes.groundDeceleration = normalFriction;
+}
+
+void secro::CharacterDashette::stateUpdateSpecial()
+{
+	float alpha = getStateTimer() / specialDuration;
+	alpha = 1.f - alpha;
+	resizeVelocity(dashSpeedCurve.calculate(alpha) * specialSpeed);
 }
 
 void secro::CharacterDashette::stateStartHyperJump()
