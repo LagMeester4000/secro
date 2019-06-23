@@ -8,6 +8,8 @@
 #include "framework/input/InputTestBot.h"
 #include "framework/ui/UIManager.h"
 #include "gameplay/level/RingOutLevel.h"
+#include "ShobuNetwork/Network.h"
+#include "secro/netplay/RawSerializeBuffer.h"
 
 //TEMP
 #include "framework/collision/CollisionRenderer.h"
@@ -34,7 +36,9 @@ namespace secro {
 
 	public:
 		//update the game
-		void update(float deltaTime);
+		void update(float deltaTime, bool shouldUpdateInput = true);
+		void simulateUpdate(float deltaTime);
+		void updateWithInput(float deltaTime, int localInput, int otherInput);
 
 		//render the game
 		void render(sf::RenderWindow& window);
@@ -57,5 +61,14 @@ namespace secro {
 
 		//gamestate
 		GameState gameState;
+
+	private: //netcode
+		ShobuNetwork network;
+		RawSerializeBuffer stateBuffer;
+
+	public:
+		void netStateSave();
+		void netStateLoad();
+		int netStateHash();
 	};
 }

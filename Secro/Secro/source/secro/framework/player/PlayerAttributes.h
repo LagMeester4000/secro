@@ -1,5 +1,6 @@
 #pragma once
 #include <cereal/cereal.hpp>
+#include <secro/framework/math/Curve.h>
 
 namespace secro {
 	enum class PlaterAttributesVersion {
@@ -20,6 +21,7 @@ namespace secro {
 		float airdodgeDuration;
 		float airdodgeSpeed;
 		float airdodgeLandingLag;
+		Curve airdodgeSpeedCurve;
 
 		//jump
 		int jumpAmount;

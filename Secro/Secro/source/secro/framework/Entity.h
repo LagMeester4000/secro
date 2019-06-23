@@ -1,9 +1,11 @@
 #pragma once
 #include <Box2D/Common/b2Math.h>
 #include "collision/FacingDirection.h"
+#include "secro/netplay/RawSerializeBuffer.h"
 
 namespace secro {
 	class Hitbox;
+	class RawSerializeBuffer;
 
 	//entity for gameplay purposes
 	class Entity {
@@ -20,6 +22,8 @@ namespace secro {
 		virtual bool canBeDestroyed() { return false; }
 		virtual void onReceiveHit(const Hitbox& hit, Entity* other) {}
 		virtual void onSuccessfulHit(const Hitbox& hit, Entity* other) {}
+		virtual void netSerSave(RawSerializeBuffer& buff) { buff.save(lastHitId); }
+		virtual void netSerLoad(RawSerializeBuffer& buff) { buff.load(lastHitId); }
 
 		//get the last hit ID
 		int& getLastHitId();

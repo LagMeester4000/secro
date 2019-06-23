@@ -83,7 +83,7 @@ int main()
 	bool redraw = true;      //Do I redraw everything on the screen?
 
 	//actual drawing window
-	sf::RenderWindow window(sf::VideoMode(800, 800, 32), "Hello", sf::Style::Fullscreen);
+	sf::RenderWindow window(sf::VideoMode(800, 800, 32), "Hello", sf::Style::Default);
 	ImGui::SFML::Init(window, true);
 	ImGui::CreateContext();
 	SetImGuiStyle();
@@ -143,6 +143,7 @@ int main()
 			//draw things here
 			ImGui::SFML::Update(window, dtClock);
 			//game->update(deltaTime);
+			std::cout << "FPS: " << 1.f / deltaTime << std::endl;
 			game->update(1.f/FPS);
 			game->render(window);
 

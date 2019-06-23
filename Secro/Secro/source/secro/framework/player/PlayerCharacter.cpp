@@ -10,6 +10,7 @@
 #include "../DebugOptions.h"
 #include "../GameplaySettings.h"
 #include "secro/framework/level/Level.h"
+#include "secro/framework/math/fmath.h"
 
 using namespace secro;
 
@@ -59,11 +60,18 @@ void secro::PlayerCharacter::init()
 	a.runMaxSpeed = 8.f;
 	a.walkMaxSpeed = 6.f;
 	//airdodge
-	a.airdodgeDuration = 0.15f;
-	a.airdodgeInvDuration = 0.11f;
+	a.airdodgeDuration = 0.25f;
+	a.airdodgeInvDuration = 0.21f;
 	a.airdodgeInvStart = 0.04f;
 	a.airdodgeLandingLag = 0.1f;
-	a.airdodgeSpeed = 13.f;
+	a.airdodgeSpeed = 15.f;
+	Circle c;
+	c.exponent = 1.5f;
+	a.airdodgeSpeedCurve.setFormula(c);
+	a.airdodgeSpeedCurve.resultAdd = 1.f;
+	a.airdodgeSpeedCurve.resultMultiplicant = -0.7f;
+	a.airdodgeSpeedCurve.inputAdd = 1.f;
+	a.airdodgeSpeedCurve.inputMultiplicant = -1.f;
 	//tech
 	a.techInPlaceDuration = 0.2f;
 	a.techInPlaceInvDuration = 0.14f;
@@ -595,6 +603,80 @@ void secro::PlayerCharacter::render(sf::RenderWindow & window)
 	}
 }
 
+void secro::PlayerCharacter::netSerSave(RawSerializeBuffer & buff)
+{
+	Entity::netSerSave(buff);
+
+	buff.save(movementState);
+	buff.save(previousMovementState);
+	buff.save(attributes);
+	buff.save(facingDirection);
+	buff.save(jumpsLeft);
+	buff.save(useGravity);
+	buff.save(canSlideOffPlatforms);
+	buff.save(previousPosition);
+	buff.save(shouldHaveFriction);
+	buff.save(walkDeadzone);
+	buff.save(hitstun);
+	buff.save(state);
+	buff.save(stateTimer);
+	buff.save(previousStateTimer);
+	buff.save(damage);
+	buff.save(debugDamage);
+	buff.save(attackTimer);
+	buff.save(currentAttackState);
+	buff.save(hasAttackHit);
+	buff.save(hitlag);
+	buff.save(hitlagVelocity);
+	buff.save(freezeShake);
+	buff.save(freezeShakePerHitlag);
+	buff.save(freezeShakeBase);
+	buff.save(invincibilityTimer);
+	buff.save(DI);
+	buff.save(airDashTimer);
+	buff.save(airDashPreviousDirection);
+	buff.save(airDashDirection);
+	buff.save(canAirDash);
+	buff.save(isAirDashUsed);
+}
+
+void secro::PlayerCharacter::netSerLoad(RawSerializeBuffer & buff)
+{
+	Entity::netSerLoad(buff);
+
+	buff.load(movementState);
+	buff.load(previousMovementState);
+	buff.load(attributes);
+	buff.load(facingDirection);
+	buff.load(jumpsLeft);
+	buff.load(useGravity);
+	buff.load(canSlideOffPlatforms);
+	buff.load(previousPosition);
+	buff.load(shouldHaveFriction);
+	buff.load(walkDeadzone);
+	buff.load(hitstun);
+	buff.load(state);
+	buff.load(stateTimer);
+	buff.load(previousStateTimer);
+	buff.load(damage);
+	buff.load(debugDamage);
+	buff.load(attackTimer);
+	buff.load(currentAttackState);
+	buff.load(hasAttackHit);
+	buff.load(hitlag);
+	buff.load(hitlagVelocity);
+	buff.load(freezeShake);
+	buff.load(freezeShakePerHitlag);
+	buff.load(freezeShakeBase);
+	buff.load(invincibilityTimer);
+	buff.load(DI);
+	buff.load(airDashTimer);
+	buff.load(airDashPreviousDirection);
+	buff.load(airDashDirection);
+	buff.load(canAirDash);
+	buff.load(isAirDashUsed);
+}
+
 b2Vec2 secro::PlayerCharacter::getPosition()
 {
 	return physicsBody->GetPosition();
@@ -1074,6 +1156,7 @@ void secro::PlayerCharacter::debugRenderAttributes(sf::RenderWindow & window)
 		ImGui::InputFloat("AirdodgeDuration", &attributes.airdodgeDuration);
 		ImGui::InputFloat("AirdodgeSpeed", &attributes.airdodgeSpeed);
 		ImGui::InputFloat("AirdodgeLandingLag", &attributes.airdodgeLandingLag);
+		attributes.airdodgeSpeedCurve.renderCurveEditor();
 
 		ImGui::Separator();
 
@@ -1544,20 +1627,9 @@ void secro::PlayerCharacter::stateUpdateAirdodge(float deltaTime)
 		}
 	}
 
-	auto airdodgeFunc = [&](float I)
-	{
-		//return -I * I + 1.f;
-		return -I * 0.6f + 1.f;
-		
-		/*if (I <= 1.f)
-		{
-			return sqrtf(1.f - I * I);
-		}
-		return 0.f;*/
-	};
-
 	float alpha = (attributes.airdodgeDuration - stateTimer) / attributes.airdodgeDuration;
-	resizeVelocity(airdodgeFunc(alpha) * attributes.airdodgeSpeed);
+	alpha = clampOne(alpha);
+	resizeVelocity(attributes.airdodgeSpeedCurve.calculate(alpha) * attributes.airdodgeSpeed);
 
 	//give invincibility once needed
 	//only happens once during the airdodge

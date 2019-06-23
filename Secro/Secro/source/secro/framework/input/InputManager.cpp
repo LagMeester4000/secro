@@ -1,6 +1,7 @@
 #include "InputManager.h"
 #include <SFML/Window.hpp>
 #include <iostream>
+#include "secro/netplay/RawSerializeBuffer.h"
 
 using namespace secro;
 
@@ -50,6 +51,14 @@ void secro::InputManager::update()
 	}
 }
 
+void secro::InputManager::updateNoInputs()
+{
+	for (auto& it : controllers)
+	{
+		it->emptyUpdate();
+	}
+}
+
 std::shared_ptr<Controller> secro::InputManager::getController(int index)
 {
 	return controllers[index];
@@ -58,4 +67,35 @@ std::shared_ptr<Controller> secro::InputManager::getController(int index)
 const std::vector<std::shared_ptr<Controller>>& secro::InputManager::getControllers()
 {
 	return controllers;
+}
+
+void secro::InputManager::netSerSave(RawSerializeBuffer & buff)
+{
+	for (auto it : controllers)
+	{
+		for (int i = 7; i >= 0; --i)
+		{
+			auto in = it->getInput(i);
+			//auto comp = Controller::compressInput(in);
+			buff.save(in);
+		}
+	}
+}
+
+void secro::InputManager::netSerLoad(RawSerializeBuffer & buff)
+{
+	for (auto it : controllers)
+	{
+		for (size_t i = 0; i < 8; ++i)
+		{
+			//CompressedInput in;
+			//buff.load(in);
+			//auto uncomp = Controller::uncompressInput(in);
+			///it->manualUpdate(uncomp);
+
+			Controller::Input in;
+			buff.load(in);
+			it->manualUpdate(in);
+		}
+	}
 }

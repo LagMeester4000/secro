@@ -9,6 +9,7 @@
 #include "gameplay/characters/CharacterOki.h"
 #include "gameplay/characters/CharacterPsycho.h"
 #include "gameplay/level/BridgeLevel.h"
+#include "ShobuNetwork/Network.h"
 
 //ui
 #include "framework/ui/UIElement.h"
@@ -47,8 +48,8 @@ secro::Game::Game(std::shared_ptr<InputManager> input)
 	newLevel->stockAmount = 4;
 
 	//set up the players
-	level->addPlayer(std::make_shared<CharacterPsycho>());
-	level->addPlayer(std::make_shared<CharacterPsycho>());
+	//level->addPlayer(std::make_shared<CharacterDashette>());
+	//level->addPlayer(std::make_shared<CharacterDashette>());
 
 	//initialize the level
 	level->init();
@@ -115,7 +116,7 @@ secro::Game::Game(std::shared_ptr<InputManager> input)
 			startLevel(newLevel, 2);
 
 			//hack the input
-			inputBot = new InputTestBot(&*level->players[1], *inputManager->getController(1), 1);
+			//inputBot = new InputTestBot(&*level->players[1], *inputManager->getController(1), 1);
 		};
 
 		std::shared_ptr<UISimpleButton> selectBridge = std::make_shared<UISimpleButton>();
@@ -154,15 +155,99 @@ secro::Game::Game(std::shared_ptr<InputManager> input)
 		uiLevelSelect->addSelectable(selectBridge);
 		uiLevelSelect->addSelectable(backButton);
 	}
+
+
+	//netplay!
+	network.registerCallbacks(
+		[](void* g, int me, int other) 
+	{
+		Game* asGame = (Game*)g;
+		asGame->updateWithInput(1.f / 60.f, me, other);
+	},
+		[](void* g) 
+	{
+		Game* asGame = (Game*)g;
+		asGame->netStateSave();
+	},
+		[](void* g) 
+	{
+		Game* asGame = (Game*)g;
+		asGame->netStateLoad();
+	},
+		[](void* g) -> int
+	{
+		//Game* asGame = (Game*)g;
+		//return asGame->netStateHash();
+		return 0;
+	}, (void*)this);
+
+	std::cout << "0 for host, 1 for client" << std::endl;
+	int i;
+	std::cin >> i;
+	if (i == 0)
+	{
+		//host
+		network.setInputDelay(2);
+		network.initializeHost(31415);
+		network.waitForClient();
+	}
+	else
+	{
+		//client
+		network.initializeClient("192.168.2.7", 31415);
+
+		//connect
+		network.connectToHost();
+
+		int stop = 0;
+	}
+
+	//set up the stage
+	startLevel(newLevel, 2);
 }
 
 //TEMP
 #include <SFML/Window.hpp>
 
-void secro::Game::update(float deltaTime)
+void secro::Game::update(float deltaTime, bool shouldUpdateInput)
 {
-	inputManager->update();//netplay change
+	//if (shouldUpdateInput)
+	//{
+	//	if (network.isHost())
+	//		inputManager->update(); //netplay change
+	//	else
+	//		inputManager->updateNoInputs();
+	//}
 
+	if (network.connected() && shouldUpdateInput)
+	{
+		//print ping
+		std::cout << network.getPing() << std::endl;
+		if (network.getPing() > 200)
+		{
+			//if (network.isHost())
+				//network.wait();
+			using namespace std::chrono_literals;
+			std::this_thread::sleep_for(30ms);
+		}
+
+		if (network.isHost())
+		{
+			auto r = inputManager->getController(0)->readInput();
+			network.update(Controller::compressInput(r).input.raw);
+		}
+		else
+		{
+			network.update(0);
+		}
+	}
+
+	//update the debug menu
+	DebugOptions::update(deltaTime);
+}
+
+void secro::Game::simulateUpdate(float deltaTime)
+{
 	switch (gameState)
 	{
 	case GameState::MainMenu:
@@ -183,9 +268,29 @@ void secro::Game::update(float deltaTime)
 		}
 	} break;
 	}
+}
 
-	//update the debug menu
-	DebugOptions::update(deltaTime);
+void secro::Game::updateWithInput(float deltaTime, int localInput, int otherInput)
+{
+	CompressedInput c0, c1;
+
+	if (network.isHost())
+	{
+		c0.input.raw = localInput;
+		c1.input.raw = otherInput;
+	}
+	else
+	{
+		c1.input.raw = localInput;
+		c0.input.raw = otherInput;
+	}
+	Controller::Input i0 = Controller::uncompressInput(c0);
+	Controller::Input i1 = Controller::uncompressInput(c1);
+
+	inputManager->getController(0)->manualUpdate(i0);
+	inputManager->getController(1)->manualUpdate(i1);
+
+	simulateUpdate(deltaTime);
 }
 
 void secro::Game::render(sf::RenderWindow & window)
@@ -215,7 +320,7 @@ void secro::Game::render(sf::RenderWindow & window)
 	GameplaySettings::render();
 
 	//render the input bot
-	inputBot->render();
+	//inputBot->render();
 }
 
 void secro::Game::startLevel(std::shared_ptr<Level> level, int amountOfPlayers)
@@ -228,4 +333,33 @@ void secro::Game::startLevel(std::shared_ptr<Level> level, int amountOfPlayers)
 	//level->addPlayer(std::make_shared<CharacterDashette>());
 	level->init();
 	gameState = GameState::Gameplay;
+}
+
+void secro::Game::netStateSave()
+{
+	stateBuffer.reset();
+	inputManager->netSerSave(stateBuffer);
+	level->physicsManager.netSerSave(stateBuffer);
+
+	for (auto& it : level->players)
+	{
+		it->netSerSave(stateBuffer);
+	}
+}
+
+void secro::Game::netStateLoad()
+{
+	stateBuffer.reset();
+	inputManager->netSerLoad(stateBuffer);
+	level->physicsManager.netSerLoad(stateBuffer);
+
+	for (auto& it : level->players)
+	{
+		it->netSerLoad(stateBuffer);
+	}
+}
+
+int secro::Game::netStateHash()
+{
+	return stateBuffer.hash();
 }

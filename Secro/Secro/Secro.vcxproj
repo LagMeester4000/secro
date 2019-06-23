@@ -93,12 +93,12 @@
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(SolutionDir)./cereal/include/;$(ProjectDir)./source/;$(SolutionDir)./rapidjson/include/;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)./cereal/include/;$(ProjectDir)./source/;$(SolutionDir)./rapidjson/include/;$(SolutionDir)./ShobuNetwork/;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpplatest</LanguageStandard>
-      <PreprocessorDefinitions>_SILENCE_ALL_CXX17_DEPRECATION_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_SILENCE_ALL_CXX17_DEPRECATION_WARNINGS;WIN32;_WINSOCK_DEPRECATED_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>opengl32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>opengl32.lib;ws2_32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -125,14 +125,14 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(SolutionDir)./cereal/include/;$(ProjectDir)./source/;$(SolutionDir)./rapidjson/include/;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)./cereal/include/;$(ProjectDir)./source/;$(SolutionDir)./rapidjson/include/;$(SolutionDir)./ShobuNetwork/;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpplatest</LanguageStandard>
-      <PreprocessorDefinitions>_SILENCE_ALL_CXX17_DEPRECATION_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_SILENCE_ALL_CXX17_DEPRECATION_WARNINGS;WIN32;_WINSOCK_DEPRECATED_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalDependencies>opengl32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>opengl32.lib;ws2_32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
@@ -164,12 +164,14 @@
     <ClInclude Include="source\secro\framework\graphics\ParallaxElement.h" />
     <ClInclude Include="source\secro\framework\graphics\Particle.h" />
     <ClInclude Include="source\secro\framework\graphics\ParticleSystem.h" />
+    <ClInclude Include="source\secro\framework\input\CompressedInput.h" />
     <ClInclude Include="source\secro\framework\input\Controller.h" />
     <ClInclude Include="source\secro\framework\input\ControllerSettings.h" />
     <ClInclude Include="source\secro\framework\input\InputManager.h" />
     <ClInclude Include="source\secro\framework\input\InputTestBot.h" />
     <ClInclude Include="source\secro\framework\level\Level.h" />
     <ClInclude Include="source\secro\framework\math\Curve.h" />
+    <ClInclude Include="source\secro\framework\math\fmath.h" />
     <ClInclude Include="source\secro\framework\physics\Filters.h" />
     <ClInclude Include="source\secro\framework\physics\PhysicsManager.h" />
     <ClInclude Include="source\secro\framework\physics\PlayerCollision.h" />
@@ -206,9 +208,13 @@
     <ClInclude Include="source\secro\gameplay\PlayerManager.h" />
     <ClInclude Include="source\secro\gameplay\Rules.h" />
     <ClInclude Include="source\secro\IGame.h" />
+    <ClInclude Include="source\secro\netplay\CopyContainer.h" />
     <ClInclude Include="source\secro\netplay\Essentials.h" />
     <ClInclude Include="source\secro\netplay\InputPacket.h" />
+    <ClInclude Include="source\secro\netplay\LevelSerializer.h" />
     <ClInclude Include="source\secro\netplay\NetplayGame.h" />
+    <ClInclude Include="source\secro\netplay\RawSerializeBuffer.h" />
+    <ClInclude Include="source\secro\netplay\SerializeFunctions.h" />
     <ClInclude Include="source\sen\Component.h" />
     <ClInclude Include="source\sen\ComponentManager.h" />
     <ClInclude Include="source\sen\Construct.h" />
@@ -226,6 +232,8 @@
     <ClInclude Include="source\sen\SerializeSave.h" />
     <ClInclude Include="source\sen\Test.h" />
     <ClInclude Include="source\sen\Transform.h" />
+    <ClInclude Include="source\ShobuNetwork\Network.h" />
+    <ClInclude Include="source\ShobuNetwork\NetworkLogger.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="source\imgui\imgui-SFML.cpp" />
@@ -250,6 +258,7 @@
     <ClCompile Include="source\secro\framework\input\InputTestBot.cpp" />
     <ClCompile Include="source\secro\framework\level\Level.cpp" />
     <ClCompile Include="source\secro\framework\math\Curve.cpp" />
+    <ClCompile Include="source\secro\framework\math\fmath.cpp" />
     <ClCompile Include="source\secro\framework\physics\PhysicsManager.cpp" />
     <ClCompile Include="source\secro\framework\physics\PlayerCollision.cpp" />
     <ClCompile Include="source\secro\framework\physics\PlayerContact.cpp" />
@@ -291,6 +300,8 @@
     <ClCompile Include="source\sen\SerializerLoad.cpp" />
     <ClCompile Include="source\sen\SerializeSave.cpp" />
     <ClCompile Include="source\sen\Test.cpp" />
+    <ClCompile Include="source\ShobuNetwork\Network.cpp" />
+    <ClCompile Include="source\ShobuNetwork\NetworkLogger.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

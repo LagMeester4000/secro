@@ -6,6 +6,7 @@
 #include <SFML/Graphics.hpp>
 #include <tuple>
 #include <imgui.h>
+#include "secro/framework/math/fmath.h"
 
 secro::CharacterDashette::CharacterDashette(Level* level, HitboxManager * hitboxManager, b2Body * body, std::shared_ptr<Controller> controller)
 	: PlayerGraphicsCharacter(level, hitboxManager, body, controller)
@@ -19,9 +20,9 @@ secro::CharacterDashette::CharacterDashette()
 void secro::CharacterDashette::init()
 {
 	PlayerGraphicsCharacter::init();
-	
+
 	specialDuration = 0.20f;
-	specialSpeed = 15.f;
+	specialSpeed = 50.f;
 	specialRemainSpeed = 0.4f;
 	specialGroundFriction = -100.f;
 	specialHyperJumpPower = 3.f;
@@ -32,7 +33,7 @@ void secro::CharacterDashette::init()
 
 	dashSpeedCurve.inputMultiplicant = -1.f;
 	dashSpeedCurve.inputAdd = 1.f;
-	dashSpeedCurve.resultMultiplicant = -1.f;
+	dashSpeedCurve.resultMultiplicant = -0.9f;
 	dashSpeedCurve.resultAdd = 1.f;
 	Circle c;
 	c.exponent = 1.5f;
@@ -319,6 +320,7 @@ void secro::CharacterDashette::stateUpdateSpecial()
 {
 	float alpha = getStateTimer() / specialDuration;
 	alpha = 1.f - alpha;
+	alpha = clampOne(alpha);
 	resizeVelocity(dashSpeedCurve.calculate(alpha) * specialSpeed);
 }
 

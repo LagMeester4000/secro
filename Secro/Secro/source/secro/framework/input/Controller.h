@@ -2,6 +2,7 @@
 #include "ControllerSettings.h"
 #include <memory>
 #include <functional>
+#include "CompressedInput.h"
 
 namespace secro {
 	struct Joystick {
@@ -39,22 +40,13 @@ namespace secro {
 
 			bool startButton = false;
 			bool selectButton = false;
-
-			//old
-			//bool aButton = false;
-			//bool bButton = false;
-			//bool xButton = false;
-			//bool yButton = false;
-			//
-			//bool lTrigger1 = false;
-			//bool lTrigger2 = false;
-			//
-			//bool rTrigger1 = false;
-			//bool rTrigger2 = false;
-			//
-			//bool start = false;
-			//bool select = false;
 		};
+
+		//compress the input into an int
+		static CompressedInput compressInput(const Input& input);
+
+		//uncompress the input from an int
+		static Input uncompressInput(const CompressedInput& input);
 
 	public:
 		static std::shared_ptr<Controller> createController(int playerIndex, int index, bool keyboard = false);
@@ -70,6 +62,9 @@ namespace secro {
 
 		//read the inputs and put them into an input struct
 		Input readInput() const;
+
+		//update without reading new input
+		void emptyUpdate();
 
 		//movement
 		const Joystick& getMovement() const;

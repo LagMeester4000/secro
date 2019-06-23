@@ -31,6 +31,8 @@ namespace secro {
 		virtual void setupAttacks(AttackCollection& attacks);
 		virtual void update(float deltaTime);
 		virtual void render(sf::RenderWindow& window);
+		void netSerSave(RawSerializeBuffer& buff) override;
+		void netSerLoad(RawSerializeBuffer& buff) override;
 
 		b2Vec2 getPosition() override;
 		void setPosition(b2Vec2 pos, bool resetVelocity = false);
@@ -291,8 +293,6 @@ namespace secro {
 		void stateKnocdownBegin();
 		void stateKnockdownEnd();
 		bool stateCanKnockdownRollLeft();
-
-		
 
 	private: //airdodge
 		bool stateCanAirdodge();

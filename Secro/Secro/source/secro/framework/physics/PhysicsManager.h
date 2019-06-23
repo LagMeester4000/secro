@@ -10,6 +10,8 @@ namespace sf {
 }
 
 namespace secro {
+	class RawSerializeBuffer;
+
 	class PhysicsManager {
 	public:
 		PhysicsManager();
@@ -31,6 +33,10 @@ namespace secro {
 		//get the physics body of a player
 		b2Body* getPlayerBody(int index);
 		
+		//serialization
+		void netSerSave(RawSerializeBuffer& buff);
+		void netSerLoad(RawSerializeBuffer& buff);
+
 	private:
 		//actual physics world
 		std::shared_ptr<b2World> world;

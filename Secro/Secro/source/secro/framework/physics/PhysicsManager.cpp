@@ -1,5 +1,7 @@
 #include "PhysicsManager.h"
 #include "secro/framework/DebugOptions.h"
+#include "secro/netplay/RawSerializeBuffer.h"
+#include "secro/netplay/SerializeFunctions.h"
 
 ///TEMP
 #include <imgui.h>
@@ -28,7 +30,6 @@ void secro::PhysicsManager::update(float deltaTime)
 {
 	world->Step(deltaTime, 10, 10);
 }
-
 
 void secro::PhysicsManager::debugRender(sf::RenderWindow& window)
 {
@@ -71,4 +72,50 @@ b2Body * secro::PhysicsManager::makePlayerBody()
 b2Body * secro::PhysicsManager::getPlayerBody(int index)
 {
 	return playersColliders[index].playerBody;
+}
+
+namespace secro {
+	void netSerSave(secro::PlayerCollision& val, secro::RawSerializeBuffer& buff)
+	{
+		//b2Transform t = val.playerBody->GetTransform();
+		//auto vel = val.playerBody->GetLinearVelocity();
+		//auto angVel = val.playerBody->GetAngularVelocity();
+		//buff.save(t);
+		//buff.save(vel);
+		//buff.save(angVel);
+
+		val.playerBody->netSerSave(buff);
+	}
+
+	void netSerLoad(secro::PlayerCollision& val, secro::RawSerializeBuffer& buff)
+	{
+		//b2Transform t;
+		//b2Vec2 vel;
+		//float angVel;
+		//buff.load(t);
+		//buff.load(vel);
+		//buff.load(angVel);
+		////not sure about .GetAngle(), might cause desync
+		//val.playerBody->SetTransform(t);
+		//val.playerBody->SetLinearVelocityRaw(vel);
+		//val.playerBody->SetAngularVelocityRaw(angVel);
+
+		val.playerBody->netSerLoad(buff);
+	}
+}
+
+void secro::PhysicsManager::netSerSave(RawSerializeBuffer & buff)
+{
+	secro::netSerSave(playersColliders, buff);
+}
+
+void secro::PhysicsManager::netSerLoad(RawSerializeBuffer & buff)
+{
+	size_t size;
+	secro::netSerLoad(size, buff);
+
+	for (size_t i = 0; i < size; ++i)
+	{
+		secro::netSerLoad(playersColliders[i], buff);
+	}
 }

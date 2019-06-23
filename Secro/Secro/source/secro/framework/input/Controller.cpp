@@ -213,6 +213,91 @@ const secro::Controller::Input & secro::Controller::prev() const
 	return inputs[1];
 }
 
+CompressedInput secro::Controller::compressInput(const Input & input)
+{
+	CompressedInput ret;
+	ret.input.raw = 0;
+
+	auto size = sizeof(CompressedInput);
+	auto thingSize = sizeof(std::bitset<16>);
+
+	//left stick
+	ret.input.broken.leftX = CompressedInput::compressAxis(input.leftStick.x / 100.f);
+	ret.input.broken.leftY = CompressedInput::compressAxis(input.leftStick.y / 100.f);
+	
+	//right stick x
+	if (input.rightStick.x > 70.f)
+	{
+		ret.input.broken.rightIsNotNullX = true;
+		ret.input.broken.rightIsPlusX = true;
+	}
+	else if (input.rightStick.x < -70.f)
+	{
+		ret.input.broken.rightIsNotNullX = true;
+		ret.input.broken.rightIsPlusX = false;
+	}
+	else
+	{
+		ret.input.broken.rightIsNotNullX = false;
+		ret.input.broken.rightIsPlusX = false;
+	}
+
+	//right stick y
+	if (input.rightStick.y > 70.f)
+	{
+		ret.input.broken.rightIsNotNullY = true;
+		ret.input.broken.rightIsPlusY = true;
+	}
+	else if (input.rightStick.y < -70.f)
+	{
+		ret.input.broken.rightIsNotNullY = true;
+		ret.input.broken.rightIsPlusY = false;
+	}
+	else
+	{
+		ret.input.broken.rightIsNotNullY = false;
+		ret.input.broken.rightIsPlusY = false;
+	}
+
+	//buttons
+	ret.input.broken.attack = input.attackButton;
+	ret.input.broken.special = input.specialButton;
+	ret.input.broken.jump = input.jumpButton;
+	ret.input.broken.shield = input.shieldButton;
+	ret.input.broken.grab = input.grabButton;
+	ret.input.broken.start = input.startButton;
+	ret.input.broken.select = input.selectButton;
+
+	return ret;
+}
+
+typename secro::Controller::Input secro::Controller::uncompressInput(const CompressedInput & input)
+{
+	Input ret;
+
+	ret.leftStick.x = CompressedInput::toAxis(input.input.broken.leftX) * 100.f;
+	ret.leftStick.y = CompressedInput::toAxis(input.input.broken.leftY) * 100.f;
+
+	ret.rightStick.x = CompressedInput::toAxis(
+		input.input.broken.rightIsNotNullX, 
+		input.input.broken.rightIsPlusX
+	) * 100.f;
+	ret.rightStick.y = CompressedInput::toAxis(
+		input.input.broken.rightIsNotNullY,
+		input.input.broken.rightIsPlusY
+	) * 100.f;
+
+	ret.attackButton =  input.input.broken.attack;
+	ret.specialButton = input.input.broken.special;
+	ret.jumpButton =    input.input.broken.jump;
+	ret.shieldButton =  input.input.broken.shield;
+	ret.grabButton =    input.input.broken.grab;
+	ret.startButton =   input.input.broken.start;
+	ret.selectButton =  input.input.broken.select;
+
+	return ret;
+}
+
 std::shared_ptr<Controller> secro::Controller::createController(int playerIndex, int index, bool keyboard)
 {
 	class make_shared_enabler : public Controller {
@@ -243,6 +328,9 @@ void secro::Controller::update()
 			Input& i = current();
 
 			i = readInput();
+
+			auto comp = compressInput(i);
+			i = uncompressInput(comp);
 		}
 		else
 		{
@@ -289,6 +377,11 @@ secro::Controller::Input secro::Controller::readInput() const
 		return i;
 	}
 	return Input();
+}
+
+void secro::Controller::emptyUpdate()
+{
+	swapBack();
 }
 
 const Joystick & secro::Controller::getMovement() const
