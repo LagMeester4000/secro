@@ -14,6 +14,7 @@ namespace secro {
 	class InputManager;
 	class PlayerCharacter;
 	class Entity;
+	class RawSerializeBuffer;
 
 	//level type that can have its own win condition
 	class Level {
@@ -47,6 +48,9 @@ namespace secro {
 
 		//returns the player who won
 		virtual std::shared_ptr<PlayerCharacter> getWinningPlayer();
+		
+		virtual void netSerSave(RawSerializeBuffer& buff);
+		virtual void netSerLoad(RawSerializeBuffer& buff);
 
 		//get the particle system
 		ParticleSystem& getParticleSystem();

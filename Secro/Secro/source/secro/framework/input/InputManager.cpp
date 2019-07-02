@@ -88,11 +88,6 @@ void secro::InputManager::netSerLoad(RawSerializeBuffer & buff)
 	{
 		for (size_t i = 0; i < 8; ++i)
 		{
-			//CompressedInput in;
-			//buff.load(in);
-			//auto uncomp = Controller::uncompressInput(in);
-			///it->manualUpdate(uncomp);
-
 			Controller::Input in;
 			buff.load(in);
 			it->manualUpdate(in);

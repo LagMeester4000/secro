@@ -1,6 +1,7 @@
 #include "RingOutLevel.h"
 #include "secro/framework/player/PlayerCharacter.h"
 #include "secro/framework/resource/ResourceManager.h"
+#include "secro/netplay/SerializeFunctions.h"
 #include <SFML/Graphics.hpp>
 
 secro::RingOutLevel::RingOutLevel(std::shared_ptr<InputManager> input)
@@ -130,6 +131,32 @@ bool secro::RingOutLevel::isGameOver()
 	}
 
 	return false;
+}
+
+void secro::RingOutLevel::netSerSave(RawSerializeBuffer & buff)
+{
+	Level::netSerSave(buff);
+
+	size_t size = playerStocks.size();
+	buff.save(size);
+
+	for (auto& it : playerStocks)
+	{
+		buff.save(it);
+	}
+}
+
+void secro::RingOutLevel::netSerLoad(RawSerializeBuffer & buff)
+{
+	Level::netSerLoad(buff);
+
+	size_t size;
+	buff.load(size);
+
+	for (size_t i = 0; i < size; ++i)
+	{
+		buff.load(playerStocks[i]);
+	}
 }
 
 void secro::RingOutLevel::renderScores(sf::RenderWindow & window)

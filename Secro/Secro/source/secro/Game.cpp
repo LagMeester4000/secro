@@ -4,6 +4,7 @@
 #include "framework/player/PlayerCharacter.h"
 #include "framework/DebugOptions.h"
 #include "framework/GameplaySettings.h"
+#include "framework/GameInstance.h"
 #include "gameplay/characters/CharacterDashette.h"
 #include "gameplay/characters/CharacterDashetteP2.h"
 #include "gameplay/characters/CharacterOki.h"
@@ -157,49 +158,63 @@ secro::Game::Game(std::shared_ptr<InputManager> input)
 	}
 
 
-	//netplay!
-	network.registerCallbacks(
-		[](void* g, int me, int other) 
+	//online
+	if (GameInstance::instance.isOnline)
 	{
-		Game* asGame = (Game*)g;
-		asGame->updateWithInput(1.f / 60.f, me, other);
-	},
-		[](void* g) 
-	{
-		Game* asGame = (Game*)g;
-		asGame->netStateSave();
-	},
-		[](void* g) 
-	{
-		Game* asGame = (Game*)g;
-		asGame->netStateLoad();
-	},
-		[](void* g) -> int
-	{
-		//Game* asGame = (Game*)g;
-		//return asGame->netStateHash();
-		return 0;
-	}, (void*)this);
+		//netplay!
+		network.registerCallbacks(
+			[](void* g, int me, int other)
+		{
+			Game* asGame = (Game*)g;
+			asGame->updateWithInput(1.f / 60.f, me, other);
+		},
+			[](void* g)
+		{
+			Game* asGame = (Game*)g;
+			asGame->netStateSave();
+		},
+			[](void* g)
+		{
+			Game* asGame = (Game*)g;
+			asGame->netStateLoad();
+		},
+			[](void* g) -> int
+		{
+			//Game* asGame = (Game*)g;
+			//return asGame->netStateHash();
+			return 0;
+		}, (void*)this);
 
-	std::cout << "0 for host, 1 for client" << std::endl;
-	int i;
-	std::cin >> i;
-	if (i == 0)
-	{
-		//host
-		network.setInputDelay(2);
-		network.initializeHost(31415);
-		network.waitForClient();
-	}
-	else
-	{
-		//client
-		network.initializeClient("192.168.2.7", 31415);
+		std::cout << "0 for host, 1 for client" << std::endl;
+		int i;
+		std::cin >> i;
+		if (i == 0)
+		{
+			//host
+			int delay = 3;
+			std::cout << "set frames of input delay (default value is 3)" << std::endl;
+			std::cin >> delay;
+			std::cout << std::endl;
 
-		//connect
-		network.connectToHost();
+			network.setInputDelay(delay);
+			network.initializeHost(31415);
+			network.waitForClient();
+		}
+		else
+		{
+			//client
+			std::string ip = "";
+			std::cout << "enter IP address" << std::endl;
+			std::cin >> ip;
+			std::cout << std::endl;
 
-		int stop = 0;
+			network.initializeClient(ip.c_str(), 31415);
+
+			//connect
+			network.connectToHost();
+
+			int stop = 0;
+		}
 	}
 
 	//set up the stage
@@ -219,27 +234,35 @@ void secro::Game::update(float deltaTime, bool shouldUpdateInput)
 	//		inputManager->updateNoInputs();
 	//}
 
-	if (network.connected() && shouldUpdateInput)
+	if (GameInstance::instance.isOnline)
 	{
-		//print ping
-		std::cout << network.getPing() << std::endl;
-		if (network.getPing() > 200)
+		if (network.connected() && shouldUpdateInput)
 		{
-			//if (network.isHost())
-				//network.wait();
-			using namespace std::chrono_literals;
-			std::this_thread::sleep_for(30ms);
-		}
+			//print ping
+			std::cout << network.getPing() << std::endl;
+			if (network.getPing() > 200)
+			{
+				using namespace std::chrono_literals;
+				std::this_thread::sleep_for(30ms);
+			}
 
-		if (network.isHost())
-		{
+			//if (network.isHost())
+			//{
 			auto r = inputManager->getController(0)->readInput();
 			network.update(Controller::compressInput(r).input.raw);
+			//}
+			//else
+			//{
+			//	network.update(0);
+			//}
 		}
-		else
-		{
-			network.update(0);
-		}
+	}
+	else
+	{
+		//offline
+		inputManager->update();
+		simulateUpdate(deltaTime);
+		level->physicsManager.serReset();
 	}
 
 	//update the debug menu
@@ -306,6 +329,22 @@ void secro::Game::render(sf::RenderWindow & window)
 	{
 		//render gameplay
 		level->render(window);
+
+		if (GameInstance::instance.isOnline)
+		{
+			//capture the view and make a new one
+			auto resetView = window.getView();
+			sf::View view(sf::FloatRect{ 0.f, 0.f, 1920.f, 1080.f });
+			window.setView(view);
+
+			//draw UI
+			std::string pingStr = "ping: ";
+			pingStr += std::to_string(network.getPing());
+			sf::Text t(pingStr.c_str(), uiFont);
+
+			//reset the view
+			window.setView(resetView);
+		}
 	} break;
 	}
 
@@ -340,6 +379,8 @@ void secro::Game::netStateSave()
 	stateBuffer.reset();
 	inputManager->netSerSave(stateBuffer);
 	level->physicsManager.netSerSave(stateBuffer);
+	level->hitboxManager.netSerSave(stateBuffer);
+	level->netSerSave(stateBuffer);
 
 	for (auto& it : level->players)
 	{
@@ -352,6 +393,8 @@ void secro::Game::netStateLoad()
 	stateBuffer.reset();
 	inputManager->netSerLoad(stateBuffer);
 	level->physicsManager.netSerLoad(stateBuffer);
+	level->hitboxManager.netSerLoad(stateBuffer);
+	level->netSerLoad(stateBuffer);
 
 	for (auto& it : level->players)
 	{

@@ -1,6 +1,7 @@
 #include "CharacterDashette.h"
 #include "secro/framework/detail/PlainVectorMath.h"
 #include "secro/framework/level/Level.h"
+#include "secro/netplay/SerializeFunctions.h"
 #include <Box2D/Box2D.h>
 #include <functional>
 #include <SFML/Graphics.hpp>
@@ -187,7 +188,7 @@ void secro::CharacterDashette::setupStates(StateMachine & sm)
 	{
 		animatedSprite.setAnimation(animSpDash);
 		auto newDir = spDir;
-		newDir.x = -newDir.x;
+		//newDir.x = -newDir.x;
 		float rot = angleFromDirection(newDir);
 		if (getFacingDirection() == FacingDirection::Left)
 			rot = 180.f + rot;
@@ -233,6 +234,40 @@ void secro::CharacterDashette::update(float deltaTime)
 void secro::CharacterDashette::render(sf::RenderWindow & window)
 {
 	PlayerGraphicsCharacter::render(window);
+}
+
+void secro::CharacterDashette::netSerSave(RawSerializeBuffer & buff)
+{
+	PlayerCharacter::netSerSave(buff);
+
+	buff.save(specialDirection);
+	buff.save(specialSpeed);
+	buff.save(specialDuration);
+	buff.save(specialRemainSpeed);
+	buff.save(specialGroundFriction);
+	buff.save(specialHyperJumpPower);
+	buff.save(specialHyperJumpHeight);
+	buff.save(specialAmountOfAirDash);
+	buff.save(normalFriction);
+	buff.save(airDashLeft);
+	buff.save(dashSpeedCurve);
+}
+
+void secro::CharacterDashette::netSerLoad(RawSerializeBuffer & buff)
+{
+	PlayerCharacter::netSerLoad(buff);
+
+	buff.load(specialDirection);
+	buff.load(specialSpeed);
+	buff.load(specialDuration);
+	buff.load(specialRemainSpeed);
+	buff.load(specialGroundFriction);
+	buff.load(specialHyperJumpPower);
+	buff.load(specialHyperJumpHeight);
+	buff.load(specialAmountOfAirDash);
+	buff.load(normalFriction);
+	buff.load(airDashLeft);
+	buff.load(dashSpeedCurve);
 }
 
 void secro::CharacterDashette::renderAttributes(sf::RenderWindow & window)
@@ -289,7 +324,7 @@ void secro::CharacterDashette::stateStartSpecial()
 	stick = makeOctoDir(stick);
 
 	//set between value
-	specialDirection = { -stick.x, stick.y };
+	specialDirection = { stick.x, stick.y };
 
 	stick = mul(stick, specialSpeed);
 
@@ -321,7 +356,10 @@ void secro::CharacterDashette::stateUpdateSpecial()
 	float alpha = getStateTimer() / specialDuration;
 	alpha = 1.f - alpha;
 	alpha = clampOne(alpha);
-	resizeVelocity(dashSpeedCurve.calculate(alpha) * specialSpeed);
+	//resizeVelocity(dashSpeedCurve.calculate(alpha) * specialSpeed);
+	auto newVel = specialDirection;
+	newVel = mul(newVel, attributes.airdodgeSpeedCurve.calculate(alpha) * specialSpeed);
+	physicsBody->SetLinearVelocity(newVel);
 }
 
 void secro::CharacterDashette::stateStartHyperJump()

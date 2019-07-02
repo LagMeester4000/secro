@@ -2,9 +2,10 @@
 #include "StateMachine.h"
 #include "MovementState.h"
 #include "PlayerAttributes.h"
-#include "../Entity.h"
-#include "../collision/FacingDirection.h"
-#include "../input/Controller.h"
+#include "secro/framework/Entity.h"
+#include "secro/framework/collision/FacingDirection.h"
+#include "secro/framework/input/Controller.h"
+#include "secro/framework/collision/HitboxId.h"
 #include "AttackCollection.h"
 
 class b2Body;
@@ -47,7 +48,9 @@ namespace secro {
 
 	protected:
 		bool snapToGround(float distance, bool startAtBottom = false);
-		void resizeVelocity(float newSize);
+
+		//THIS FUNCTION HAS BEEN DEEMED UNSAFE
+		//void resizeVelocity(float newSize);
 
 	public:
 		//to test if the character should keep running forward, or stop adding velocity
@@ -227,13 +230,13 @@ namespace secro {
 		PlayerState currentAttackState;
 
 		//the current attack
-		std::shared_ptr<HitboxCollection> currentAttackHitbox;
+		HitboxId currentAttackHitbox;
 
 		//frame data of the hurtbox
 		FrameData hurtboxFrames;
 
 		//the player's hurtbox
-		std::shared_ptr<HitboxCollection> hurtbox;
+		HitboxId hurtbox;
 
 		//to check if the attack has connected
 		bool hasAttackHit;
@@ -300,6 +303,9 @@ namespace secro {
 		void stateAirdodgeStart();
 		void stateAirdodgeEnd();
 		void stateUpdateAirdodge(float deltaTime);
+
+		//saved direction
+		b2Vec2 airdodgeDirectrion;
 
 	private: //invincibility
 		//update the invincibility

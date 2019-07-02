@@ -20,6 +20,9 @@ namespace secro {
 
 		bool isGameOver() override;
 
+		void netSerSave(RawSerializeBuffer& buff) override;
+		void netSerLoad(RawSerializeBuffer& buff) override;
+
 	private: //graphics
 		void renderScores(sf::RenderWindow& window);
 		void renderScore(sf::RenderWindow& window, sf::Vector2f position, PlayerCharacter* player, int stocks);

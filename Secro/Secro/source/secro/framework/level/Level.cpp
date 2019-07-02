@@ -79,6 +79,14 @@ std::shared_ptr<PlayerCharacter> secro::Level::getWinningPlayer()
 	return std::shared_ptr<PlayerCharacter>();
 }
 
+void secro::Level::netSerSave(RawSerializeBuffer & buff)
+{
+}
+
+void secro::Level::netSerLoad(RawSerializeBuffer & buff)
+{
+}
+
 ParticleSystem & secro::Level::getParticleSystem()
 {
 	return particleSystem;

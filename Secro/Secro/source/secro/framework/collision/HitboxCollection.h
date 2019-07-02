@@ -14,10 +14,14 @@ namespace secro {
 	class PlayerCharacter;
 	class Entity;
 	struct FrameData;
+	class RawSerializeBuffer;
 
 	class HitboxCollection {
 	public:
 		HitboxCollection(Entity* owner, FrameData& framedata, bool isHitbox);
+
+		//not recommended for use
+		HitboxCollection() {}
 
 		//update the bounding volume if needed
 		void update();
@@ -47,6 +51,12 @@ namespace secro {
 		//get the hit Id
 		int getHitId();
 
+		//net serialize save
+		void netSerSave(RawSerializeBuffer& buff);
+
+		//net serialize load
+		void netSerLoad(RawSerializeBuffer& buff);
+
 	private:
 		//update the bounding volume
 		void updateRelativeBox();
@@ -58,8 +68,8 @@ namespace secro {
 		//if nullptr, the hitbox doesn't have an owner
 		Entity* owner;
 		
-		//oredered list of hitboxes
-		std::vector<std::shared_ptr<Hitbox>> hitboxes;
+		//ordered list of hitboxes
+		std::vector<Hitbox> hitboxes;
 
 		//dirty flag to check if the hitboxes have been updated
 		//might not be needed
@@ -77,6 +87,7 @@ namespace secro {
 	private:
 		static int hitIdCounter;
 
+		//generate a new unique id for the hit
 		int makeHitId();
 	};
 }

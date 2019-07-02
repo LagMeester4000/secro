@@ -3,6 +3,8 @@
 #include <imgui/imgui-SFML.h>
 #include <imgui.h>
 #include "Game.h"
+#include "secro/framework/detail/CommandArgs.h"
+#include "secro/framework/GameInstance.h"
 #include "sen/Test.h"
 #include "framework/input/InputManager.h"
 
@@ -75,15 +77,28 @@ const bool useVsync = false;
 const bool useSleep = false;
 const float FPS = 60.0f; //The desired FPS. (The number of updates each second).
 
-int main()
+int main(int argc, char *argv[])
 {
+	//save args
+	secro::CommandArgs args(argc, argv);
+	secro::GameInstance::instance.isOnline = args.hasArg("online");
+
 	//test SEN library
 	sen::test();
 
 	bool redraw = true;      //Do I redraw everything on the screen?
 
+	auto screenType = sf::Style::Default;
+	if (argc > 1)
+	{
+		if (args.hasArg("fullscreen"))
+		{
+			screenType = sf::Style::Fullscreen;
+		}
+	}
+
 	//actual drawing window
-	sf::RenderWindow window(sf::VideoMode(800, 800, 32), "Hello", sf::Style::Default);
+	sf::RenderWindow window(sf::VideoMode(800, 800, 32), "Secro", screenType);
 	ImGui::SFML::Init(window, true);
 	ImGui::CreateContext();
 	SetImGuiStyle();
@@ -143,7 +158,7 @@ int main()
 			//draw things here
 			ImGui::SFML::Update(window, dtClock);
 			//game->update(deltaTime);
-			std::cout << "FPS: " << 1.f / deltaTime << std::endl;
+			//std::cout << "FPS: " << 1.f / deltaTime << std::endl;
 			game->update(1.f/FPS);
 			game->render(window);
 

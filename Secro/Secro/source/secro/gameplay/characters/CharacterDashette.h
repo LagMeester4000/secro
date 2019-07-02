@@ -16,6 +16,8 @@ namespace secro {
 		void setupAttacks(AttackCollection& attacks) override;
 		void update(float deltaTime) override;
 		void render(sf::RenderWindow& window) override;
+		void netSerSave(RawSerializeBuffer& buff) override;
+		void netSerLoad(RawSerializeBuffer& buff) override;
 
 	protected:
 		void renderAttributes(sf::RenderWindow& window) override;

@@ -1,1 +1,1 @@
-Client connected. Input Delay is 4. Sending handshake..
+Client connected. Input Delay is 5. Sending handshake..

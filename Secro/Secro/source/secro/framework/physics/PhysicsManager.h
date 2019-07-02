@@ -37,6 +37,9 @@ namespace secro {
 		void netSerSave(RawSerializeBuffer& buff);
 		void netSerLoad(RawSerializeBuffer& buff);
 
+		//soft reset
+		void serReset();
+
 	private:
 		//actual physics world
 		std::shared_ptr<b2World> world;

@@ -26,6 +26,8 @@ struct NetworkMetric
 static std::atomic<bool> saving_metrics(true);
 void write_metrics()
 {
+	return;
+
     std::ofstream network_data("network_metrics.csv");
     network_data << "Update Rate, Waits / Sec, Rollbacks / Sec, Ping" << std::endl;
     while(saving_metrics) {

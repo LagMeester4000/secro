@@ -119,3 +119,13 @@ void secro::PhysicsManager::netSerLoad(RawSerializeBuffer & buff)
 		secro::netSerLoad(playersColliders[i], buff);
 	}
 }
+
+void secro::PhysicsManager::serReset()
+{
+	auto& man = const_cast<b2ContactManager&>(world->GetContactManager());
+
+	for (auto* it = world->GetContactList(); it; it = it->GetNext())
+	{
+		man.Destroy(it);
+	}
+}

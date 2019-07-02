@@ -1,6 +1,6 @@
 #pragma once
 #include <functional>
-#include "Box.h"
+#include "Box2D/Common/b2Math.h"
 #include "FacingDirection.h"
 
 namespace sf {
@@ -10,30 +10,45 @@ namespace sf {
 namespace secro {
 	class PlayerCharacter;
 	struct HitboxChange;
+	class RawSerializeBuffer;
+
+	struct Box {
+		b2Vec2 p1, p2;
+	};
 
 	//overlapping hitbox for colliding with other hitboxes
 	class Hitbox {
 	public:
 		//update the hitbox
-		virtual void update(HitboxChange& change);
+		void update(HitboxChange& change);
 
 		//render the hitbox
-		virtual void render(sf::RenderWindow& window, b2Vec2 position, b2Vec2 scale) = 0;
+		void render(sf::RenderWindow& window, b2Vec2 position, b2Vec2 scale);
 
 		//get the relative space that the hitbox uses
-		virtual Box getSpace() = 0;
+		Box getSpace();
 
 		//check for collision with another hitbox
-		virtual bool collide(Hitbox& other, b2Vec2 otherPosition, b2Vec2 otherScale, b2Vec2 position, b2Vec2 scale) = 0;
+		bool collide(Hitbox& other, b2Vec2 otherPosition, b2Vec2 otherScale, b2Vec2 position, b2Vec2 scale);
 
 		//knock a player back
 		void knockbackPlayer(PlayerCharacter* player, FacingDirection direction);
 
+		//calculate the knockback vector resulting from a hit
 		b2Vec2 getKnockback(PlayerCharacter* player);
+
+		//net serialize save
+		void netSerSave(RawSerializeBuffer& buff);
+
+		//net serialize load
+		void netSerLoad(RawSerializeBuffer& buff);
 
 	public://collision properties
 		//relative position
 		b2Vec2 position;
+
+		//size of hitbox
+		float radius;
 
 		//to check wether the box is a hit or hurbox
 		bool isHitbox;

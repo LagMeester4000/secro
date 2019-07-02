@@ -1,7 +1,7 @@
 #include "HitboxCollection.h"
 #include "../Entity.h"
 #include "FrameData.h"
-#include "CircleHitbox.h"
+#include "secro/netplay/SerializeFunctions.h"
 #include <set>
 #include <iostream>
 #include <algorithm>
@@ -15,11 +15,7 @@ secro::HitboxCollection::HitboxCollection(Entity * owner, FrameData & framedata,
 	updatedFlag = false;
 	relativeBox = { };
 	this->owner = owner;
-	hitboxes = std::vector<std::shared_ptr<Hitbox>>(framedata.amountOfHitboxes, nullptr);
-	for (auto& it : hitboxes)
-	{
-		it = std::make_shared<CircleHitbox>();
-	}
+	hitboxes = std::vector<Hitbox>((size_t)framedata.amountOfHitboxes);
 
 	//load hurtbox is this is a hurtbox
 	if (!isHitbox)
@@ -41,8 +37,8 @@ void secro::HitboxCollection::update()
 HitResult secro::HitboxCollection::collide(HitboxCollection & other)
 {
 	//set can only have one of the same
-	std::set<std::shared_ptr<Hitbox>> setHit;
-	std::set<std::shared_ptr<Hitbox>> setHurt;
+	std::set<Hitbox*> setHit;
+	std::set<Hitbox*> setHurt;
 
 	//find scale and stuff
 	auto otherPos = other.owner->getPosition();
@@ -54,19 +50,19 @@ HitResult secro::HitboxCollection::collide(HitboxCollection & other)
 	{
 		for (auto& myHit : hitboxes)
 		{
-			if (!myHit->isActive || !otherHit->isActive)
+			if (!myHit.isActive || !otherHit.isActive)
 				continue;
 
-			if (myHit->collide(
-				*otherHit,
+			if (myHit.collide(
+				otherHit,
 				otherPos,
 				otherScale,
 				myPos,
 				myScale
 			))
 			{
-				setHit.insert(myHit);
-				setHurt.insert(otherHit);
+				setHit.insert(&myHit);
+				setHurt.insert(&otherHit);
 			}
 		}
 	}
@@ -104,8 +100,8 @@ void secro::HitboxCollection::debugRender(sf::RenderWindow & window)
 {
 	for (auto& it : hitboxes)
 	{
-		if (it->isActive)
-			it->render(window, owner->getPosition(), scale(owner));
+		if (it.isActive)
+			it.render(window, owner->getPosition(), scale(owner));
 	}
 }
 
@@ -125,7 +121,7 @@ void secro::HitboxCollection::changeHitboxes(std::vector<HitboxChange>& changes)
 
 void secro::HitboxCollection::changeHitboxes(HitboxChange & change)
 {
-	hitboxes[change.index]->update(change);
+	hitboxes[change.index].update(change);
 }
 
 Box secro::HitboxCollection::getVolume()
@@ -151,6 +147,51 @@ Entity * secro::HitboxCollection::getOwner()
 int secro::HitboxCollection::getHitId()
 {
 	return hitId;
+}
+
+void secro::HitboxCollection::netSerSave(RawSerializeBuffer & buff)
+{
+	//this will need to be replaced with a handle (instead of pointer) later on
+	buff.save(owner);
+
+	size_t size = hitboxes.size();
+	buff.save(size);
+	for (auto& it : hitboxes)
+	{
+		it.netSerSave(buff);
+	}
+
+	buff.save(updatedFlag);
+	buff.save(relativeBox);
+	buff.save(shouldDelete);
+	buff.save(hitId);
+
+	//please change later, it saves this multiple times now
+	buff.save(hitIdCounter);
+}
+
+void secro::HitboxCollection::netSerLoad(RawSerializeBuffer & buff)
+{
+	//this will need to be replaced with a handle (instead of pointer) later on
+	buff.load(owner);
+
+	size_t size;
+	buff.load(size);
+	hitboxes.clear();
+	for (size_t i = 0; i < size; ++i)
+	{
+		Hitbox h;
+		h.netSerLoad(buff);
+		hitboxes.push_back(h);
+	}
+
+	buff.load(updatedFlag);
+	buff.load(relativeBox);
+	buff.load(shouldDelete);
+	buff.load(hitId);
+
+	//please change later, it saves this multiple times now
+	buff.load(hitIdCounter);
 }
 
 void secro::HitboxCollection::updateRelativeBox()

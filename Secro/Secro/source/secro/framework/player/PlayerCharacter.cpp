@@ -625,12 +625,15 @@ void secro::PlayerCharacter::netSerSave(RawSerializeBuffer & buff)
 	buff.save(debugDamage);
 	buff.save(attackTimer);
 	buff.save(currentAttackState);
+	buff.save(currentAttackHitbox);
+	buff.save(hurtbox);
 	buff.save(hasAttackHit);
 	buff.save(hitlag);
 	buff.save(hitlagVelocity);
 	buff.save(freezeShake);
 	buff.save(freezeShakePerHitlag);
 	buff.save(freezeShakeBase);
+	buff.save(airdodgeDirectrion);
 	buff.save(invincibilityTimer);
 	buff.save(DI);
 	buff.save(airDashTimer);
@@ -662,12 +665,15 @@ void secro::PlayerCharacter::netSerLoad(RawSerializeBuffer & buff)
 	buff.load(debugDamage);
 	buff.load(attackTimer);
 	buff.load(currentAttackState);
+	buff.load(currentAttackHitbox);
+	buff.load(hurtbox);
 	buff.load(hasAttackHit);
 	buff.load(hitlag);
 	buff.load(hitlagVelocity);
 	buff.load(freezeShake);
 	buff.load(freezeShakePerHitlag);
 	buff.load(freezeShakeBase);
+	buff.load(airdodgeDirectrion);
 	buff.load(invincibilityTimer);
 	buff.load(DI);
 	buff.load(airDashTimer);
@@ -983,13 +989,13 @@ bool secro::PlayerCharacter::snapToGround(float distance, bool startAtBottom)
 	return false;
 }
 
-void secro::PlayerCharacter::resizeVelocity(float newSize)
-{
-	auto vel = physicsBody->GetLinearVelocity();
-	vel.Normalize();
-	vel *= newSize;
-	physicsBody->SetLinearVelocity(vel);
-}
+//void secro::PlayerCharacter::resizeVelocity(float newSize)
+//{
+//	auto vel = physicsBody->GetLinearVelocity();
+//	vel.Normalize();
+//	vel *= newSize;
+//	physicsBody->SetLinearVelocity(vel);
+//}
 
 bool secro::PlayerCharacter::keepRunning()
 {
@@ -1076,8 +1082,12 @@ void secro::PlayerCharacter::stateStartWalk()
 
 void secro::PlayerCharacter::endAttack()
 {
-	currentAttackHitbox->destroy();
-	currentAttackHitbox = nullptr;
+	//destroy and reset attack
+	if (currentAttackHitbox != HitboxId::None)
+	{
+		hitboxManager->getHitbox(currentAttackHitbox)->destroy();
+	}
+	currentAttackHitbox = HitboxId::None;
 
 	if (movementState == MovementState::OnGround)
 	{
@@ -1349,7 +1359,7 @@ void secro::PlayerCharacter::updateAttack(float deltaTime)
 	//if attacking
 	if ((int)state > (int)PlayerState::AFirstAttack && (int)state < (int)PlayerState::ALastAttack)
 	{
-		if (currentAttackHitbox != nullptr)
+		if (currentAttackHitbox != HitboxId::None)
 		{
 			auto& currentMove = attackCollection.getAttack(state);
 			auto& frames = currentMove.frames;
@@ -1360,7 +1370,7 @@ void secro::PlayerCharacter::updateAttack(float deltaTime)
 			{
 				if (it.time > attackTimer && it.time <= nextAttackTimer)
 				{
-					currentAttackHitbox->changeHitboxes(it.changes);
+					hitboxManager->getHitbox(currentAttackHitbox)->changeHitboxes(it.changes);
 				}
 			}
 
@@ -1440,10 +1450,10 @@ b2Vec2 secro::PlayerCharacter::calcFreezeShake()
 
 void secro::PlayerCharacter::stateStartNewAttack(PlayerState attack)
 {
-	if (currentAttackHitbox != nullptr)
+	if (currentAttackHitbox != HitboxId::None)
 	{
-		currentAttackHitbox->destroy();
-		currentAttackHitbox = nullptr;
+		hitboxManager->getHitbox(currentAttackHitbox)->destroy();
+		currentAttackHitbox = HitboxId::None;
 	}
 
 	currentAttackState = attack;
@@ -1461,7 +1471,8 @@ void secro::PlayerCharacter::stateStartShield()
 		return;
 	}
 
-	hurtbox->changeHitboxes(hurtboxFrames.frames[1].changes);
+	if (hurtbox != HitboxId::None)
+		hitboxManager->getHurtbox(hurtbox)->changeHitboxes(hurtboxFrames.frames[1].changes);
 }
 
 void secro::PlayerCharacter::stateEndShield()
@@ -1472,7 +1483,8 @@ void secro::PlayerCharacter::stateEndShield()
 		return;
 	}
 
-	hurtbox->changeHitboxes(hurtboxFrames.frames[0].changes);
+	if (hurtbox != HitboxId::None)
+		hitboxManager->getHurtbox(hurtbox)->changeHitboxes(hurtboxFrames.frames[0].changes);
 }
 
 void secro::PlayerCharacter::stateUpdateDash(float deltaTime)
@@ -1588,6 +1600,7 @@ void secro::PlayerCharacter::stateAirdodgeStart()
 	if (dir.y > -50.f && dir.y < 0.f && movementState == MovementState::OnGround)
 		dir.y = 0.f;
 	dir.Normalize();
+	airdodgeDirectrion = dir;
 	dir *= attributes.airdodgeSpeed;
 	physicsBody->SetLinearVelocity(dir);
 
@@ -1629,7 +1642,10 @@ void secro::PlayerCharacter::stateUpdateAirdodge(float deltaTime)
 
 	float alpha = (attributes.airdodgeDuration - stateTimer) / attributes.airdodgeDuration;
 	alpha = clampOne(alpha);
-	resizeVelocity(attributes.airdodgeSpeedCurve.calculate(alpha) * attributes.airdodgeSpeed);
+	//resizeVelocity(attributes.airdodgeSpeedCurve.calculate(alpha) * attributes.airdodgeSpeed);
+	auto newVel = airdodgeDirectrion;
+	newVel = mul(newVel, attributes.airdodgeSpeedCurve.calculate(alpha) * attributes.airdodgeSpeed);
+	physicsBody->SetLinearVelocity(newVel);
 
 	//give invincibility once needed
 	//only happens once during the airdodge

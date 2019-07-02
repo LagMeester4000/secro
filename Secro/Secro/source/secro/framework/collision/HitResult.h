@@ -12,10 +12,10 @@ namespace secro {
 
 		//hitboxes that have hit the hurtboxes of the other entity
 		//ordered by priority
-		std::vector<std::shared_ptr<Hitbox>> hits;
+		std::vector<Hitbox*> hits;
 
 		//hurtboxes of the other entity that have been hit by the hitboxes
 		//ordered by priority
-		std::vector<std::shared_ptr<Hitbox>> hurts;
+		std::vector<Hitbox*> hurts;
 	};
 }

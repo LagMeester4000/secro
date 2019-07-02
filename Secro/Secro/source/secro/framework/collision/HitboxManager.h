@@ -1,9 +1,11 @@
 #pragma once
 #include "HitboxCollection.h"
+#include "HitboxId.h"
 
 namespace secro {
 	struct FrameData;
 	class Level;
+	class RawSerializeBuffer;
 
 	//manager that holds all the hit and hurtboxes from the player used for damaging
 	//this is separate from the physics
@@ -19,21 +21,36 @@ namespace secro {
 		void render(sf::RenderWindow& window);
 
 		//add a hitbox to the scene
-		std::shared_ptr<HitboxCollection> addHitbox(Entity* owner, FrameData& framedata);
+		HitboxId addHitbox(Entity* owner, FrameData& framedata);
 
 		//add a hurtbox to the scene
 		//takes the first frame of the framedata as a constant hurtbox
-		std::shared_ptr<HitboxCollection> addHurtbox(Entity* owner, FrameData& framedata);
-		
+		HitboxId addHurtbox(Entity* owner, FrameData& framedata);
+
+		//get a hitbox from a handle
+		HitboxCollection* getHitbox(HitboxId id);
+
+		//get a hurtbox from a handle
+		HitboxCollection* getHurtbox(HitboxId id);
+
+		//net serialize save
+		void netSerSave(RawSerializeBuffer& buff);
+
+		//net serialize load
+		void netSerLoad(RawSerializeBuffer& buff);
+
 	private:
-		//delete all the mared hit and hurtboxes
-		void deleteMarked();
+		//clear all the hitboxes
+		void clearHitboxes();
+
+		//returns the amount of hitboxes that are not marked as delete
+		size_t amountOfActiveHitboxes(std::vector<HitboxCollection>& hitboxes);
 
 	private:
 		//all the hitboxes in the scene
-		std::vector<std::shared_ptr<HitboxCollection>> hitboxes;
+		std::vector<HitboxCollection> hitboxes;
 
 		//all the hurtboxes in the scene
-		std::vector<std::shared_ptr<HitboxCollection>> hurtboxes;
+		std::vector<HitboxCollection> hurtboxes;
 	};
 }
