@@ -154,6 +154,7 @@
     <ClInclude Include="source\secro\framework\collision\HitResult.h" />
     <ClInclude Include="source\secro\framework\DebugOptions.h" />
     <ClInclude Include="source\secro\framework\detail\CommandArgs.h" />
+    <ClInclude Include="source\secro\framework\detail\Handle.h" />
     <ClInclude Include="source\secro\framework\detail\PlainVectorMath.h" />
     <ClInclude Include="source\secro\framework\Entity.h" />
     <ClInclude Include="source\secro\framework\collision\Hitbox.h" />
@@ -172,11 +173,19 @@
     <ClInclude Include="source\secro\framework\level\Level.h" />
     <ClInclude Include="source\secro\framework\math\Curve.h" />
     <ClInclude Include="source\secro\framework\math\fmath.h" />
+    <ClInclude Include="source\secro\framework\physics\BoxCollider.h" />
+    <ClInclude Include="source\secro\framework\physics\Collider.h" />
+    <ClInclude Include="source\secro\framework\physics\ColliderProfile.h" />
+    <ClInclude Include="source\secro\framework\physics\CollisionResult.h" />
+    <ClInclude Include="source\secro\framework\physics\Contact.h" />
     <ClInclude Include="source\secro\framework\physics\Filters.h" />
+    <ClInclude Include="source\secro\framework\physics\PhysicsDef.h" />
     <ClInclude Include="source\secro\framework\physics\PhysicsManager.h" />
     <ClInclude Include="source\secro\framework\physics\PlayerCollision.h" />
     <ClInclude Include="source\secro\framework\physics\PlayerContact.h" />
+    <ClInclude Include="source\secro\framework\physics\Ray.h" />
     <ClInclude Include="source\secro\framework\physics\StageCollision.h" />
+    <ClInclude Include="source\secro\framework\physics\Vector2.h" />
     <ClInclude Include="source\secro\framework\player\AttackCollection.h" />
     <ClInclude Include="source\secro\framework\player\MovementState.h" />
     <ClInclude Include="source\secro\framework\player\PlayerAttributes.h" />
@@ -261,6 +270,8 @@
     <ClCompile Include="source\secro\framework\level\Level.cpp" />
     <ClCompile Include="source\secro\framework\math\Curve.cpp" />
     <ClCompile Include="source\secro\framework\math\fmath.cpp" />
+    <ClCompile Include="source\secro\framework\physics\BoxCollider.cpp" />
+    <ClCompile Include="source\secro\framework\physics\Collider.cpp" />
     <ClCompile Include="source\secro\framework\physics\PhysicsManager.cpp" />
     <ClCompile Include="source\secro\framework\physics\PlayerCollision.cpp" />
     <ClCompile Include="source\secro\framework\physics\PlayerContact.cpp" />

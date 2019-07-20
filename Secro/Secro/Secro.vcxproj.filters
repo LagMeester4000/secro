@@ -303,6 +303,33 @@
     <ClInclude Include="source\secro\framework\detail\CommandArgs.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="source\secro\framework\physics\Vector2.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="source\secro\framework\physics\BoxCollider.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="source\secro\framework\physics\CollisionResult.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="source\secro\framework\physics\PhysicsDef.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="source\secro\framework\physics\Contact.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="source\secro\framework\detail\Handle.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="source\secro\framework\physics\Collider.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="source\secro\framework\physics\ColliderProfile.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="source\secro\framework\physics\Ray.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="source\secro\main.cpp">
@@ -507,6 +534,12 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="source\secro\framework\GameInstance.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="source\secro\framework\physics\BoxCollider.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="source\secro\framework\physics\Collider.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
