@@ -25,7 +25,7 @@ namespace secro {
 		void renderScore(sf::RenderWindow& window, sf::Vector2f position, PlayerCharacter* player, int stocks);
 
 	public: //gamemode rules
-		b2Vec2 bounds;
+		Vector2 bounds;
 		int pointAmount;
 
 	private:

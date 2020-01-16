@@ -1,6 +1,6 @@
 #pragma once
 #include <memory>
-#include "framework/physics/PhysicsManager.h"
+#include "framework/physics/SecroPhysicsManager.h"
 #include "framework/input/InputManager.h"
 #include "framework/collision/HitboxManager.h"
 #include "gameplay/PlayerManager.h"
@@ -10,6 +10,8 @@
 #include "gameplay/level/RingOutLevel.h"
 #include "ShobuNetwork/Network.h"
 #include "secro/netplay/RawSerializeBuffer.h"
+#include "KraNet/KraNetSession.h"
+#include "netplay/NetworkDebugUI.h"
 
 //TEMP
 #include "framework/collision/CollisionRenderer.h"
@@ -37,8 +39,8 @@ namespace secro {
 	public:
 		//update the game
 		void update(float deltaTime, bool shouldUpdateInput = true);
-		void simulateUpdate(float deltaTime);
-		void updateWithInput(float deltaTime, int localInput, int otherInput);
+		void simulateUpdate(float deltaTime, bool duringRollback = false);
+		void updateWithInput(float deltaTime, int localInput, int otherInput, bool duringRollback = false);
 
 		//render the game
 		void render(sf::RenderWindow& window);
@@ -64,11 +66,18 @@ namespace secro {
 
 	private: //netcode
 		ShobuNetwork network;
+		kra::net::KraNetSession kraNet;
 		RawSerializeBuffer stateBuffer;
+		NetworkDebugUI networkUI;
 
 	public:
 		void netStateSave();
 		void netStateLoad();
 		int netStateHash();
+
+		static void staticNetStateUpdate(void* ex, KraNetInput p1, KraNetInput p2);
+		static void staticNetStateSimulate(void* ex, KraNetInput p1, KraNetInput p2);
+		static void staticNetStateSave(void* ex);
+		static void staticNetStateLoad(void* ex);
 	};
 }

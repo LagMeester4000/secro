@@ -15,8 +15,11 @@ namespace secro {
 		void init() override;
 
 		void update(float deltaTime) override;
+		void updateSimulate(float deltaTime) override;
 
 		void render(sf::RenderWindow& window) override;
+
+		void reset() override;
 
 		bool isGameOver() override;
 
@@ -35,7 +38,7 @@ namespace secro {
 		ParallaxElement background;
 
 	public: //gamemode rules
-		b2Vec2 boundsMin, boundsMax;
+		Vector2 boundsMin, boundsMax;
 		int stockAmount;
 
 	private:

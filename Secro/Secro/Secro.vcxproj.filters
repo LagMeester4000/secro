@@ -21,12 +21,6 @@
     <ClInclude Include="source\secro\Game.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="source\secro\framework\physics\PhysicsManager.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="source\secro\framework\physics\PlayerCollision.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="source\secro\framework\physics\StageCollision.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -97,9 +91,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="source\secro\gameplay\characters\CharacterDashette.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="source\secro\gameplay\characters\CharacterDashetteP2.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="source\secro\gameplay\Camera.h">
@@ -190,9 +181,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="source\secro\framework\graphics\Particle.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="source\secro\framework\physics\PlayerContact.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="source\secro\gameplay\characters\CharacterOki.h">
@@ -327,7 +315,22 @@
     <ClInclude Include="source\secro\framework\physics\ColliderProfile.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="source\secro\framework\physics\Ray.h">
+    <ClInclude Include="source\secro\framework\physics\SecroPhysicsManager.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="source\secro\framework\physics\RayCastCallback.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="source\secro\framework\physics\RayCastResult.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="source\secro\framework\math\ray.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="source\secro\framework\detail\VirtualObjectPool.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="source\secro\netplay\NetworkDebugUI.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -336,12 +339,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="source\secro\Game.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="source\secro\framework\physics\PhysicsManager.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="source\secro\framework\physics\PlayerCollision.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="source\secro\framework\physics\StageCollision.cpp">
@@ -396,9 +393,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="source\secro\gameplay\characters\CharacterDashette.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="source\secro\gameplay\characters\CharacterDashetteP2.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="source\secro\gameplay\Camera.cpp">
@@ -462,9 +456,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="source\secro\framework\graphics\ParticleSystem.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="source\secro\framework\physics\PlayerContact.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="source\secro\gameplay\characters\CharacterOki.cpp">
@@ -540,6 +531,18 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="source\secro\framework\physics\Collider.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="source\secro\framework\physics\SecroPhysicsManager.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="source\secro\framework\math\ray.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="source\secro\framework\physics\Vector2.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="source\secro\netplay\NetworkDebugUI.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

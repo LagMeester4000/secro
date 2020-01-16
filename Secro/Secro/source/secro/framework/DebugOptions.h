@@ -15,6 +15,7 @@ namespace secro {
 			bool enableGameplaySettingsEditor = false;
 			bool enablePhysicsRender = false;
 			bool enableHitboxRender = false;
+			bool enableNetworkRender = false;
 		};
 
 	public:

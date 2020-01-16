@@ -1,5 +1,5 @@
 #pragma once
-#include "secro/framework/physics/PhysicsManager.h"
+#include "secro/framework/physics/SecroPhysicsManager.h"
 #include "secro/framework/collision/HitboxManager.h"
 #include "secro/gameplay/Camera.h"
 #include "secro/framework/graphics/ParticleSystem.h"
@@ -30,10 +30,14 @@ namespace secro {
 		//update physics, camera, and players
 		//shoul be called at the end of a child function
 		virtual void update(float deltaTime);
+		virtual void updateSimulate(float deltaTime);
 
 		//render the stage, players, ui, and anything else
 		virtual void render(sf::RenderWindow& window);
 		void cameraRender(sf::RenderWindow& window);
+
+		//resets the level to its original state
+		virtual void reset();
 
 		//adds a player to the level
 		//called from the game/menu select
@@ -58,8 +62,11 @@ namespace secro {
 		//get the camera
 		Camera& getCamera();
 
+		//get the physics manager
+		SecroPhysicsManager& getPhysics();
+
 	protected:
-		PhysicsManager physicsManager;
+		SecroPhysicsManager physicsManager;
 		std::shared_ptr<InputManager> inputManager;
 		HitboxManager hitboxManager;
 		ParticleSystem particleSystem;

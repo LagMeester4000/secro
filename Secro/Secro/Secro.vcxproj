@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
@@ -70,10 +70,10 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <IncludePath>$(SolutionDir)./imgui/;$(ProjectDir)./source/;$(IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir)./imgui/;$(ProjectDir)./source/;$(SolutionDir)./KraNet/include;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <IncludePath>$(SolutionDir)./imgui/;$(ProjectDir)./source/;$(IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir)./imgui/;$(ProjectDir)./source/;$(SolutionDir)./KraNet/include;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -98,7 +98,8 @@
       <PreprocessorDefinitions>_SILENCE_ALL_CXX17_DEPRECATION_WARNINGS;WIN32;_WINSOCK_DEPRECATED_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>opengl32.lib;ws2_32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>opengl32.lib;ws2_32.lib;KraNet.lib;Windowsapp.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(OutputPath)./;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -132,7 +133,8 @@
     <Link>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalDependencies>opengl32.lib;ws2_32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>opengl32.lib;ws2_32.lib;KraNet.lib;Windowsapp.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(OutputPath)./;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
@@ -152,6 +154,10 @@
     <ClInclude Include="source\secro\framework\collision\HitboxId.h" />
     <ClInclude Include="source\secro\framework\collision\HitboxManager.h" />
     <ClInclude Include="source\secro\framework\collision\HitResult.h" />
+    <ClInclude Include="source\secro\framework\detail\VirtualObjectPool.h" />
+    <ClInclude Include="source\secro\framework\math\ray.h" />
+    <ClInclude Include="source\secro\framework\physics\RayCastResult.h" />
+    <ClInclude Include="source\secro\framework\physics\SecroPhysicsManager.h" />
     <ClInclude Include="source\secro\framework\DebugOptions.h" />
     <ClInclude Include="source\secro\framework\detail\CommandArgs.h" />
     <ClInclude Include="source\secro\framework\detail\Handle.h" />
@@ -180,10 +186,7 @@
     <ClInclude Include="source\secro\framework\physics\Contact.h" />
     <ClInclude Include="source\secro\framework\physics\Filters.h" />
     <ClInclude Include="source\secro\framework\physics\PhysicsDef.h" />
-    <ClInclude Include="source\secro\framework\physics\PhysicsManager.h" />
-    <ClInclude Include="source\secro\framework\physics\PlayerCollision.h" />
-    <ClInclude Include="source\secro\framework\physics\PlayerContact.h" />
-    <ClInclude Include="source\secro\framework\physics\Ray.h" />
+    <ClInclude Include="source\secro\framework\physics\RayCastCallback.h" />
     <ClInclude Include="source\secro\framework\physics\StageCollision.h" />
     <ClInclude Include="source\secro\framework\physics\Vector2.h" />
     <ClInclude Include="source\secro\framework\player\AttackCollection.h" />
@@ -208,7 +211,6 @@
     <ClInclude Include="source\secro\Game.h" />
     <ClInclude Include="source\secro\gameplay\Camera.h" />
     <ClInclude Include="source\secro\gameplay\characters\CharacterDashette.h" />
-    <ClInclude Include="source\secro\gameplay\characters\CharacterDashetteP2.h" />
     <ClInclude Include="source\secro\gameplay\characters\CharacterOki.h" />
     <ClInclude Include="source\secro\gameplay\characters\CharacterPsycho.h" />
     <ClInclude Include="source\secro\gameplay\characters\PlayerGraphicsCharacter.h" />
@@ -222,6 +224,7 @@
     <ClInclude Include="source\secro\netplay\InputPacket.h" />
     <ClInclude Include="source\secro\netplay\LevelSerializer.h" />
     <ClInclude Include="source\secro\netplay\NetplayGame.h" />
+    <ClInclude Include="source\secro\netplay\NetworkDebugUI.h" />
     <ClInclude Include="source\secro\netplay\RawSerializeBuffer.h" />
     <ClInclude Include="source\secro\netplay\SerializeFunctions.h" />
     <ClInclude Include="source\sen\Component.h" />
@@ -270,12 +273,12 @@
     <ClCompile Include="source\secro\framework\level\Level.cpp" />
     <ClCompile Include="source\secro\framework\math\Curve.cpp" />
     <ClCompile Include="source\secro\framework\math\fmath.cpp" />
+    <ClCompile Include="source\secro\framework\math\ray.cpp" />
     <ClCompile Include="source\secro\framework\physics\BoxCollider.cpp" />
     <ClCompile Include="source\secro\framework\physics\Collider.cpp" />
-    <ClCompile Include="source\secro\framework\physics\PhysicsManager.cpp" />
-    <ClCompile Include="source\secro\framework\physics\PlayerCollision.cpp" />
-    <ClCompile Include="source\secro\framework\physics\PlayerContact.cpp" />
+    <ClCompile Include="source\secro\framework\physics\SecroPhysicsManager.cpp" />
     <ClCompile Include="source\secro\framework\physics\StageCollision.cpp" />
+    <ClCompile Include="source\secro\framework\physics\Vector2.cpp" />
     <ClCompile Include="source\secro\framework\player\AttackCollection.cpp" />
     <ClCompile Include="source\secro\framework\player\PlayerAttributes.cpp" />
     <ClCompile Include="source\secro\framework\player\PlayerCharacter.cpp" />
@@ -293,7 +296,6 @@
     <ClCompile Include="source\secro\Game.cpp" />
     <ClCompile Include="source\secro\gameplay\Camera.cpp" />
     <ClCompile Include="source\secro\gameplay\characters\CharacterDashette.cpp" />
-    <ClCompile Include="source\secro\gameplay\characters\CharacterDashetteP2.cpp" />
     <ClCompile Include="source\secro\gameplay\characters\CharacterOki.cpp" />
     <ClCompile Include="source\secro\gameplay\characters\CharacterPsycho.cpp" />
     <ClCompile Include="source\secro\gameplay\characters\PlayerGraphicsCharacter.cpp" />
@@ -303,6 +305,7 @@
     <ClCompile Include="source\secro\main.cpp" />
     <ClCompile Include="source\secro\netplay\InputPacket.cpp" />
     <ClCompile Include="source\secro\netplay\NetplayGame.cpp" />
+    <ClCompile Include="source\secro\netplay\NetworkDebugUI.cpp" />
     <ClCompile Include="source\sen\Component.cpp" />
     <ClCompile Include="source\sen\ComponentManager.cpp" />
     <ClCompile Include="source\sen\Construct.cpp" />

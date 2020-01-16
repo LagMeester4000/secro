@@ -70,7 +70,7 @@ namespace secro {
 		const Joystick& getMovement() const;
 		Direction getMovementDirection() const;
 		Direction getMovementPushDirection() const;
-		DirectionPress getMovementPushDirectionExt() const;
+		DirectionPress getMovementPushDirectionExt(bool useOld = false) const;
 
 		//attack with the stick
 		const Joystick& getDirAttack() const;

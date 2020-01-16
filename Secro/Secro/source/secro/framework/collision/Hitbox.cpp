@@ -30,7 +30,7 @@ void secro::Hitbox::update(HitboxChange & change)
 	extraFreezeFrames = change.extraFreezeFrames;
 }
 
-void secro::Hitbox::render(sf::RenderWindow & window, b2Vec2 position, b2Vec2 scale)
+void secro::Hitbox::render(sf::RenderWindow & window, Vector2 position, Vector2 scale)
 {
 	auto actualPos = position + mul(this->position, scale);
 
@@ -56,7 +56,7 @@ Box secro::Hitbox::getSpace()
 	return ret;
 }
 
-bool secro::Hitbox::collide(Hitbox & other, b2Vec2 otherPosition, b2Vec2 otherScale, b2Vec2 position, b2Vec2 scale)
+bool secro::Hitbox::collide(Hitbox & other, Vector2 otherPosition, Vector2 otherScale, Vector2 position, Vector2 scale)
 {
 	auto aPosOther = otherPosition + mul(other.position, otherScale);
 	auto aPosMy = position + mul(this->position, scale);
@@ -69,7 +69,7 @@ void secro::Hitbox::knockbackPlayer(PlayerCharacter * player, FacingDirection di
 {
 	float knockbackDist = GameplaySettings::calculateKnockback(player->getDamageScalar(), knockbackPowerBase, knockbackPowerGrowth);
 	float hitstun = GameplaySettings::calculateHitstun(damage, player->getDamageScalar(), knockbackDist, hitstunAdjustment);
-	b2Vec2 knockback = mul(directionFromAngle<b2Vec2>(knockbackAngle), knockbackDist);
+	Vector2 knockback = mul(directionFromAngle<Vector2>(knockbackAngle), knockbackDist);
 
 	if (direction == FacingDirection::Left)
 		knockback.x = -knockback.x;
@@ -79,10 +79,10 @@ void secro::Hitbox::knockbackPlayer(PlayerCharacter * player, FacingDirection di
 	player->knockBack(knockback);
 }
 
-b2Vec2 secro::Hitbox::getKnockback(PlayerCharacter * player)
+Vector2 secro::Hitbox::getKnockback(PlayerCharacter * player)
 {
 	float knockbackDist = GameplaySettings::calculateKnockback(player->getDamageScalar(), knockbackPowerBase, knockbackPowerGrowth);
-	return mul(directionFromAngle<b2Vec2>(knockbackAngle), knockbackDist);
+	return mul(directionFromAngle<Vector2>(knockbackAngle), knockbackDist);
 }
 
 void secro::Hitbox::netSerSave(RawSerializeBuffer & buff)

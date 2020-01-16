@@ -6,7 +6,7 @@
 #include <SFML/Graphics.hpp>
 #include <tuple>
 
-secro::PlayerGraphicsCharacter::PlayerGraphicsCharacter(Level* level, HitboxManager * hitboxManager, b2Body * body, std::shared_ptr<Controller> controller)
+secro::PlayerGraphicsCharacter::PlayerGraphicsCharacter(Level* level, HitboxManager * hitboxManager, PhysicsHandle body, std::shared_ptr<Controller> controller)
 	: PlayerCharacter(level, hitboxManager, body, controller)
 {
 }
@@ -227,6 +227,7 @@ void secro::PlayerGraphicsCharacter::setupStates(StateMachine & sm)
 void secro::PlayerGraphicsCharacter::update(float deltaTime)
 {
 	PlayerCharacter::update(deltaTime);
+	auto& coll = getPhysicsCollider();
 
 	if (!isInHitlag())
 		animatedSprite.update(sf::seconds(deltaTime));
@@ -234,7 +235,7 @@ void secro::PlayerGraphicsCharacter::update(float deltaTime)
 	//spawn hit particles
 	if (getState() == PlayerState::Hitstun)
 	{
-		auto vel = getPhysicsBody()->GetLinearVelocity();
+		auto vel = coll.getVelocity();
 		auto speed = length(vel);
 		std::cout << speed << std::endl;
 		particleHitDuration = particleHitDurationMax / (speed / 10.f);
@@ -258,7 +259,7 @@ void secro::PlayerGraphicsCharacter::update(float deltaTime)
 				part.animation.setAnimation(particleHit);
 				part.animation.setOrigin({ 43.f, 22.5f });
 				part.animation.setPosition(pos.x, pos.y);
-				part.animation.setRotation(angleFromDirection(getPhysicsBody()->GetLinearVelocity()));
+				part.animation.setRotation(angleFromDirection(coll.getVelocity()));
 				part.opacityOverTime = -200.f;
 				part.opacity = 100.f;
 				//part.scale = { 0.2f, 0.2f };
@@ -282,7 +283,7 @@ void secro::PlayerGraphicsCharacter::update(float deltaTime)
 				part.animation.setOrigin({ 9.5f, 22.5f });
 				part.animation.setScale({ 0.05f, 0.05f });
 				part.animation.setPosition(pos.x, pos.y);
-				part.animation.setRotation(angleFromDirection(getPhysicsBody()->GetLinearVelocity()));
+				part.animation.setRotation(angleFromDirection(coll.getVelocity()));
 				part.opacityOverTime = -200.f;
 				part.opacity = 100.f;
 				part.scale = { 0.05f, 0.05f };
@@ -302,7 +303,7 @@ void secro::PlayerGraphicsCharacter::render(sf::RenderWindow & window)
 	if (facingDirection == FacingDirection::Left)
 		scale = -1.f;
 
-	auto pos = physicsBody->GetPosition();
+	auto pos = getPhysicsCollider().getPosition();
 	auto shake = calcFreezeShake();
 	animatedSprite.setPosition(pos.x + shake.x, pos.y + 0.22f + shake.y);
 	animatedSprite.setScale(sf::Vector2f(0.05f * scale, 0.05f));
@@ -317,6 +318,26 @@ void secro::PlayerGraphicsCharacter::render(sf::RenderWindow & window)
 		shieldSprite.setScale(sf::Vector2f(0.05f * scale, 0.05f * scale));
 		window.draw(shieldSprite);
 	}
+}
+
+void secro::PlayerGraphicsCharacter::netSerSave(RawSerializeBuffer & buff)
+{
+	PlayerCharacter::netSerSave(buff);
+	std::size_t currentFrame = animatedSprite.getCurrentFrame();
+	sf::Time currentTime = animatedSprite.getCurrentTime();
+	buff.save(currentFrame);
+	buff.save(currentTime);
+}
+
+void secro::PlayerGraphicsCharacter::netSerLoad(RawSerializeBuffer & buff)
+{
+	PlayerCharacter::netSerLoad(buff);
+	std::size_t currentFrame;
+	sf::Time currentTime;
+	buff.load(currentFrame);
+	buff.load(currentTime);
+	animatedSprite.setCurrentFrame(currentFrame);
+	animatedSprite.setCurrentTime(currentTime);
 }
 
 void secro::PlayerGraphicsCharacter::addFrames(int amount, Animation & animation)

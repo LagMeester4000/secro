@@ -22,7 +22,7 @@ void secro::InputTestBot::update(typename Controller::Input & input)
 	
 	std::cout << (int)player->getState() << std::endl; 
 
-	if (player->IsInHitstun())
+	if (player->isInHitstun())
 	{
 		if (!randomDI)
 			input.leftStick.x = DI;

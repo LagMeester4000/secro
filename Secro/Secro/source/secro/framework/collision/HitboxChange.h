@@ -1,6 +1,6 @@
 #pragma once
 #include <cereal/cereal.hpp>
-#include <Box2D/Common/b2Math.h>
+#include "secro/framework/physics/Vector2.h"
 
 namespace secro {
 	enum class HitboxChangeVersion : std::uint32_t {
@@ -12,7 +12,7 @@ namespace secro {
 
 	struct HitboxChange {
 		int index = 0;
-		b2Vec2 position = { 0.f, 0.f };
+		Vector2 position = { 0.f, 0.f };
 		bool isActive = true;
 		bool isHitbox = true;//else is hurtbox
 		int hitNumber = 0;
@@ -37,7 +37,7 @@ namespace secro {
 #pragma region serializetion
 namespace cereal {
 	template<typename T>
-	void serialize(T& ar, b2Vec2& vec)
+	void serialize(T& ar, secro::Vector2& vec)
 	{
 		ar(cereal::make_nvp("x", vec.x), cereal::make_nvp("y", vec.y));
 	}

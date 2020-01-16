@@ -13,6 +13,7 @@ namespace secro {
 
 		Vector2 getPosition() const;
 		void setPosition(Vector2 vec);
+		void updatePosition(sfloat deltaTime);
 		
 		Vector2 getVelocity() const;
 		void setVelocity(Vector2 vec);
@@ -20,7 +21,7 @@ namespace secro {
 		ColliderProfile getProfile() const;
 		void setProfile(ColliderProfile prof);
 
-	private:
+	protected:
 		Vector2 position;
 		Vector2 velocity;
 		ColliderProfile profile;

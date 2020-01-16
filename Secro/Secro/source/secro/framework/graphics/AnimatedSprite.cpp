@@ -150,6 +150,32 @@ void AnimatedSprite::setFrame(std::size_t newFrame, bool resetTime)
 		m_currentTime = sf::Time::Zero;
 }
 
+std::size_t AnimatedSprite::getCurrentFrame() const
+{
+	return m_currentFrame;
+}
+
+void AnimatedSprite::setCurrentFrame(std::size_t f)
+{
+	if (!m_animation)
+		return;
+	if (f >= m_animation->getSize())
+		return;
+
+	m_currentFrame = f;
+	setFrame(f, true);
+}
+
+sf::Time AnimatedSprite::getCurrentTime() const
+{
+	return m_currentTime;
+}
+
+void AnimatedSprite::setCurrentTime(sf::Time time)
+{
+	m_currentTime = time;
+}
+
 void AnimatedSprite::update(sf::Time deltaTime)
 {
 	// if not paused and we have a valid animation

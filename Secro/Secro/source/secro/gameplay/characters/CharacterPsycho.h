@@ -5,7 +5,7 @@ namespace secro {
 	class CharacterPsycho : public PlayerGraphicsCharacter {
 	public:
 		CharacterPsycho();
-		CharacterPsycho(Level* level, HitboxManager* hitboxManager, b2Body* body, std::shared_ptr<Controller> controller);
+		CharacterPsycho(Level* level, HitboxManager* hitboxManager, PhysicsHandle body, std::shared_ptr<Controller> controller);
 
 		void init() override;
 		void loadAnimations() override;

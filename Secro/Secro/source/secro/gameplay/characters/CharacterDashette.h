@@ -7,7 +7,7 @@
 namespace secro {
 	class CharacterDashette : public PlayerGraphicsCharacter {
 	public:
-		CharacterDashette(Level* level, HitboxManager* hitboxManager, b2Body* body, std::shared_ptr<Controller> controller);
+		CharacterDashette(Level* level, HitboxManager* hitboxManager, PhysicsHandle body, std::shared_ptr<Controller> controller);
 		CharacterDashette();
 
 		void init() override;
@@ -23,7 +23,7 @@ namespace secro {
 		void renderAttributes(sf::RenderWindow& window) override;
 
 	private: //special
-		b2Vec2 specialDirection;
+		Vector2 specialDirection;
 		float specialSpeed;
 		float specialDuration;
 		float specialRemainSpeed;

@@ -54,6 +54,12 @@ namespace secro {
 		return sqrtf(vec.x * vec.x + vec.y * vec.y);
 	}
 
+	template<typename T>
+	float dot(const T& vec1, const T& vec2)
+	{
+		return vec1.x * vec2.x + vec1.y * vec2.y;
+	}
+
 	//get the normalise a vector
 	template<typename T>
 	T normalise(const T& vec)

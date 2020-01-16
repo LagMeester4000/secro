@@ -1,6 +1,6 @@
 #pragma once
 #include <functional>
-#include "Box2D/Common/b2Math.h"
+#include "secro/framework/physics/Vector2.h"
 #include "FacingDirection.h"
 
 namespace sf {
@@ -13,7 +13,7 @@ namespace secro {
 	class RawSerializeBuffer;
 
 	struct Box {
-		b2Vec2 p1, p2;
+		Vector2 p1, p2;
 	};
 
 	//overlapping hitbox for colliding with other hitboxes
@@ -23,19 +23,19 @@ namespace secro {
 		void update(HitboxChange& change);
 
 		//render the hitbox
-		void render(sf::RenderWindow& window, b2Vec2 position, b2Vec2 scale);
+		void render(sf::RenderWindow& window, Vector2 position, Vector2 scale);
 
 		//get the relative space that the hitbox uses
 		Box getSpace();
 
 		//check for collision with another hitbox
-		bool collide(Hitbox& other, b2Vec2 otherPosition, b2Vec2 otherScale, b2Vec2 position, b2Vec2 scale);
+		bool collide(Hitbox& other, Vector2 otherPosition, Vector2 otherScale, Vector2 position, Vector2 scale);
 
 		//knock a player back
 		void knockbackPlayer(PlayerCharacter* player, FacingDirection direction);
 
 		//calculate the knockback vector resulting from a hit
-		b2Vec2 getKnockback(PlayerCharacter* player);
+		Vector2 getKnockback(PlayerCharacter* player);
 
 		//net serialize save
 		void netSerSave(RawSerializeBuffer& buff);
@@ -45,7 +45,7 @@ namespace secro {
 
 	public://collision properties
 		//relative position
-		b2Vec2 position;
+		Vector2 position;
 
 		//size of hitbox
 		float radius;

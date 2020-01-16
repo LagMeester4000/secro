@@ -8,6 +8,9 @@
 #include "sen/Test.h"
 #include "framework/input/InputManager.h"
 
+//windows only
+#include <expandedresources.h>
+
 void SetImGuiStyle()
 {
 	ImGuiStyle* style = &ImGui::GetStyle();
@@ -75,10 +78,17 @@ void SetImGuiStyle()
 
 const bool useVsync = false;
 const bool useSleep = false;
-const float FPS = 60.0f; //The desired FPS. (The number of updates each second).
+const float FPS = 60.f; //The desired FPS. (The number of updates each second).
 
 int main(int argc, char *argv[])
 {
+	//print compilation type
+#if _DEBUG
+	std::cout << "Running in DEBUG mode" << std::endl;
+#else
+	std::cout << "Running in RELEASE mode" << std::endl;
+#endif
+
 	//save args
 	secro::CommandArgs args(argc, argv);
 	secro::GameInstance::instance.isOnline = args.hasArg("online");
@@ -98,7 +108,7 @@ int main(int argc, char *argv[])
 	}
 
 	//actual drawing window
-	sf::RenderWindow window(sf::VideoMode(800, 800, 32), "Secro", screenType);
+	sf::RenderWindow window(sf::VideoMode(800, 450, 32), "Secro", screenType);
 	ImGui::SFML::Init(window, true);
 	ImGui::CreateContext();
 	SetImGuiStyle();
@@ -116,6 +126,20 @@ int main(int argc, char *argv[])
 	sf::Event ev;
 	while (window.isOpen())
 	{
+		//TEMP
+		//stupid check to see if game is in game mode
+		//BOOL has;
+		//HasExpandedResources(&has);
+		//if (has)
+		//{
+		//	std::cout << "IS GAME" << std::endl;
+		//}
+		//else
+		//{
+		//	std::cout << "IS NOT GAME" << std::endl;
+		//}
+		//
+
 		auto dtClock = clock.getElapsedTime();
 		float deltaTime = dtClock.asSeconds();
 		
@@ -158,8 +182,10 @@ int main(int argc, char *argv[])
 			//draw things here
 			ImGui::SFML::Update(window, dtClock);
 			//game->update(deltaTime);
-			//std::cout << "FPS: " << 1.f / deltaTime << std::endl;
-			game->update(1.f/FPS);
+			//if (1.f / deltaTime < 55.f)
+			//	std::cout << "FPS: " << 1.f / deltaTime << std::endl;
+			
+			game->update(deltaTime);
 			game->render(window);
 
 			ImGui::SFML::Render(window);

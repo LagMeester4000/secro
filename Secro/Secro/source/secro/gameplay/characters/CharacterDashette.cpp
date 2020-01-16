@@ -9,7 +9,7 @@
 #include <imgui.h>
 #include "secro/framework/math/fmath.h"
 
-secro::CharacterDashette::CharacterDashette(Level* level, HitboxManager * hitboxManager, b2Body * body, std::shared_ptr<Controller> controller)
+secro::CharacterDashette::CharacterDashette(Level* level, HitboxManager * hitboxManager, PhysicsHandle body, std::shared_ptr<Controller> controller)
 	: PlayerGraphicsCharacter(level, hitboxManager, body, controller)
 {
 }
@@ -238,7 +238,7 @@ void secro::CharacterDashette::render(sf::RenderWindow & window)
 
 void secro::CharacterDashette::netSerSave(RawSerializeBuffer & buff)
 {
-	PlayerCharacter::netSerSave(buff);
+	PlayerGraphicsCharacter::netSerSave(buff);
 
 	buff.save(specialDirection);
 	buff.save(specialSpeed);
@@ -255,7 +255,7 @@ void secro::CharacterDashette::netSerSave(RawSerializeBuffer & buff)
 
 void secro::CharacterDashette::netSerLoad(RawSerializeBuffer & buff)
 {
-	PlayerCharacter::netSerLoad(buff);
+	PlayerGraphicsCharacter::netSerLoad(buff);
 
 	buff.load(specialDirection);
 	buff.load(specialSpeed);
@@ -330,7 +330,7 @@ void secro::CharacterDashette::stateStartSpecial()
 
 
 	useGravity = false;
-	physicsBody->SetLinearVelocity({ stick.x, stick.y });
+	getPhysicsCollider().setVelocity(Vector2{ stick.x, stick.y });
 	setMovementState(MovementState::InAir);
 	setStateTimer(specialDuration);
 
@@ -344,8 +344,9 @@ void secro::CharacterDashette::stateStartSpecial()
 void secro::CharacterDashette::stateEndSpecial()
 {
 	useGravity = true;
-	auto vel = physicsBody->GetLinearVelocity();
-	physicsBody->SetLinearVelocity(mul(vel, specialRemainSpeed));
+	auto& coll = getPhysicsCollider();
+	auto vel = coll.getVelocity();
+	coll.setVelocity(mul(vel, specialRemainSpeed));
 
 	//reset friction
 	attributes.groundDeceleration = normalFriction;
@@ -359,24 +360,26 @@ void secro::CharacterDashette::stateUpdateSpecial()
 	//resizeVelocity(dashSpeedCurve.calculate(alpha) * specialSpeed);
 	auto newVel = specialDirection;
 	newVel = mul(newVel, attributes.airdodgeSpeedCurve.calculate(alpha) * specialSpeed);
-	physicsBody->SetLinearVelocity(newVel);
+	getPhysicsCollider().setVelocity(newVel);
 }
 
 void secro::CharacterDashette::stateStartHyperJump()
 {
 	movementState = MovementState::InAir;
 	
-	auto vel = physicsBody->GetLinearVelocity();
+	auto& coll = getPhysicsCollider();
+	auto vel = coll.getVelocity();
 	vel.y = 0.f;
 	vel = mul(vel, specialHyperJumpPower);
 	vel.y = -specialHyperJumpHeight;
 
-	physicsBody->SetLinearVelocity(vel);
+	coll.setVelocity(vel);
 }
 
 void secro::CharacterDashette::stateStartShineSpecial()
 {
-	auto vel = physicsBody->GetLinearVelocity();
+	auto& coll = getPhysicsCollider();
+	auto vel = coll.getVelocity();
 	vel.y /= 3.f;
 
 	if (movementState == MovementState::OnGround)
@@ -388,7 +391,7 @@ void secro::CharacterDashette::stateStartShineSpecial()
 		vel.x /= 3.f;
 	}
 
-	physicsBody->SetLinearVelocity(vel);
+	coll.setVelocity(vel);
 	setStateTimer(0.2f);
 }
 

@@ -8,11 +8,11 @@ secro::CollisionRenderer::CollisionRenderer()
 	frameData.amountOfHitboxes = 1;
 }
 
-void secro::CollisionRenderer::render(sf::RenderWindow & window, FrameData & framedata, float time, b2Vec2 position, float scale)
+void secro::CollisionRenderer::render(sf::RenderWindow & window, FrameData & framedata, float time, Vector2 position, float scale)
 {
 }
 
-void secro::CollisionRenderer::render(sf::RenderWindow & window, HitboxChange & change, bool isSelected, b2Vec2 scale)
+void secro::CollisionRenderer::render(sf::RenderWindow & window, HitboxChange & change, bool isSelected, Vector2 scale)
 {
 	sf::Vector2f aScale = { scale.x, scale.y };
 

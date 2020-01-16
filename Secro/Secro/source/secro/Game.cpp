@@ -6,7 +6,6 @@
 #include "framework/GameplaySettings.h"
 #include "framework/GameInstance.h"
 #include "gameplay/characters/CharacterDashette.h"
-#include "gameplay/characters/CharacterDashetteP2.h"
 #include "gameplay/characters/CharacterOki.h"
 #include "gameplay/characters/CharacterPsycho.h"
 #include "gameplay/level/BridgeLevel.h"
@@ -18,6 +17,35 @@
 #include "framework/ui/UIMenu.h"
 
 using namespace secro;
+
+struct KraInputConverter {
+	union {
+		uint8_t asStruct[4];
+		int asInt;
+	};
+};
+
+KraNetInput toKraNet(int val)
+{
+	KraInputConverter c;
+	c.asInt = val;
+	KraNetInput ret;
+	ret.i0 = c.asStruct[0];
+	ret.i1 = c.asStruct[1];
+	ret.i2 = c.asStruct[2];
+	ret.i3 = c.asStruct[3];
+	return ret;
+}
+
+int fromKraNet(KraNetInput val)
+{
+	KraInputConverter c;
+	c.asStruct[0] = val.i0;
+	c.asStruct[1] = val.i1;
+	c.asStruct[2] = val.i2;
+	c.asStruct[3] = val.i3;
+	return c.asInt;
+}
 
 std::shared_ptr<Game> secro::Game::createGame(std::shared_ptr<InputManager> input)
 {
@@ -33,7 +61,7 @@ std::shared_ptr<Game> secro::Game::createGame(std::shared_ptr<InputManager> inpu
 }
 
 secro::Game::Game(std::shared_ptr<InputManager> input)
-	: inputManager(input), ui(this)
+	: inputManager(input), ui(this), kraNet(this, &staticNetStateUpdate)
 {
 	//set starting state
 	gameState = GameState::MainMenu;
@@ -157,11 +185,17 @@ secro::Game::Game(std::shared_ptr<InputManager> input)
 		uiLevelSelect->addSelectable(backButton);
 	}
 
+	//set up the stage
+	//needs to be done before netcode so that it can be serialized
+	startLevel(newLevel, 2);
+
+
+
 
 	//online
 	if (GameInstance::instance.isOnline)
 	{
-		//netplay!
+		/*//netplay!
 		network.registerCallbacks(
 			[](void* g, int me, int other)
 		{
@@ -183,14 +217,23 @@ secro::Game::Game(std::shared_ptr<InputManager> input)
 			//Game* asGame = (Game*)g;
 			//return asGame->netStateHash();
 			return 0;
-		}, (void*)this);
+		}, (void*)this);*/
+		kraNet.SetSimulateFunction(&staticNetStateSimulate);
+		kraNet.SetUpdateFunction(&staticNetStateUpdate);
+		kraNet.SetRollbackSaveStateFunction(&staticNetStateSave);
+		kraNet.SetRollbackLoadStateFunction(&staticNetStateLoad);
 
-		std::cout << "0 for host, 1 for client" << std::endl;
+		uint16_t DefaultDirectPort = 31418;
+		std::cout << "Choose connection type:" << std::endl <<
+			"  0 for host, " << std::endl << 
+			"  1 for client," << std::endl <<
+			"  2 for direct host, " << std::endl <<
+			"  3 for direct client, " << std::endl;
 		int i;
 		std::cin >> i;
 		if (i == 0)
 		{
-			//host
+			/*//host
 			int delay = 3;
 			std::cout << "set frames of input delay (default value is 3)" << std::endl;
 			std::cin >> delay;
@@ -198,11 +241,13 @@ secro::Game::Game(std::shared_ptr<InputManager> input)
 
 			network.setInputDelay(delay);
 			network.initializeHost(31415);
-			network.waitForClient();
+			network.waitForClient();*/
+
+			std::cout << "host code: " << kraNet.StartHost() << std::endl;
 		}
-		else
+		else if (i == 1)
 		{
-			//client
+			/*//client
 			std::string ip = "";
 			std::cout << "enter IP address" << std::endl;
 			std::cin >> ip;
@@ -213,19 +258,50 @@ secro::Game::Game(std::shared_ptr<InputManager> input)
 			//connect
 			network.connectToHost();
 
-			int stop = 0;
+			int stop = 0;*/
+
+			std::cout << "insert host code: " << std::endl;
+			uint32_t code;
+			std::cin >> code;
+			kraNet.StartJoin(code);
+		}
+		else if (i == 2)
+		{
+			std::cout << "waiting for other connection..." << std::endl;
+			if (!kraNet.ListenConnection(DefaultDirectPort))
+			{
+				//ERROR
+				std::cout << "host connection could not be established" << std::endl;
+			}
+		}
+		else if (i == 3)
+		{
+			std::cout << "insert other IP: " << std::endl;
+			std::string ipStr;
+			std::cin >> ipStr;
+			sf::IpAddress ip(ipStr.c_str());
+			if (!kraNet.StartConnection(ip, DefaultDirectPort))
+			{
+				//ERROR
+				std::cout << "join connection could not be established" << std::endl;
+			}
 		}
 	}
-
-	//set up the stage
-	startLevel(newLevel, 2);
 }
 
 //TEMP
 #include <SFML/Window.hpp>
 
-void secro::Game::update(float deltaTime, bool shouldUpdateInput)
+void secro::Game::update(float realDeltaTime, bool shouldUpdateInput)
 {
+	float deltaTime = 1.f / 60.f;
+	networkUI.update(
+		kraNet.GetPing(),
+		1.f / realDeltaTime,
+		(float)kraNet.GetLastFrameDifference(),
+		(int)kraNet.GetCurrentFrame()
+	);
+
 	//if (shouldUpdateInput)
 	//{
 	//	if (network.isHost())
@@ -236,7 +312,7 @@ void secro::Game::update(float deltaTime, bool shouldUpdateInput)
 
 	if (GameInstance::instance.isOnline)
 	{
-		if (network.connected() && shouldUpdateInput)
+		/*if (network.connected() && shouldUpdateInput)
 		{
 			//print ping
 			std::cout << network.getPing() << std::endl;
@@ -255,21 +331,26 @@ void secro::Game::update(float deltaTime, bool shouldUpdateInput)
 			//{
 			//	network.update(0);
 			//}
-		}
+		}*/
+		auto r = inputManager->getController(0)->readInput();
+		int asInt = Controller::compressInput(r).input.raw;
+		kraNet.Update(toKraNet(asInt));
 	}
 	else
 	{
 		//offline
 		inputManager->update();
 		simulateUpdate(deltaTime);
-		level->physicsManager.serReset();
+
+		//used to remove all the contacts
+		//level->physicsManager.serReset();
 	}
 
 	//update the debug menu
 	DebugOptions::update(deltaTime);
 }
 
-void secro::Game::simulateUpdate(float deltaTime)
+void secro::Game::simulateUpdate(float deltaTime, bool duringRollback)
 {
 	switch (gameState)
 	{
@@ -280,40 +361,41 @@ void secro::Game::simulateUpdate(float deltaTime)
 	} break;
 	case GameState::Gameplay:
 	{
-		level->update(deltaTime);
+		if (duringRollback)
+			level->updateSimulate(deltaTime);
+		else
+			level->update(deltaTime);
+
 		if (level->isGameOver())
 		{
-			gameState = GameState::MainMenu;
-		}
-		if (level->isGameOver())
-		{
-			gameState = GameState::MainMenu;
+			level->reset();
 		}
 	} break;
 	}
 }
 
-void secro::Game::updateWithInput(float deltaTime, int localInput, int otherInput)
+// function should already be called with the inputs swapped on each client
+void secro::Game::updateWithInput(float deltaTime, int localInput, int otherInput, bool duringRollback)
 {
 	CompressedInput c0, c1;
 
-	if (network.isHost())
-	{
+	//if (network.isHost())
+	//{
 		c0.input.raw = localInput;
 		c1.input.raw = otherInput;
-	}
-	else
-	{
-		c1.input.raw = localInput;
-		c0.input.raw = otherInput;
-	}
+	//}
+	//else
+	//{
+	//	c1.input.raw = localInput;
+	//	c0.input.raw = otherInput;
+	//}
 	Controller::Input i0 = Controller::uncompressInput(c0);
 	Controller::Input i1 = Controller::uncompressInput(c1);
 
 	inputManager->getController(0)->manualUpdate(i0);
 	inputManager->getController(1)->manualUpdate(i1);
-
-	simulateUpdate(deltaTime);
+	
+	simulateUpdate(deltaTime, duringRollback);
 }
 
 void secro::Game::render(sf::RenderWindow & window)
@@ -357,6 +439,9 @@ void secro::Game::render(sf::RenderWindow & window)
 
 	//render the gameplay settings
 	GameplaySettings::render();
+
+	//render the network info
+	networkUI.render();
 
 	//render the input bot
 	//inputBot->render();
@@ -405,4 +490,28 @@ void secro::Game::netStateLoad()
 int secro::Game::netStateHash()
 {
 	return stateBuffer.hash();
+}
+
+void secro::Game::staticNetStateUpdate(void * ex, KraNetInput p1, KraNetInput p2)
+{
+	Game* asGame = (Game*)ex;
+	asGame->updateWithInput(1.f / 60.f, fromKraNet(p1), fromKraNet(p2), false);
+}
+
+void secro::Game::staticNetStateSimulate(void * ex, KraNetInput p1, KraNetInput p2)
+{
+	Game* asGame = (Game*)ex;
+	asGame->updateWithInput(1.f / 60.f, fromKraNet(p1), fromKraNet(p2), true);
+}
+
+void secro::Game::staticNetStateSave(void * ex)
+{
+	Game* asGame = (Game*)ex;
+	asGame->netStateSave();
+}
+
+void secro::Game::staticNetStateLoad(void * ex)
+{
+	Game* asGame = (Game*)ex;
+	asGame->netStateLoad();
 }

@@ -5,7 +5,7 @@ namespace secro {
 	struct CollisionResult {
 		Vector2 point;
 		Vector2 normal;
-		bool hit;
+		bool hit = false;
 		
 		//alpha value of when the hit happened
 		sfloat timeOfHit;

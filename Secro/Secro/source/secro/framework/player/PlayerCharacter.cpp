@@ -18,7 +18,7 @@ secro::PlayerCharacter::PlayerCharacter()
 {
 }
 
-secro::PlayerCharacter::PlayerCharacter(Level* levell, HitboxManager* hitboxM, b2Body * body, std::shared_ptr<Controller> controller)
+secro::PlayerCharacter::PlayerCharacter(Level* levell, HitboxManager* hitboxM, PhysicsHandle body, std::shared_ptr<Controller> controller)
 {
 	hitboxManager = hitboxM;
 	physicsBody = body;
@@ -27,7 +27,7 @@ secro::PlayerCharacter::PlayerCharacter(Level* levell, HitboxManager* hitboxM, b
 	level = levell;
 }
 
-void secro::PlayerCharacter::lateSetup(Level* levell, HitboxManager * hitboxM, b2Body * body, std::shared_ptr<Controller> controller)
+void secro::PlayerCharacter::lateSetup(Level* levell, HitboxManager * hitboxM, PhysicsHandle body, std::shared_ptr<Controller> controller)
 {
 	hitboxManager = hitboxM;
 	physicsBody = body;
@@ -46,8 +46,12 @@ void secro::PlayerCharacter::init()
 	a.airAcceleration = 40.f;
 	a.airDeceleration = 10.f;
 	a.airMaxSpeed = 8.f;
+	//dash
 	a.dashDuration = 0.25f;
 	a.dashInitialSpeed = 11.5f;
+	a.dashSpeedCurve.setFormula(Linear{});
+	a.dashSpeedCurve.resultMultiplicant = 3.f;
+	//fall
 	a.doubleJumpSpeed = 20.f;
 	a.fallSpeed = 50.f;
 	a.fastfallSpeed = 10.f;
@@ -56,6 +60,7 @@ void secro::PlayerCharacter::init()
 	a.jumpFullSpeed = 17.f;
 	a.jumpShortSpeed = 10.f;
 	a.jumpSquatDuration = 0.05f;
+	//run
 	a.runAcceleration = 50.f;
 	a.runMaxSpeed = 8.f;
 	a.walkMaxSpeed = 6.f;
@@ -137,13 +142,22 @@ void secro::PlayerCharacter::setupStates(StateMachine & sm)
 	//dash
 	sm.addSetState(PlayerState::Dash, std::bind(&PlayerCharacter::stateStartDash, this));
 	sm.addUnsetState(PlayerState::Dash, std::bind(&PlayerCharacter::stateEndDash, this));
-	sm.addCondition(PlayerState::Dash, PlayerState::Dash, [&](float f)
+	sm.addCondition(PlayerState::Dash, PlayerState::Stand, [&](float f)
 	{
 		auto input = getInput();
 		auto mov = input->getMovementDirection();
 		auto smash = input->getMovementPushDirectionExt();
 		auto face = getFacingDirection();
-		return smash.speed > 30.f && ((mov == Direction::Left && face == FacingDirection::Right) || (mov == Direction::Right && face == FacingDirection::Left));
+		bool ret = smash.speed > 30.f && ((mov == Direction::Left && face == FacingDirection::Right) || (mov == Direction::Right && face == FacingDirection::Left));
+		if (ret)
+		{
+			auto& coll = getPhysicsCollider();
+			auto vel = coll.getVelocity();
+			vel.x = 0.f;
+			coll.setVelocity(vel);
+			return true;
+		}
+		return false;
 	});
 	sm.addCondition(PlayerState::Dash, PlayerState::Run, [&](float f)
 	{
@@ -156,9 +170,9 @@ void secro::PlayerCharacter::setupStates(StateMachine & sm)
 	sm.addCondition(PlayerState::Stand, PlayerState::Dash, [&](float f)
 	{
 		auto input = getInput();
-		auto smash = input->getMovementPushDirectionExt();
+		auto smash = input->getMovementPushDirectionExt(true);
 		auto mov = input->getMovementDirection();
-		return smash.speed > 30.f && ((mov == Direction::Left) || (mov == Direction::Right));
+		return smash.speed > 20.f && ((mov == Direction::Left) || (mov == Direction::Right));
 	});
 	sm.addCondition(PlayerState::Dash, PlayerState::Stand, [&](float f)
 	{
@@ -170,7 +184,7 @@ void secro::PlayerCharacter::setupStates(StateMachine & sm)
 	//run
 	sm.addCondition(PlayerState::Run, PlayerState::Stand, [&](float f)
 	{
-		return getPhysicsBody()->GetLinearVelocity().Length() < 0.1f;
+		return length(getPhysicsCollider().getVelocity()) < 0.1f;
 	});
 	sm.addCondition(PlayerState::Run, PlayerState::Dash, [&](float f)
 	{
@@ -401,7 +415,7 @@ void secro::PlayerCharacter::setupStates(StateMachine & sm)
 	//hitstun
 	sm.addCondition(PlayerState::Hitstun, PlayerState::Jump, [&](float f)
 	{
-		return !IsInHitstun();
+		return !isInHitstun();
 	});
 
 
@@ -510,6 +524,7 @@ void secro::PlayerCharacter::update(float deltaTime)
 	updateDI(deltaTime);
 	updateHitlag(deltaTime);
 	updateAirDashTimer(deltaTime);
+	updatePlatformCollision();
 
 	if (!isInHitlag())
 	{
@@ -683,32 +698,37 @@ void secro::PlayerCharacter::netSerLoad(RawSerializeBuffer & buff)
 	buff.load(isAirDashUsed);
 }
 
-b2Vec2 secro::PlayerCharacter::getPosition()
+Vector2 secro::PlayerCharacter::getPosition()
 {
-	return physicsBody->GetPosition();
+	return level->getPhysics().getCollider(physicsBody).getPosition();
 }
 
-void secro::PlayerCharacter::setPosition(b2Vec2 pos, bool resetVelocity)
+void secro::PlayerCharacter::setPosition(Vector2 pos, bool resetVelocity)
 {
-	physicsBody->SetTransform(pos, 0.f);
+	auto& coll = level->getPhysics().getCollider(physicsBody);
+	coll.setPosition(pos);
 	if (resetVelocity)
-		physicsBody->SetLinearVelocity({ 0.f, 0.f });
+		coll.setVelocity({ 0.f, 0.f });
 }
 
-void secro::PlayerCharacter::reset(b2Vec2 position)
+void secro::PlayerCharacter::reset(Vector2 position)
 {
+	auto& coll = level->getPhysics().getCollider(physicsBody);
 	damage = debugDamage;
-	physicsBody->SetTransform(position, 0.f);
-	physicsBody->SetLinearVelocity({ 0.f, 0.f });
+	coll.setPosition(position);
+	coll.setVelocity({ 0.f, 0.f });
 }
 
 void secro::PlayerCharacter::freeze()
 {
-	physicsBody->SetLinearVelocity({ 0.f, 0.f });
+	auto& coll = level->getPhysics().getCollider(physicsBody);
+	coll.setVelocity({ 0.f, 0.f });
 }
 
 void secro::PlayerCharacter::updateMovement(float deltaTime)
 {
+	auto& coll = level->getPhysics().getCollider(physicsBody);
+
 	//swap the movementstate
 	previousMovementState = movementState;
 
@@ -719,12 +739,12 @@ void secro::PlayerCharacter::updateMovement(float deltaTime)
 		//update gravity
 		if (useGravity)
 		{
-			auto cvel = physicsBody->GetLinearVelocity();
-			physicsBody->SetLinearVelocity(b2Vec2(cvel.x, cvel.y + attributes.fallSpeed * deltaTime/* * deltaTime*/));
+			auto cvel = coll.getVelocity();
+			coll.setVelocity(Vector2{ cvel.x, cvel.y + attributes.fallSpeed * deltaTime/* * deltaTime*/ });
 		}
 
 		//actual movement
-		if (!IsInHitstun())
+		if (!isInHitstun())
 		{
 			//double jumps
 			if (state == PlayerState::Jump)
@@ -732,18 +752,18 @@ void secro::PlayerCharacter::updateMovement(float deltaTime)
 				if (input->jumpPressed() && jumpsLeft > 0)
 				{
 					jumpsLeft--;
-					b2Vec2 jumpVel = { 0.f, -attributes.doubleJumpSpeed };
-					physicsBody->SetLinearVelocity(jumpVel);
+					Vector2 jumpVel = { 0.f, -attributes.doubleJumpSpeed };
+					coll.setVelocity(jumpVel);
 				}
 			}
 
 			//fastfall
 			if (input->getMovementPushDirection() == Direction::Down)
 			{
-				auto vel = physicsBody->GetLinearVelocity();
+				auto vel = coll.getVelocity();
 				if (vel.y > 0.f && vel.y < attributes.fastfallSpeed)
 				{
-					physicsBody->SetLinearVelocity(b2Vec2(vel.x, attributes.fastfallSpeed));
+					coll.setVelocity({ vel.x, attributes.fastfallSpeed });
 				}
 			}
 
@@ -753,27 +773,27 @@ void secro::PlayerCharacter::updateMovement(float deltaTime)
 				if (mdir == Direction::Left)
 				{
 					//maybe setting velocity wrong !!!
-					auto vel = physicsBody->GetLinearVelocity();
+					auto vel = coll.getVelocity();
 
-					b2Vec2 unitVec = { -attributes.airAcceleration * deltaTime/* * deltaTime*/, 0.f };
+					Vector2 unitVec = { -attributes.airAcceleration * deltaTime/* * deltaTime*/, 0.f };
 
 					if (vel.x > -attributes.airMaxSpeed)
 					{
 						vel += unitVec;
-						physicsBody->SetLinearVelocity(vel);
+						coll.setVelocity(vel);
 					}
 				}
 				else if (mdir == Direction::Right)
 				{
 					//maybe setting velocity wrong !!!
-					auto vel = physicsBody->GetLinearVelocity();
+					auto vel = coll.getVelocity();
 
-					b2Vec2 unitVec = { attributes.airAcceleration * deltaTime/* * deltaTime*/, 0.f };
+					Vector2 unitVec = { attributes.airAcceleration * deltaTime/* * deltaTime*/, 0.f };
 
 					if (vel.x < attributes.airMaxSpeed)
 					{
 						vel += unitVec;
-						physicsBody->SetLinearVelocity(vel);
+						coll.setVelocity(vel);
 					}
 				}
 
@@ -782,7 +802,7 @@ void secro::PlayerCharacter::updateMovement(float deltaTime)
 			//apply tracktion when needed
 			if (shouldHaveFriction)
 			{
-				auto vel = physicsBody->GetLinearVelocity();
+				auto vel = coll.getVelocity();
 				//if (input->getMovementDirection() == Direction::Neutral)
 				if (abs(vel.x) >= attributes.airMaxSpeed || !keepRunning() || state != PlayerState::Hitstun)
 				{
@@ -800,18 +820,21 @@ void secro::PlayerCharacter::updateMovement(float deltaTime)
 						vel = { 0.f, vel.y };
 					}
 
-					physicsBody->SetLinearVelocity(vel);
+					coll.setVelocity(vel);
 				}
 			}
 		}
 
-		//shap to ground
-		auto FVel = physicsBody->GetLinearVelocity();
-		if (snapToGround(FVel.y * deltaTime * 1.2f, isAttacking()))
+		//snap to ground
+		auto FVel = coll.getVelocity();
+		if ((!isInHitstun() || !isInHitlag()) && FVel.y > 0.f)
 		{
-			movementState = MovementState::OnGround;
-			FVel.y = 0.f;
-			physicsBody->SetLinearVelocity(FVel);
+			if (snapToGround(FVel.y * deltaTime * 1.2f, isAttacking()))
+			{
+				movementState = MovementState::OnGround;
+				FVel.y = 0.f;
+				coll.setVelocity(FVel);
+			}
 		}
 
 	} break;
@@ -838,27 +861,27 @@ void secro::PlayerCharacter::updateMovement(float deltaTime)
 				if (facingDirection == FacingDirection::Left)
 				{
 					//maybe setting velocity wrong !!!
-					auto vel = physicsBody->GetLinearVelocity();
+					auto vel = coll.getVelocity();
 					
-					b2Vec2 unitVec = { -attributes.runAcceleration * deltaTime/* * deltaTime*/, 0.f };
+					Vector2 unitVec = { -attributes.runAcceleration * deltaTime/* * deltaTime*/, 0.f };
 
 					if (abs(vel.x) < maxSpeed)
 					{
 						vel += unitVec;
-						physicsBody->SetLinearVelocity(vel);
+						coll.setVelocity(vel);
 					}
 				}
 				else
 				{
 					//maybe setting velocity wrong !!!
-					auto vel = physicsBody->GetLinearVelocity();
+					auto vel = coll.getVelocity();
 
-					b2Vec2 unitVec = { attributes.runAcceleration * deltaTime/* * deltaTime*/, 0.f };
+					Vector2 unitVec = { attributes.runAcceleration * deltaTime/* * deltaTime*/, 0.f };
 
 					if (abs(vel.x) < maxSpeed)
 					{
 						vel += unitVec;
-						physicsBody->SetLinearVelocity(vel);
+						coll.setVelocity(vel);
 					}
 				}
 
@@ -871,12 +894,12 @@ void secro::PlayerCharacter::updateMovement(float deltaTime)
 			if ((!keepRunning() || groundSpeedTooHigh())/* && state != PlayerState::Dash*/)
 			{
 				auto decelVal = attributes.groundDeceleration * deltaTime/* * deltaTime*/;
-				auto vel = physicsBody->GetLinearVelocity();
+				auto vel = coll.getVelocity();
 
-				if (vel.Length() > decelVal)
+				if (length(vel) > decelVal)
 				{
 					auto adder = vel;
-					adder.Normalize();
+					adder = normalise(adder);
 					adder *= decelVal;
 					vel -= adder;
 				}
@@ -885,7 +908,7 @@ void secro::PlayerCharacter::updateMovement(float deltaTime)
 					vel = { 0.f, 0.f };
 				}
 
-				physicsBody->SetLinearVelocity(vel);
+				coll.setVelocity(vel);
 			}
 		}
 
@@ -899,9 +922,9 @@ void secro::PlayerCharacter::updateMovement(float deltaTime)
 			}
 			else //put the character back on the platform 
 			{
-				physicsBody->SetTransform(previousPosition, 0.f);
-				auto oldVel = physicsBody->GetLinearVelocity();
-				physicsBody->SetLinearVelocity({ 0.f, oldVel.y });
+				coll.setPosition(previousPosition);
+				auto oldVel = coll.getVelocity();
+				coll.setVelocity({ 0.f, oldVel.y });
 			}
 		}
 	} break;
@@ -909,13 +932,27 @@ void secro::PlayerCharacter::updateMovement(float deltaTime)
 
 
 	//update the previous position
-	previousPosition = physicsBody->GetPosition();
+	previousPosition = coll.getPosition();
 }
 
+void secro::PlayerCharacter::updatePlatformCollision()
+{
+	if (canDropThroughPlatform())
+	{
+		getPhysicsCollider().setProfile(ColliderProfile::EntityNoPlatform);
+	}
+	else
+	{
+		getPhysicsCollider().setProfile(ColliderProfile::Entity);
+	}
+}
+
+//NEEDS A FULL REWRITE
 bool secro::PlayerCharacter::snapToGround(float distance, bool startAtBottom)
 {
-
-	auto vel = physicsBody->GetLinearVelocity();
+	return level->getPhysics().pushDown(physicsBody, 0.01f);
+	/*auto& coll = level->getPhysics().getCollider(physicsBody);
+	auto vel = coll.getVelocity();
 	
 	//don't want to snap to the ground if we're moving upwards
 	if (vel.y < 0.f && movementState != MovementState::OnGround)
@@ -986,6 +1023,8 @@ bool secro::PlayerCharacter::snapToGround(float distance, bool startAtBottom)
 		physicsBody->SetTransform(newPos, 0.f);
 		return true;
 	}
+	return false;*/
+
 	return false;
 }
 
@@ -1024,6 +1063,7 @@ void secro::PlayerCharacter::stateEndStand()
 
 void secro::PlayerCharacter::stateStartJump()
 {
+	auto& coll = level->getPhysics().getCollider(physicsBody);
 	if (state == PlayerState::Airdodge)
 		return;
 
@@ -1031,11 +1071,11 @@ void secro::PlayerCharacter::stateStartJump()
 
 	bool fullHop = input->jumpHeld();
 
-	auto currentVel = physicsBody->GetLinearVelocity();
+	auto currentVel = coll.getVelocity();
 	if (fullHop)
-		physicsBody->SetLinearVelocity({ currentVel.x, -attributes.jumpFullSpeed });
+		coll.setVelocity({ currentVel.x, -attributes.jumpFullSpeed });
 	else
-		physicsBody->SetLinearVelocity({ currentVel.x, -attributes.jumpShortSpeed });
+		coll.setVelocity({ currentVel.x, -attributes.jumpShortSpeed });
 }
 
 void secro::PlayerCharacter::stateStartJumpSquat()
@@ -1045,17 +1085,18 @@ void secro::PlayerCharacter::stateStartJumpSquat()
 
 void secro::PlayerCharacter::stateStartDash()
 {
+	auto& coll = level->getPhysics().getCollider(physicsBody);
 	auto dir = input->getMovementDirection();
 	
 	if (dir == Direction::Left)
 	{
 		facingDirection = FacingDirection::Left;
-		physicsBody->SetLinearVelocity(b2Vec2(-attributes.dashInitialSpeed, 0.f));
+		coll.setVelocity(Vector2{ -attributes.dashInitialSpeed, 0.f });
 	}
 	else if (dir == Direction::Right)
 	{
 		facingDirection = FacingDirection::Right;
-		physicsBody->SetLinearVelocity(b2Vec2(attributes.dashInitialSpeed, 0.f));
+		coll.setVelocity(Vector2{ attributes.dashInitialSpeed, 0.f });
 	}
 
 	stateTimer = attributes.dashDuration;
@@ -1101,12 +1142,13 @@ void secro::PlayerCharacter::endAttack()
 
 bool secro::PlayerCharacter::groundSpeedTooHigh()
 {
-	auto vel = physicsBody->GetLinearVelocity();
+	auto& coll = level->getPhysics().getCollider(physicsBody);
+	auto vel = coll.getVelocity();
 	
 	if (state == PlayerState::Run)
-		return vel.Length() > attributes.runMaxSpeed;
+		return length(vel) > attributes.runMaxSpeed;
 	else if (state == PlayerState::Walk)
-		return vel.Length() > attributes.walkMaxSpeed;
+		return length(vel) > attributes.walkMaxSpeed;
 
 	return false;
 }
@@ -1118,13 +1160,13 @@ bool secro::PlayerCharacter::canDropThroughPlatform()
 
 	if (movementState == MovementState::InAir)
 	{
-		if (isAttacking() || IsInHitstun())
+		if (isAttacking() || isInHitstun())
 			return false;
 		return input->getMovementDirection() == Direction::Down;
 	}
 	else if (movementState == MovementState::OnGround)
 	{
-		if (isAttacking() || IsInHitstun() || state == PlayerState::JumpSquat || state == PlayerState::LandingLag)
+		if (isAttacking() || isInHitstun() || state == PlayerState::JumpSquat || state == PlayerState::LandingLag)
 			return false;
 
 		for (size_t i = 0; i < 5; ++i)
@@ -1182,6 +1224,7 @@ void secro::PlayerCharacter::debugRenderAttributes(sf::RenderWindow & window)
 		ImGui::Text("Dash");
 		ImGui::InputFloat("DashDuration", &attributes.dashDuration);
 		ImGui::InputFloat("DashInitialSpeed", &attributes.dashInitialSpeed);
+		attributes.dashSpeedCurve.renderCurveEditor();
 
 		ImGui::Separator();
 
@@ -1226,9 +1269,14 @@ FacingDirection secro::PlayerCharacter::getFacingDirection()
 	return facingDirection;
 }
 
-const b2Body * secro::PlayerCharacter::getPhysicsBody()
+PhysicsHandle secro::PlayerCharacter::getPhysicsBody()
 {
 	return physicsBody;
+}
+
+BoxCollider & secro::PlayerCharacter::getPhysicsCollider()
+{
+	return level->getPhysics().getCollider(physicsBody);
 }
 
 bool secro::PlayerCharacter::isEqual(FacingDirection facing, Direction dir)
@@ -1246,7 +1294,7 @@ float secro::PlayerCharacter::getWalkDeadzone()
 	return walkDeadzone;
 }
 
-void secro::PlayerCharacter::knockBack(b2Vec2 knockback)
+void secro::PlayerCharacter::knockBack(Vector2 knockback)
 {
 	if (isInvincible())
 		return;
@@ -1260,7 +1308,7 @@ void secro::PlayerCharacter::knockBack(b2Vec2 knockback)
 	if (knockback.y < 0)
 		movementState = MovementState::InAir;
 
-	physicsBody->SetLinearVelocity(knockback);
+	getPhysicsCollider().setVelocity(knockback);
 }
 
 void secro::PlayerCharacter::setMovementState(MovementState m)
@@ -1273,8 +1321,8 @@ void secro::PlayerCharacter::tryDoubleJump(float deltaTime)
 	if (input->jumpPressed() && jumpsLeft > 0)
 	{
 		jumpsLeft--;
-		b2Vec2 jumpVel = { 0.f, -attributes.doubleJumpSpeed };
-		physicsBody->SetLinearVelocity(jumpVel);
+		Vector2 jumpVel = { 0.f, -attributes.doubleJumpSpeed };
+		getPhysicsCollider().setVelocity(jumpVel);
 		//stateMachine.changeState(this, PlayerState::Jump, 0.01666f);
 	}
 }
@@ -1285,7 +1333,7 @@ void secro::PlayerCharacter::updateHitstun(float deltaTime)
 		hitstun -= deltaTime;
 }
 
-bool secro::PlayerCharacter::IsInHitstun()
+bool secro::PlayerCharacter::isInHitstun()
 {
 	return hitstun > 0.f;
 }
@@ -1415,7 +1463,7 @@ void secro::PlayerCharacter::updateHitlag(float deltaTime)
 
 		if (hitlag <= 0.f)
 		{
-			physicsBody->SetLinearVelocity(hitlagVelocity);
+			getPhysicsCollider().setVelocity(hitlagVelocity);
 
 			if (!isInvincible() && state == PlayerState::Hitstun)
 				applyDI();
@@ -1430,9 +1478,10 @@ bool secro::PlayerCharacter::isInHitlag()
 
 void secro::PlayerCharacter::putInHitlag(float duration)
 {
+	auto& coll = getPhysicsCollider();
 	hitlag = duration;
-	hitlagVelocity = physicsBody->GetLinearVelocity();
-	physicsBody->SetLinearVelocity(b2Vec2(0.f, 0.f));
+	hitlagVelocity = coll.getVelocity();
+	coll.setVelocity(Vector2{ 0.f, 0.f });
 	freezeShake = duration * freezeShakePerHitlag + freezeShakeBase;
 }
 
@@ -1491,14 +1540,33 @@ void secro::PlayerCharacter::stateUpdateDash(float deltaTime)
 {
 	auto dir = input->getMovementDirection();
 	if (!isEqual(facingDirection, dir))
+	{
 		canSlideOffPlatforms = false;
+	}
 	else
+	{
 		canSlideOffPlatforms = true;
+
+		//update dash speed if the player is holding the direction
+		float timeScalar = (attributes.dashDuration - getStateTimer()) / attributes.dashDuration;
+		auto& coll = getPhysicsCollider();
+		auto vel = coll.getVelocity();
+		if (facingDirection == FacingDirection::Left)
+		{
+			vel.x = -attributes.dashInitialSpeed * attributes.dashSpeedCurve.calculate(timeScalar);
+		}
+		else //right
+		{
+			vel.x = attributes.dashInitialSpeed * attributes.dashSpeedCurve.calculate(timeScalar);
+		}
+		coll.setVelocity(vel);
+	}
 }
 
 void secro::PlayerCharacter::stateUpdateStand(float deltaTime)
 {
-	auto vel = physicsBody->GetLinearVelocity();
+	auto& coll = getPhysicsCollider();
+	auto vel = coll.getVelocity();
 
 	if (vel.x > 0.5f)
 	{
@@ -1534,8 +1602,8 @@ bool secro::PlayerCharacter::stateCanTechEnd()
 
 void secro::PlayerCharacter::stateTechLeftBegin()
 {
-	b2Vec2 vel = { -attributes.techRollSpeed, 0.f };
-	physicsBody->SetLinearVelocity(vel);
+	Vector2 vel = { -attributes.techRollSpeed, 0.f };
+	getPhysicsCollider().setVelocity(vel);
 	setStateTimer(attributes.techRollDuration);
 	makeInvincible(attributes.techRollInvDuration);
 
@@ -1548,8 +1616,8 @@ void secro::PlayerCharacter::stateTechLeftBegin()
 
 void secro::PlayerCharacter::stateTechRightBegin()
 {
-	b2Vec2 vel = { attributes.techRollSpeed, 0.f };
-	physicsBody->SetLinearVelocity(vel);
+	Vector2 vel = { attributes.techRollSpeed, 0.f };
+	getPhysicsCollider().setVelocity(vel);
 	setStateTimer(attributes.techRollDuration);
 	makeInvincible(attributes.techRollInvDuration);
 
@@ -1562,8 +1630,8 @@ void secro::PlayerCharacter::stateTechRightBegin()
 
 void secro::PlayerCharacter::stateTechInPlaceBegin()
 {
-	b2Vec2 vel = { 0.f, 0.f };
-	physicsBody->SetLinearVelocity(vel);
+	Vector2 vel = { 0.f, 0.f };
+	getPhysicsCollider().setVelocity(vel);
 	setStateTimer(attributes.techInPlaceDuration);
 	makeInvincible(attributes.techInPlaceInvDuration);
 
@@ -1596,13 +1664,13 @@ void secro::PlayerCharacter::stateAirdodgeStart()
 	useGravity = false;
 
 	//set velocity
-	auto dir = conv<b2Vec2>(input->getMovement());
+	auto dir = conv<Vector2>(input->getMovement());
 	if (dir.y > -50.f && dir.y < 0.f && movementState == MovementState::OnGround)
 		dir.y = 0.f;
-	dir.Normalize();
+	dir = normalise(dir);
 	airdodgeDirectrion = dir;
 	dir *= attributes.airdodgeSpeed;
-	physicsBody->SetLinearVelocity(dir);
+	getPhysicsCollider().setVelocity(dir);
 
 	//check for air
 	if (dir.y < 0.f)
@@ -1616,12 +1684,13 @@ void secro::PlayerCharacter::stateAirdodgeStart()
 
 void secro::PlayerCharacter::stateAirdodgeEnd()
 {
+	auto& coll = getPhysicsCollider();
 	useGravity = true;
 
 	if (movementState == MovementState::InAir)
 	{
-		b2Vec2 vel = mul(physicsBody->GetLinearVelocity(), 0.3f);
-		physicsBody->SetLinearVelocity(vel);
+		Vector2 vel = mul(coll.getVelocity(), 0.3f);
+		coll.setVelocity(vel);
 	}
 	else if (movementState == MovementState::OnGround)
 	{
@@ -1631,7 +1700,8 @@ void secro::PlayerCharacter::stateAirdodgeEnd()
 
 void secro::PlayerCharacter::stateUpdateAirdodge(float deltaTime)
 {
-	auto vel = physicsBody->GetLinearVelocity();
+	auto& coll = getPhysicsCollider();
+	auto vel = coll.getVelocity();
 	if (vel.y > -0.1f)
 	{
 		if (snapToGround(0.5f, false))
@@ -1645,7 +1715,7 @@ void secro::PlayerCharacter::stateUpdateAirdodge(float deltaTime)
 	//resizeVelocity(attributes.airdodgeSpeedCurve.calculate(alpha) * attributes.airdodgeSpeed);
 	auto newVel = airdodgeDirectrion;
 	newVel = mul(newVel, attributes.airdodgeSpeedCurve.calculate(alpha) * attributes.airdodgeSpeed);
-	physicsBody->SetLinearVelocity(newVel);
+	coll.setVelocity(newVel);
 
 	//give invincibility once needed
 	//only happens once during the airdodge
@@ -1679,7 +1749,8 @@ void secro::PlayerCharacter::updateDI(float deltaTime)
 
 void secro::PlayerCharacter::applyDI()
 {
-	auto vel = physicsBody->GetLinearVelocity();
+	auto& coll = getPhysicsCollider();
+	auto vel = coll.getVelocity();
 	
 	if (vel.x == 0.f && vel.y == 0.f)
 		return;
@@ -1687,7 +1758,7 @@ void secro::PlayerCharacter::applyDI()
 	float angle = angleFromDirection(vel);
 	float DIDiff = getDI(angle);
 	auto newVel = adjustAngle(vel, DIDiff);
-	physicsBody->SetLinearVelocity(newVel);
+	coll.setVelocity(newVel);
 }
 
 float secro::PlayerCharacter::getDI(float angle)
@@ -1755,11 +1826,11 @@ void secro::PlayerCharacter::conditionAirDash()
 	if (canAirDash && !isAirDashUsed)
 	{
 		//start the air dash
-		b2Vec2 dir = { 1.f, -0.3f };
+		Vector2 dir = { 1.f, -0.3f };
 		if (airDashDirection == Direction::Left)
 			dir.x = -1.f;
 
-		physicsBody->SetLinearVelocity(mul(dir, attributes.airDashSpeed));
+		getPhysicsCollider().setVelocity(mul(dir, attributes.airDashSpeed));
 
 		//airdash can no longer be used
 		isAirDashUsed = true;

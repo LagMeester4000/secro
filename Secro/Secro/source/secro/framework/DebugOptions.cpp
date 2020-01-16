@@ -26,6 +26,7 @@ void secro::DebugOptions::render(sf::RenderWindow & window)
 			ImGui::Checkbox("Gameplay Settings", &options.enableGameplaySettingsEditor);
 			ImGui::Checkbox("Render Physics", &options.enablePhysicsRender);
 			ImGui::Checkbox("Render Hitboxes", &options.enableHitboxRender);
+			ImGui::Checkbox("Render Network Info", &options.enableNetworkRender);
 
 			ImGui::EndMenu();
 		}

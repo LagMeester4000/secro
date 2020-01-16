@@ -8,3 +8,8 @@ float secro::clampOne(float f)
 		return 1.f;
 	return f;
 }
+
+float secro::abs(float f)
+{
+	return f < 0.f ? -f : f;
+}

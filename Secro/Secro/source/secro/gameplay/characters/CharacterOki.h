@@ -6,7 +6,7 @@
 namespace secro {
 	class CharacterOki : public PlayerCharacter {
 	public:
-		CharacterOki(Level* level, HitboxManager* hitboxManager, b2Body* body, std::shared_ptr<Controller> controller);
+		CharacterOki(Level* level, HitboxManager* hitboxManager, PhysicsHandle body, std::shared_ptr<Controller> controller);
 		CharacterOki();
 
 		void init() override;

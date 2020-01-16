@@ -14,10 +14,38 @@ void secro::RingOutLevel::init()
 	Level::init();
 
 	//make level layout
-	physicsManager.addStageCollider(b2Vec2(0.f, 5.f), b2Vec2(8.f, 3.f));
-	physicsManager.addStageCollider(b2Vec2(0.f, -3.3f), b2Vec2(2.f, 0.3f), true);
-	physicsManager.addStageCollider(b2Vec2(4.f, -0.6f), b2Vec2(2.f, 0.3f), true);
-	physicsManager.addStageCollider(b2Vec2(-4.f, -0.6f), b2Vec2(2.f, 0.3f), true);
+	{
+		BoxCollider coll;
+		coll.setProfile(ColliderProfile::SolidGround);
+		coll.setPosition(Vector2{ 0.f, 5.f });
+		coll.setSize(Vector2{ 8.f, 3.f } * 2.f);
+		physicsManager.addCollider(coll);
+	}
+	{
+		BoxCollider coll;
+		coll.setProfile(ColliderProfile::PlatformGround);
+		coll.setPosition(Vector2{ 0.f, -3.3f });
+		coll.setSize(Vector2{ 2.f, 0.3f } * 2.f);
+		physicsManager.addCollider(coll);
+	}
+	{
+		BoxCollider coll;
+		coll.setProfile(ColliderProfile::PlatformGround);
+		coll.setPosition(Vector2{ 4.f, -0.6f });
+		coll.setSize(Vector2{ 2.f, 0.3f } * 2.f);
+		physicsManager.addCollider(coll);
+	}
+	{
+		BoxCollider coll;
+		coll.setProfile(ColliderProfile::PlatformGround);
+		coll.setPosition(Vector2{ -4.f, -0.6f });
+		coll.setSize(Vector2{ 2.f, 0.3f } * 2.f);
+		physicsManager.addCollider(coll);
+	}
+	//physicsManager.addStageCollider(b2Vec2(0.f, 5.f), b2Vec2(8.f, 3.f));
+	//physicsManager.addStageCollider(b2Vec2(0.f, -3.3f), b2Vec2(2.f, 0.3f), true);
+	//physicsManager.addStageCollider(b2Vec2(4.f, -0.6f), b2Vec2(2.f, 0.3f), true);
+	//physicsManager.addStageCollider(b2Vec2(-4.f, -0.6f), b2Vec2(2.f, 0.3f), true);
 	
 	//set player stocks
 	for (size_t i = 0; i < players.size(); ++i)
@@ -63,13 +91,31 @@ void secro::RingOutLevel::update(float deltaTime)
 			playerStocks[i]--;
 		}
 	}
+}
 
-	//update background
-	background.update(camera);
+void secro::RingOutLevel::updateSimulate(float deltaTime)
+{
+	Level::updateSimulate(deltaTime);
+
+	//respawn mechanic
+	for (size_t i = 0; i < players.size(); ++i)
+	{
+		auto& it = players[i];
+		auto pos = it->getPosition();
+		if (pos.x < boundsMin.x || pos.x > boundsMax.x ||
+			pos.y < boundsMin.y || pos.y > boundsMax.y)
+		{
+			it->reset({ 0.f, 0.f });
+			playerStocks[i]--;
+		}
+	}
 }
 
 void secro::RingOutLevel::render(sf::RenderWindow & window)
 {
+	//update background
+	background.update(camera);
+
 	//render the background
 	background.render(window);
 
@@ -118,6 +164,17 @@ void secro::RingOutLevel::render(sf::RenderWindow & window)
 
 	renderScores(window);
 	Level::cameraRender(window);
+}
+
+void secro::RingOutLevel::reset()
+{
+	Level::reset();
+
+	//set player stocks
+	for (auto& it : playerStocks)
+	{
+		it = stockAmount;
+	}
 }
 
 bool secro::RingOutLevel::isGameOver()

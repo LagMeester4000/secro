@@ -13,7 +13,11 @@ void secro::BridgeLevel::init()
 	Level::init();
 
 	//setup stage
-	physicsManager.addStageCollider(b2Vec2(0.f, 5.f), b2Vec2(bounds.x + 2.f, 3.f));
+	BoxCollider coll;
+	coll.setProfile(ColliderProfile::SolidGround);
+	coll.setPosition(Vector2{ 0.f, 5.f });
+	coll.setSize(Vector2{ bounds.x + 2.f, 3.f });
+	physicsManager.addCollider(coll);
 
 	//set player points
 	for (size_t i = 0; i < players.size(); ++i)

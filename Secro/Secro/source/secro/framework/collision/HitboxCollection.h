@@ -61,7 +61,7 @@ namespace secro {
 		//update the bounding volume
 		void updateRelativeBox();
 
-		static b2Vec2 scale(Entity* entity);
+		static Vector2 scale(Entity* entity);
 
 	private:
 		//reference to owner character

@@ -7,7 +7,7 @@
 #include <SFML/Graphics.hpp>
 #include <tuple>
 
-secro::CharacterOki::CharacterOki(Level* level, HitboxManager * hitboxManager, b2Body * body, std::shared_ptr<Controller> controller)
+secro::CharacterOki::CharacterOki(Level* level, HitboxManager * hitboxManager, PhysicsHandle body, std::shared_ptr<Controller> controller)
 	: PlayerCharacter(level, hitboxManager, body, controller)
 {
 }
@@ -264,6 +264,7 @@ void secro::CharacterOki::setupAttacks(AttackCollection & atts)
 void secro::CharacterOki::update(float deltaTime)
 {
 	PlayerCharacter::update(deltaTime);
+	auto& coll = getPhysicsCollider();
 
 	if (!isInHitlag())
 		animatedSprite.update(sf::seconds(deltaTime));
@@ -272,7 +273,7 @@ void secro::CharacterOki::update(float deltaTime)
 	//spawn hit particles
 	if (getState() == PlayerState::Hitstun)
 	{
-		auto vel = getPhysicsBody()->GetLinearVelocity();
+		auto vel = coll.getVelocity();
 		auto speed = length(vel);
 		std::cout << speed << std::endl;
 		particleHitDuration = particleHitDurationMax / (speed / 10.f);
@@ -296,7 +297,7 @@ void secro::CharacterOki::update(float deltaTime)
 				part.animation.setAnimation(particleHit);
 				part.animation.setOrigin({ 43.f, 22.5f });
 				part.animation.setPosition(pos.x, pos.y);
-				part.animation.setRotation(angleFromDirection(getPhysicsBody()->GetLinearVelocity()));
+				part.animation.setRotation(angleFromDirection(coll.getVelocity()));
 				part.opacityOverTime = -200.f;
 				part.opacity = 80.f;
 				part.useAnimation = true;
@@ -318,7 +319,7 @@ void secro::CharacterOki::update(float deltaTime)
 				part.animation.setOrigin({ 9.5f, 22.5f });
 				part.animation.setScale({ 0.05f, 0.05f });
 				part.animation.setPosition(pos.x, pos.y);
-				part.animation.setRotation(angleFromDirection(getPhysicsBody()->GetLinearVelocity()));
+				part.animation.setRotation(angleFromDirection(coll.getVelocity()));
 				part.opacityOverTime = -200.f;
 				part.opacity = 100.f;
 				part.useAnimation = false;
@@ -337,7 +338,7 @@ void secro::CharacterOki::render(sf::RenderWindow & window)
 	if (facingDirection == FacingDirection::Left)
 		scale = -1.f;
 
-	auto pos = physicsBody->GetPosition();
+	auto pos = getPhysicsCollider().getPosition();
 	animatedSprite.setPosition(pos.x, pos.y + 0.22f);
 	animatedSprite.setScale(sf::Vector2f(0.05f * scale, 0.05f));
 	animatedSprite.setOrigin(32.f, 32.f);

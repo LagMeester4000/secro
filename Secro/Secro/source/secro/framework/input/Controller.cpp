@@ -406,14 +406,21 @@ Direction secro::Controller::getMovementPushDirection() const
 	return Direction::Neutral;
 }
 
-DirectionPress secro::Controller::getMovementPushDirectionExt() const
+DirectionPress secro::Controller::getMovementPushDirectionExt(bool useOld) const
 {
 	DirectionPress ret;
 	ret.hardPush = false;
 
-	auto& newJ = current().leftStick;
-	auto& oldJ0 = prev().leftStick;
-	auto& oldJ1 = prev(2).leftStick;
+	Joystick newJ = current().leftStick;
+	Joystick oldJ0 = prev().leftStick;
+	Joystick oldJ1 = prev(2).leftStick;
+
+	if (useOld && distance(newJ, oldJ0) < 0.1f)
+	{
+		newJ = prev().leftStick;
+		oldJ0 = prev(2).leftStick;
+		oldJ1 = prev(3).leftStick;
+	}
 
 	ret.speed = (distance(newJ, oldJ0) + distance(oldJ0, oldJ1)) / 2.f;
 

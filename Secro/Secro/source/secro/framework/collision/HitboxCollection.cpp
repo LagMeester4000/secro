@@ -198,7 +198,7 @@ void secro::HitboxCollection::updateRelativeBox()
 {
 }
 
-b2Vec2 secro::HitboxCollection::scale(Entity * entity)
+Vector2 secro::HitboxCollection::scale(Entity * entity)
 {
 	auto dir = entity->getFacingDirection();
 

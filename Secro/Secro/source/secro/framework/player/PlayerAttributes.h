@@ -38,6 +38,7 @@ namespace secro {
 		//dash (not the character dash, but the dash on the ground)
 		float dashDuration;
 		float dashInitialSpeed;
+		Curve dashSpeedCurve;
 		
 		//ground move
 		float runAcceleration;

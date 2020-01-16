@@ -5,7 +5,7 @@ secro::CharacterPsycho::CharacterPsycho()
 {
 }
 
-secro::CharacterPsycho::CharacterPsycho(Level * level, HitboxManager * hitboxManager, b2Body * body, std::shared_ptr<Controller> controller)
+secro::CharacterPsycho::CharacterPsycho(Level * level, HitboxManager * hitboxManager, PhysicsHandle body, std::shared_ptr<Controller> controller)
 	: PlayerGraphicsCharacter(level, hitboxManager, body, controller)
 {
 }
@@ -103,5 +103,5 @@ bool secro::CharacterPsycho::ConditionUpSpecial(float deltaTime)
 void secro::CharacterPsycho::BeginUpSpecial(float deltaTime)
 {
 	CanNeutralSpecial = false;
-	physicsBody->SetLinearVelocity({ 0.f, -UpSpecialSpeed });
+	getPhysicsCollider().setVelocity(Vector2{ 0.f, -UpSpecialSpeed });
 }

@@ -7,7 +7,7 @@ namespace secro {
 	//aditional layer for graphics on top of the character
 	class PlayerGraphicsCharacter : public PlayerCharacter {
 	public:
-		PlayerGraphicsCharacter(Level* level, HitboxManager* hitboxManager, b2Body* body, std::shared_ptr<Controller> controller);
+		PlayerGraphicsCharacter(Level* level, HitboxManager* hitboxManager, PhysicsHandle body, std::shared_ptr<Controller> controller);
 		PlayerGraphicsCharacter();
 
 		void init() override;
@@ -15,6 +15,9 @@ namespace secro {
 		void setupStates(StateMachine& stateMachine) override;
 		void update(float deltaTime) override;
 		void render(sf::RenderWindow& window) override;
+
+		void netSerSave(RawSerializeBuffer& buff) override;
+		void netSerLoad(RawSerializeBuffer& buff) override;
 
 	public: //graphics
 		AnimatedSprite animatedSprite;

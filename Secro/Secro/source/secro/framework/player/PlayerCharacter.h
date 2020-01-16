@@ -6,6 +6,7 @@
 #include "secro/framework/collision/FacingDirection.h"
 #include "secro/framework/input/Controller.h"
 #include "secro/framework/collision/HitboxId.h"
+#include "secro/framework/physics/SecroPhysicsManager.h"
 #include "AttackCollection.h"
 
 class b2Body;
@@ -24,8 +25,8 @@ namespace secro {
 		friend class StateMachine;
 	public:
 		PlayerCharacter();
-		PlayerCharacter(Level* level, HitboxManager* hitboxManager, b2Body* body, std::shared_ptr<Controller> controller);
-		void lateSetup(Level* level, HitboxManager* hitboxManager, b2Body* body, std::shared_ptr<Controller> controller);
+		PlayerCharacter(Level* level, HitboxManager* hitboxManager, PhysicsHandle body, std::shared_ptr<Controller> controller);
+		void lateSetup(Level* level, HitboxManager* hitboxManager, PhysicsHandle body, std::shared_ptr<Controller> controller);
 
 		virtual void init();
 		virtual void setupStates(StateMachine& stateMachine);
@@ -35,9 +36,9 @@ namespace secro {
 		void netSerSave(RawSerializeBuffer& buff) override;
 		void netSerLoad(RawSerializeBuffer& buff) override;
 
-		b2Vec2 getPosition() override;
-		void setPosition(b2Vec2 pos, bool resetVelocity = false);
-		void reset(b2Vec2 position);
+		Vector2 getPosition() override;
+		void setPosition(Vector2 pos, bool resetVelocity = false);
+		void reset(Vector2 position);
 		void freeze();
 
 	protected: //essentials
@@ -45,6 +46,7 @@ namespace secro {
 
 	private: //movement
 		void updateMovement(float deltaTime);
+		void updatePlatformCollision();
 
 	protected:
 		bool snapToGround(float distance, bool startAtBottom = false);
@@ -70,7 +72,7 @@ namespace secro {
 		FacingDirection facingDirection;
 
 		//the body used for terrain collision
-		b2Body* physicsBody;
+		PhysicsHandle physicsBody;
 		
 		//the amount of jumps that the player has left
 		int jumpsLeft;
@@ -83,7 +85,7 @@ namespace secro {
 
 		//the previous position of the player
 		//used for the canSlideOffPlatforms functionality
-		b2Vec2 previousPosition;
+		Vector2 previousPosition;
 
 		//should the player have friction
 		bool shouldHaveFriction = true;
@@ -117,7 +119,8 @@ namespace secro {
 		MovementState getMovementState();
 		const PlayerAttributes& getPlayerAttributes();
 		FacingDirection getFacingDirection() override;
-		const b2Body* getPhysicsBody();
+		PhysicsHandle getPhysicsBody();
+		BoxCollider& getPhysicsCollider();
 		static bool isEqual(FacingDirection facing, Direction dir);
 		static bool isOpposite(FacingDirection facing, Direction dir);
 		
@@ -125,7 +128,7 @@ namespace secro {
 		float getWalkDeadzone();
 
 		//knock the player back (no hitstun)
-		void knockBack(b2Vec2 knockback);
+		void knockBack(Vector2 knockback);
 
 	public:
 		//function used to start and load a new attack state
@@ -149,7 +152,7 @@ namespace secro {
 
 	public:
 		//check if the player is in hitstun
-		bool IsInHitstun();
+		bool isInHitstun();
 
 		//put the player in hitstun state
 		void putInHitstun(float duration);
@@ -262,7 +265,7 @@ namespace secro {
 		float hitlag;
 
 		//the velocity before the hit
-		b2Vec2 hitlagVelocity;
+		Vector2 hitlagVelocity;
 
 		//range of freezeShake
 		float freezeShake = 0.1f;
@@ -305,7 +308,7 @@ namespace secro {
 		void stateUpdateAirdodge(float deltaTime);
 
 		//saved direction
-		b2Vec2 airdodgeDirectrion;
+		Vector2 airdodgeDirectrion;
 
 	private: //invincibility
 		//update the invincibility
