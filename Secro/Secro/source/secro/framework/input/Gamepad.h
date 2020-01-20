@@ -48,10 +48,10 @@ namespace secro {
 		//also loads the button mappings
 		void setPadIndex(int index);
 		
-		//saves the button mappings to a file located in "controllerMapping/"
+		//saves the button mappings to a file located in "controllerMapping.json"
 		void saveMappings() const;
 
-		//tries to load button mappings from "controllerMapping/"
+		//tries to load button mappings from "controllerMapping.json"
 		bool loadMappings();
 
 	public: //get button/axis values
@@ -61,6 +61,7 @@ namespace secro {
 	private:
 		std::array<int, Buttons::BUTTONS_MAX> buttonMappings;
 		std::array<int, Axes::AXES_MAX> axisMappings;
+		std::array<bool, Axes::AXES_MAX> axisMappingsSwap;
 
 		//-1 == not_set
 		int controllerIndex = -1;

@@ -7,6 +7,7 @@
 #include "secro/framework/GameInstance.h"
 #include "sen/Test.h"
 #include "framework/input/InputManager.h"
+#include "framework/input/GamepadManager.h"
 
 //windows only
 #include <expandedresources.h>
@@ -79,6 +80,8 @@ void SetImGuiStyle()
 const bool useVsync = false;
 const bool useSleep = false;
 const float FPS = 60.f; //The desired FPS. (The number of updates each second).
+#define RENDER_MAX_FALSE
+// change to RENDER_MAX_TRUE to turn on maximum framerate during rendering, but still 60hz gameplay loop
 
 int main(int argc, char *argv[])
 {
@@ -118,6 +121,7 @@ int main(int argc, char *argv[])
 		window.setVerticalSyncEnabled(true);
 
 	//game start object
+	secro::GamepadManager::update();
 	auto game = secro::Game::createGame(std::make_shared<secro::InputManager>());
 	
 	//clock for timing
@@ -177,21 +181,40 @@ int main(int argc, char *argv[])
 		if (redraw)
 		{
 			redraw = false;
+#ifndef RENDER_MAX_TRUE
 			window.clear(sf::Color(0, 102, 204));
 
 			//draw things here
 			ImGui::SFML::Update(window, dtClock);
-			//game->update(deltaTime);
+#endif
+
 			//if (1.f / deltaTime < 55.f)
 			//	std::cout << "FPS: " << 1.f / deltaTime << std::endl;
 			
-			game->update(deltaTime);
+			secro::GamepadManager::update();
+			game->update(deltaTime, window.hasFocus());
+
+#ifndef RENDER_MAX_TRUE
 			game->render(window);
 
 			ImGui::SFML::Render(window);
 			ImGui::EndFrame();
 			window.display();
+#endif
+
 		}
+
+#ifdef RENDER_MAX_TRUE
+		window.clear(sf::Color(0, 102, 204));
+
+		//draw things here
+		ImGui::SFML::Update(window, dtClock);
+		game->render(window);
+
+		ImGui::SFML::Render(window);
+		ImGui::EndFrame();
+		window.display();
+#endif
 	}
 
 	ImGui::SFML::Shutdown();

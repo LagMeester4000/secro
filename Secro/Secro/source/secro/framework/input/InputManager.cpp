@@ -2,6 +2,7 @@
 #include <SFML/Window.hpp>
 #include <iostream>
 #include "secro/netplay/RawSerializeBuffer.h"
+#include "secro/framework/input/GamepadManager.h"
 
 using namespace secro;
 
@@ -14,33 +15,38 @@ void secro::InputManager::init(int amountOfControllers)
 	if (controllers.size() > 0)
 		return;
 
-	int foundControllers = 0;
-	for (int i = 0; i < 8; ++i)
-	{
-		if (sf::Joystick::isConnected((unsigned)i))
-			foundControllers++;
-		else
-			continue;
-
-		controllers.push_back(
-			Controller::createController(controllers.size(), i, false)
-		);
-
-		std::cout << "Registered controller (" << foundControllers - 1 << ") with index " << i << std::endl;
-
-		if (foundControllers == amountOfControllers)
-			return;
-	}
-
+	//int foundControllers = 0;
+	//for (int i = 0; i < 8; ++i)
+	//{
+	//	if (sf::Joystick::isConnected((unsigned)i))
+	//		foundControllers++;
+	//	else
+	//		continue;
+	//
+	//	controllers.push_back(
+	//		Controller::createController(controllers.size(), i, false)
+	//	);
+	//
+	//	std::cout << "Registered controller (" << foundControllers - 1 << ") with index " << i << std::endl;
+	//
+	//	if (foundControllers == amountOfControllers)
+	//		return;
+	//}
+	//
+	//
 	//print error
-	std::cout << "Could only find " << foundControllers << " controller(s)!" << std::endl;
+	//std::cout << "Could only find " << foundControllers << " controller(s)!" << std::endl;
+	//
+	//for (int i = foundControllers; i < amountOfControllers; ++i)
+	//{
+	//	controllers.push_back(
+	//		Controller::createController(-1, 0, false)
+	//	);
+	//}
 
-	for (int i = foundControllers; i < amountOfControllers; ++i)
-	{
-		controllers.push_back(
-			Controller::createController(-1, 0, false)
-		);
-	}
+	controllers.push_back(Controller::createController(controllers.size(), GamepadManager::createGamepad(), false));
+	controllers.push_back(Controller::createController(controllers.size(), GamepadManager::createGamepad(), false));
+	
 }
 
 void secro::InputManager::update()

@@ -5,6 +5,7 @@
 #include <SFML/Network.hpp>
 #include "NetInputBuffer.h"
 #include "NetPacket.h"
+#include "Ping.h"
 
 namespace kra {
 	namespace net {
@@ -39,6 +40,9 @@ namespace kra {
 			uint32_t GetPingIndex() const;
 			int64_t GetLastFrameDifference() const;
 			uint32_t GetCurrentFrame() const;
+			bool HasStartedConnection() const;
+			bool HasStunCompleted() const;
+			bool UsingStun() const;
 
 		public: // Setters
 			void SetUpdateFunction(void(*F)(void*, KraNetInput, KraNetInput));
@@ -100,6 +104,9 @@ namespace kra {
 			// Holds if the session is using stun server or not
 			bool UseStun = true;
 
+			// True if one of the functions to start a connection has been called
+			bool StartedConnection = false;
+
 		private: // Non-const data
 			NetInputBuffer Inputs;
 			std::unique_ptr<sf::UdpSocket> Sock;
@@ -112,6 +119,7 @@ namespace kra {
 			uint32_t PingIndex = 1; // Very important to start at 1
 			bool PingDone = false;
 			double LastPingTime = 0.0;
+			Ping PingTime;
 			int64_t LastFrameDifference = 0;
 		};
 	}

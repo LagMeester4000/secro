@@ -1,4 +1,5 @@
 #include "ParticleSystem.h"
+#include "secro/netplay/RawSerializeBuffer.h"
 
 using namespace secro;
 
@@ -45,6 +46,9 @@ void secro::ParticleSystem::renderBack(sf::RenderWindow & window)
 
 Particle & secro::ParticleSystem::spawnParticle()
 {
+	// DISABLE PARTICLES
+	return NullPart;
+
 	for (auto& it : particles)
 	{
 		if (!it.has_value())
@@ -57,6 +61,29 @@ Particle & secro::ParticleSystem::spawnParticle()
 	auto& ret = particles[particles.size() - 1];
 	ret.emplace();
 	return *ret;
+}
+
+void secro::ParticleSystem::netSerSave(RawSerializeBuffer & buff)
+{
+	size_t size = particles.size();
+	buff.save(size);
+	for (size_t i = 0; i < size; ++i)
+	{
+		buff.save(particles[i]);
+	}
+}
+
+void secro::ParticleSystem::netSerLoad(RawSerializeBuffer & buff)
+{
+	std::optional<Particle> load;
+	size_t size;
+	buff.load(size);
+	particles.clear();
+	for (size_t i = 0; i < size; ++i)
+	{
+		buff.load(load);
+		particles.push_back(load);
+	}
 }
 
 void secro::ParticleSystem::garbageCollect()

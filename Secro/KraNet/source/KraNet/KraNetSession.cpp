@@ -38,6 +38,7 @@ bool kra::net::KraNetSession::StartConnection(sf::IpAddress OOtherIp, unsigned s
 			OtherPort = PPort;
 			Initialize();
 			Host = false;
+			StartedConnection = true;
 			return true;
 		}
 	}
@@ -49,6 +50,7 @@ uint32_t kra::net::KraNetSession::StartHost()
 {
 	Host = true;
 	Stun.StartHost();
+	StartedConnection = true;
 	return Stun.GetSessionCode();
 }
 
@@ -77,6 +79,7 @@ bool kra::net::KraNetSession::ListenConnection(unsigned short PPort)
 				Sock->setBlocking(false);
 				Initialize();
 				Host = true;
+				StartedConnection = true;
 				return true;
 			}
 		}
@@ -88,6 +91,7 @@ void kra::net::KraNetSession::StartJoin(uint32_t SessionCode)
 {
 	Host = false;
 	Stun.StartJoin(SessionCode);
+	StartedConnection = true;
 }
 
 #include <iostream>
@@ -143,7 +147,7 @@ bool kra::net::KraNetSession::IsHost() const
 
 double kra::net::KraNetSession::GetPing() const
 {
-	return LastPingTime;
+	return PingTime.Get();
 }
 
 sf::IpAddress kra::net::KraNetSession::GetOtherIp() const
@@ -174,6 +178,21 @@ int64_t kra::net::KraNetSession::GetLastFrameDifference() const
 uint32_t kra::net::KraNetSession::GetCurrentFrame() const
 {
 	return Inputs.GetGameplayFrameIndex();
+}
+
+bool kra::net::KraNetSession::HasStartedConnection() const
+{
+	return StartedConnection;
+}
+
+bool kra::net::KraNetSession::HasStunCompleted() const
+{
+	return Stun.Completed();
+}
+
+bool kra::net::KraNetSession::UsingStun() const
+{
+	return UseStun;
 }
 
 void kra::net::KraNetSession::SetUpdateFunction(void(*F)(void *, KraNetInput, KraNetInput))
@@ -257,10 +276,17 @@ void kra::net::KraNetSession::SendInput()
 		
 		// Set ping var
 		LastPingTime = PingAsMs;
+		PingTime.Add(PingAsMs);
+		double AvgPing = PingTime.Get();
 		
 		int64_t LocalFrame = (int64_t)Inputs.GetGameplayFrameIndex(),
 			RemoteFrame = (int64_t)InNetPacket.Input.GameplayFrame;
-		int64_t PingAsFrames = (int64_t)(PingAsMs / ((1.0 / FPS) * 1000.0));
+		
+		double PingAsFramesDouble = ((AvgPing) / ((1.0 / FPS) * 1000.0));
+		double AdjustedRemoteFrameDouble = (double)RemoteFrame + PingAsFramesDouble;
+		double FrameDiffDouble = (double)LocalFrame - AdjustedRemoteFrameDouble;
+
+		int64_t PingAsFrames = (int64_t)(PingAsFramesDouble/* - 0.5*/); // Round the frames (kinda down), to be more accurate
 		int64_t AdjustedRemoteFrame = RemoteFrame + PingAsFrames;
 		int64_t FrameDiff = LocalFrame - AdjustedRemoteFrame;
 		//std::cout << "Difference in frames: " << FrameDiff << std::endl;
@@ -271,12 +297,13 @@ void kra::net::KraNetSession::SendInput()
 
 		// TEMP 
 		// use sleeping to get the two machines synced up
-		if (FrameDiff >= 2 /*&& IsHost()*/)
+		if (FrameDiffDouble >= 2.0 /*&& IsHost()*/)
 		{
 			//sleep for half
 
 			// ENABLE THIS FOR SYNCING
-			std::this_thread::sleep_for(std::chrono::milliseconds(8 * FrameDiff));
+			//std::this_thread::sleep_for(std::chrono::milliseconds(16 * FrameDiff));
+			std::this_thread::sleep_for(std::chrono::milliseconds((long long)(16.0 * FrameDiffDouble)));
 			//std::cout << "Sleeping for " << 8 * FrameDiff << "ms" << std::endl;
 		}
 
@@ -336,6 +363,8 @@ void kra::net::KraNetSession::ReceiveInput()
 				// Setup the boolean to do the actual work in the SendInput function
 				PingDone = true;
 				PingIndex++;
+
+				// Add ping to ping manager
 			}
 
 			// Process inputs

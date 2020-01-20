@@ -1,0 +1,74 @@
+{
+  "2508": {
+    "FaceLeft": 0,
+    "FaceRight": 1,
+    "FaceUp": 3,
+    "FaceDown": 2,
+
+    "LeftShoulder": 4,
+    "RightShoulder": 5,
+
+    "SpecialLeft": 6,
+    "SpecialRight": 7,
+
+    "LeftStickPress": 0,
+    "RightStickPress": 0,
+
+
+
+    "LeftStickX": 0,
+    "LeftStickX_swap": false,
+    "LeftStickY": 1,
+    "LeftStickY_swap": false,
+    "RightStickX": 2,
+    "RightStickX_swap": false,
+    "RightStickY": 3,
+    "RightStickY_swap": false,
+
+    "DPadX": 6,
+    "DPadX_swap": false,
+    "DPadY": 7,
+    "DPadY_swap": false,
+
+    "LeftTrigger": 4,
+    "LeftTrigger_swap": true,
+    "RightTrigger": 5,
+    "RightTrigger_swap": true
+  },
+  "673": {
+    "FaceLeft": 2,
+    "FaceRight": 0,
+    "FaceUp": 3,
+    "FaceDown": 1,
+
+    "LeftShoulder": 4,
+    "RightShoulder": 5,
+
+    "SpecialLeft": 6,
+    "SpecialRight": 7,
+
+    "LeftStickPress": 8,
+    "RightStickPress": 9,
+
+
+
+    "LeftStickX": 0,
+    "LeftStickX_swap": false,
+    "LeftStickY": 1,
+    "LeftStickY_swap": false,
+    "RightStickX": 4,
+    "RightStickX_swap": false,
+    "RightStickY": 5,
+    "RightStickY_swap": false,
+
+    "DPadX": 6,
+    "DPadX_swap": false,
+    "DPadY": 7,
+    "DPadY_swap": false,
+
+    "LeftTrigger": 2,
+    "LeftTrigger_swap": true,
+    "RightTrigger": 2,
+    "RightTrigger_swap": false
+  }
+}

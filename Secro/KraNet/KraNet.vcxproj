@@ -141,9 +141,11 @@
     <ClCompile Include="source\KraNet\NetInputBuffer.cpp" />
     <ClCompile Include="source\KraNet\NetPacket.cpp" />
     <ClCompile Include="source\KraNet\Network\UDPSocket.cpp" />
+    <ClCompile Include="source\KraNet\Ping.cpp" />
     <ClCompile Include="source\KraPunchClient\StunClient.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="include\KraNet\Detail\RingBufferStatic.h" />
     <ClInclude Include="include\KraNet\GameInstance.h" />
     <ClInclude Include="include\KraNet\KraNet.h" />
     <ClInclude Include="include\KraNet\KraNetInput.h" />
@@ -152,6 +154,7 @@
     <ClInclude Include="include\KraNet\NetPacket.h" />
     <ClInclude Include="include\KraNet\Network\UDPPeer.h" />
     <ClInclude Include="include\KraNet\Network\UDPSocket.h" />
+    <ClInclude Include="include\KraNet\Ping.h" />
     <ClInclude Include="include\KraPunchClient\StunClient.h" />
   </ItemGroup>
   <ItemGroup>

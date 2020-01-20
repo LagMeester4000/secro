@@ -144,6 +144,7 @@
     <ClInclude Include="source\editor\Editor.h" />
     <ClInclude Include="source\editor\Scene.h" />
     <ClInclude Include="source\imgui\imgui-SFML.h" />
+    <ClInclude Include="source\json\json.hpp" />
     <ClInclude Include="source\secro\framework\ai\AIController.h" />
     <ClInclude Include="source\secro\framework\collision\Attack.h" />
     <ClInclude Include="source\secro\framework\collision\CollisionRenderer.h" />
@@ -156,6 +157,7 @@
     <ClInclude Include="source\secro\framework\collision\HitResult.h" />
     <ClInclude Include="source\secro\framework\detail\VirtualObjectPool.h" />
     <ClInclude Include="source\secro\framework\input\Gamepad.h" />
+    <ClInclude Include="source\secro\framework\input\GamepadManager.h" />
     <ClInclude Include="source\secro\framework\math\ray.h" />
     <ClInclude Include="source\secro\framework\physics\RayCastResult.h" />
     <ClInclude Include="source\secro\framework\physics\SecroPhysicsManager.h" />
@@ -269,6 +271,8 @@
     <ClCompile Include="source\secro\framework\graphics\Particle.cpp" />
     <ClCompile Include="source\secro\framework\graphics\ParticleSystem.cpp" />
     <ClCompile Include="source\secro\framework\input\Controller.cpp" />
+    <ClCompile Include="source\secro\framework\input\Gamepad.cpp" />
+    <ClCompile Include="source\secro\framework\input\GamepadManager.cpp" />
     <ClCompile Include="source\secro\framework\input\InputManager.cpp" />
     <ClCompile Include="source\secro\framework\input\InputTestBot.cpp" />
     <ClCompile Include="source\secro\framework\level\Level.cpp" />

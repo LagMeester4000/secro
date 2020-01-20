@@ -3,6 +3,7 @@
 #include <iostream>
 #include <math.h>
 #include "../detail/PlainVectorMath.h"
+#include "secro/framework/input/GamepadManager.h"
 
 using namespace secro;
 
@@ -323,7 +324,7 @@ void secro::Controller::update()
 	//get new inputs
 	if (!useIntercept)
 	{
-		if (sf::Joystick::isConnected(controllerIndex))
+		//if (sf::Joystick::isConnected(controllerIndex))
 		{
 			Input& i = current();
 
@@ -332,10 +333,10 @@ void secro::Controller::update()
 			auto comp = compressInput(i);
 			i = uncompressInput(comp);
 		}
-		else
-		{
-			//std::cout << "controller not plugged in" << std::endl;
-		}
+		//else
+		//{
+		//	//std::cout << "controller not plugged in" << std::endl;
+		//}
 	}
 	else
 	{
@@ -351,28 +352,29 @@ void secro::Controller::manualUpdate(Input & push)
 
 secro::Controller::Input secro::Controller::readInput() const
 {
-	if (playerIndex != -1 && sf::Joystick::isConnected(controllerIndex))
+	if (playerIndex != -1 && GamepadManager::isConnected(controllerIndex)/* && sf::Joystick::isConnected(controllerIndex)*/)
 	{
 		Input i;
+		auto& gamepad = GamepadManager::getGamepad(controllerIndex);
 
 		//buttons
-		i.specialButton = sf::Joystick::isButtonPressed(controllerIndex, settings.specialButton);
-		i.attackButton = sf::Joystick::isButtonPressed(controllerIndex, settings.attackButton);
-		i.jumpButton = sf::Joystick::isButtonPressed(controllerIndex, settings.jumpButton);
-		i.grabButton = sf::Joystick::isButtonPressed(controllerIndex, settings.grabButton);
-		i.startButton = sf::Joystick::isButtonPressed(controllerIndex, settings.startButton);
-		i.selectButton = sf::Joystick::isButtonPressed(controllerIndex, settings.selectButton);
+		i.specialButton = gamepad.getKeyDown(Gamepad::FaceRight);//sf::Joystick::isButtonPressed(controllerIndex, settings.specialButton);
+		i.attackButton = gamepad.getKeyDown(Gamepad::FaceDown);//sf::Joystick::isButtonPressed(controllerIndex, settings.attackButton);
+		i.jumpButton = gamepad.getKeyDown(Gamepad::FaceUp);//sf::Joystick::isButtonPressed(controllerIndex, settings.jumpButton);
+		i.grabButton = gamepad.getKeyDown(Gamepad::RightShoulder);//sf::Joystick::isButtonPressed(controllerIndex, settings.grabButton);
+		i.startButton = gamepad.getKeyDown(Gamepad::SpecialRight);//sf::Joystick::isButtonPressed(controllerIndex, settings.startButton);
+		i.selectButton = gamepad.getKeyDown(Gamepad::SpecialLeft);//sf::Joystick::isButtonPressed(controllerIndex, settings.selectButton);
 
 		//triggers (need to be tested)
-		i.shieldButton = sf::Joystick::getAxisPosition(controllerIndex, (sf::Joystick::Axis)settings.shieldButton.axis) < (20.f * settings.shieldButton.scale);
+		i.shieldButton = gamepad.getAxis(Gamepad::RightTrigger)/*sf::Joystick::getAxisPosition(controllerIndex, (sf::Joystick::Axis)settings.shieldButton.axis)*/ < (20.f * settings.shieldButton.scale);
 
 		//joysticks
-		i.leftStick.x = sf::Joystick::getAxisPosition(controllerIndex, (sf::Joystick::Axis)settings.leftStick.x.axis) * settings.leftStick.x.scale;
-		i.leftStick.y = sf::Joystick::getAxisPosition(controllerIndex, (sf::Joystick::Axis)settings.leftStick.y.axis) * settings.leftStick.y.scale;
+		i.leftStick.x = gamepad.getAxis(Gamepad::LeftStickX)/*sf::Joystick::getAxisPosition(controllerIndex, (sf::Joystick::Axis)settings.leftStick.x.axis)*/ * settings.leftStick.x.scale;
+		i.leftStick.y = gamepad.getAxis(Gamepad::LeftStickY)/*sf::Joystick::getAxisPosition(controllerIndex, (sf::Joystick::Axis)settings.leftStick.y.axis)*/ * settings.leftStick.y.scale;
 
 		//joysticks
-		i.rightStick.x = sf::Joystick::getAxisPosition(controllerIndex, (sf::Joystick::Axis)settings.rightStick.x.axis) * settings.rightStick.x.scale;
-		i.rightStick.y = sf::Joystick::getAxisPosition(controllerIndex, (sf::Joystick::Axis)settings.rightStick.y.axis) * settings.rightStick.y.scale;
+		i.rightStick.x = gamepad.getAxis(Gamepad::RightStickX)/*sf::Joystick::getAxisPosition(controllerIndex, (sf::Joystick::Axis)settings.rightStick.x.axis)*/ * settings.rightStick.x.scale;
+		i.rightStick.y = gamepad.getAxis(Gamepad::RightStickY)/*sf::Joystick::getAxisPosition(controllerIndex, (sf::Joystick::Axis)settings.rightStick.y.axis)*/ * settings.rightStick.y.scale;
 
 		return i;
 	}

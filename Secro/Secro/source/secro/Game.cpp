@@ -223,69 +223,69 @@ secro::Game::Game(std::shared_ptr<InputManager> input)
 		kraNet.SetRollbackSaveStateFunction(&staticNetStateSave);
 		kraNet.SetRollbackLoadStateFunction(&staticNetStateLoad);
 
-		uint16_t DefaultDirectPort = 31418;
-		std::cout << "Choose connection type:" << std::endl <<
-			"  0 for host, " << std::endl << 
-			"  1 for client," << std::endl <<
-			"  2 for direct host, " << std::endl <<
-			"  3 for direct client, " << std::endl;
-		int i;
-		std::cin >> i;
-		if (i == 0)
-		{
-			/*//host
-			int delay = 3;
-			std::cout << "set frames of input delay (default value is 3)" << std::endl;
-			std::cin >> delay;
-			std::cout << std::endl;
-
-			network.setInputDelay(delay);
-			network.initializeHost(31415);
-			network.waitForClient();*/
-
-			std::cout << "host code: " << kraNet.StartHost() << std::endl;
-		}
-		else if (i == 1)
-		{
-			/*//client
-			std::string ip = "";
-			std::cout << "enter IP address" << std::endl;
-			std::cin >> ip;
-			std::cout << std::endl;
-
-			network.initializeClient(ip.c_str(), 31415);
-
-			//connect
-			network.connectToHost();
-
-			int stop = 0;*/
-
-			std::cout << "insert host code: " << std::endl;
-			uint32_t code;
-			std::cin >> code;
-			kraNet.StartJoin(code);
-		}
-		else if (i == 2)
-		{
-			std::cout << "waiting for other connection..." << std::endl;
-			if (!kraNet.ListenConnection(DefaultDirectPort))
-			{
-				//ERROR
-				std::cout << "host connection could not be established" << std::endl;
-			}
-		}
-		else if (i == 3)
-		{
-			std::cout << "insert other IP: " << std::endl;
-			std::string ipStr;
-			std::cin >> ipStr;
-			sf::IpAddress ip(ipStr.c_str());
-			if (!kraNet.StartConnection(ip, DefaultDirectPort))
-			{
-				//ERROR
-				std::cout << "join connection could not be established" << std::endl;
-			}
-		}
+		//uint16_t DefaultDirectPort = 31418;
+		//std::cout << "Choose connection type:" << std::endl <<
+		//	"  0 for host, " << std::endl << 
+		//	"  1 for client," << std::endl <<
+		//	"  2 for direct host, " << std::endl <<
+		//	"  3 for direct client, " << std::endl;
+		//int i;
+		//std::cin >> i;
+		//if (i == 0)
+		//{
+		//	/*//host
+		//	int delay = 3;
+		//	std::cout << "set frames of input delay (default value is 3)" << std::endl;
+		//	std::cin >> delay;
+		//	std::cout << std::endl;
+		//
+		//	network.setInputDelay(delay);
+		//	network.initializeHost(31415);
+		//	network.waitForClient();*/
+		//
+		//	std::cout << "host code: " << kraNet.StartHost() << std::endl;
+		//}
+		//else if (i == 1)
+		//{
+		//	/*//client
+		//	std::string ip = "";
+		//	std::cout << "enter IP address" << std::endl;
+		//	std::cin >> ip;
+		//	std::cout << std::endl;
+		//
+		//	network.initializeClient(ip.c_str(), 31415);
+		//
+		//	//connect
+		//	network.connectToHost();
+		//
+		//	int stop = 0;*/
+		//
+		//	std::cout << "insert host code: " << std::endl;
+		//	uint32_t code;
+		//	std::cin >> code;
+		//	kraNet.StartJoin(code);
+		//}
+		//else if (i == 2)
+		//{
+		//	std::cout << "waiting for other connection..." << std::endl;
+		//	if (!kraNet.ListenConnection(DefaultDirectPort))
+		//	{
+		//		//ERROR
+		//		std::cout << "host connection could not be established" << std::endl;
+		//	}
+		//}
+		//else if (i == 3)
+		//{
+		//	std::cout << "insert other IP: " << std::endl;
+		//	std::string ipStr;
+		//	std::cin >> ipStr;
+		//	sf::IpAddress ip(ipStr.c_str());
+		//	if (!kraNet.StartConnection(ip, DefaultDirectPort))
+		//	{
+		//		//ERROR
+		//		std::cout << "join connection could not be established" << std::endl;
+		//	}
+		//}
 	}
 }
 
@@ -294,6 +294,10 @@ secro::Game::Game(std::shared_ptr<InputManager> input)
 
 void secro::Game::update(float realDeltaTime, bool shouldUpdateInput)
 {
+	// Test to see if game should update at all
+	if (GameInstance::instance.isOnline && !kraNet.HasStartedConnection())
+		return;
+
 	float deltaTime = 1.f / 60.f;
 	networkUI.update(
 		kraNet.GetPing(),
@@ -332,14 +336,21 @@ void secro::Game::update(float realDeltaTime, bool shouldUpdateInput)
 			//	network.update(0);
 			//}
 		}*/
-		auto r = inputManager->getController(0)->readInput();
+		Controller::Input r;
+		if (shouldUpdateInput)
+			r = inputManager->getController(0)->readInput();
+		else
+			r = Controller::Input();
+
 		int asInt = Controller::compressInput(r).input.raw;
 		kraNet.Update(toKraNet(asInt));
 	}
 	else
 	{
 		//offline
-		inputManager->update();
+		if (shouldUpdateInput)
+			inputManager->update();
+
 		simulateUpdate(deltaTime);
 
 		//used to remove all the contacts
@@ -398,8 +409,41 @@ void secro::Game::updateWithInput(float deltaTime, int localInput, int otherInpu
 	simulateUpdate(deltaTime, duringRollback);
 }
 
+#include <imgui.h>
+char ipOrCode[32] = "";
+uint16_t DefaultDirectPort = 31418;
 void secro::Game::render(sf::RenderWindow & window)
 {
+	if (GameInstance::instance.isOnline && (
+			!kraNet.HasStartedConnection() || 
+			(kraNet.UsingStun() && kraNet.IsHost() && !kraNet.HasStunCompleted()) 
+		))
+	{
+		//render connection window
+		if (ImGui::Begin("Networking setup"))
+		{
+			ImGui::InputText("in", ipOrCode, 32);
+			if (ImGui::Button("Host"))
+			{
+				sprintf_s(ipOrCode, "Session Code: %u", kraNet.StartHost());
+			}
+			if (ImGui::Button("Join"))
+			{
+				kraNet.StartJoin((unsigned int)atoll(ipOrCode));
+			}
+			if (ImGui::Button("Direct Host"))
+			{
+				kraNet.ListenConnection(DefaultDirectPort);
+			}
+			if (ImGui::Button("Direct Join"))
+			{
+				kraNet.StartConnection(ipOrCode, DefaultDirectPort);
+			}
+		}
+		ImGui::End();
+	}
+
+
 	switch (gameState)
 	{
 	case GameState::MainMenu:

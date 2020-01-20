@@ -39,6 +39,9 @@
     <ClCompile Include="source\KraPunchClient\StunClient.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="source\KraNet\Ping.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\KraNet\Network\UDPPeer.h">
@@ -66,6 +69,12 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\KraPunchClient\StunClient.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\KraNet\Ping.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\KraNet\Detail\RingBufferStatic.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
