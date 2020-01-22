@@ -12,6 +12,7 @@ namespace secro {
 			bool enableHitboxEditor = false;
 			bool enablePlayerAttributeEditor = false;
 			bool enableInputEditor = false;
+			bool enableGamepadEditor = false;
 			bool enableGameplaySettingsEditor = false;
 			bool enablePhysicsRender = false;
 			bool enableHitboxRender = false;

@@ -125,6 +125,24 @@ bool secro::GamepadManager::isConnected(int index)
 	return members.pads[members.padMap[index]].connected;
 }
 
+std::vector<int> secro::GamepadManager::debugGetConnectedGamepads()
+{
+	std::vector<int> ret;
+	for (int i = 0; i < 8; ++i)
+	{
+		if (members.pads[i].connected)
+		{
+			ret.push_back(i);
+		}
+	}
+	return ret;
+}
+
+Gamepad & secro::GamepadManager::debugGetGamepad(int rawGamepadIndex)
+{
+	return members.pads[rawGamepadIndex].pad;
+}
+
 secro::GamepadManager::Members::Members()
 {
 	for (auto& it : padMap)

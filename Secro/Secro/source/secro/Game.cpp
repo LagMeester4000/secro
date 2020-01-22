@@ -10,6 +10,7 @@
 #include "gameplay/characters/CharacterPsycho.h"
 #include "gameplay/level/BridgeLevel.h"
 #include "ShobuNetwork/Network.h"
+#include "framework/input/InputMappingUI.h"
 
 //ui
 #include "framework/ui/UIElement.h"
@@ -489,6 +490,9 @@ void secro::Game::render(sf::RenderWindow & window)
 
 	//render the input bot
 	//inputBot->render();
+
+	//render input mapping
+	InputMappingUI::staticRender();
 }
 
 void secro::Game::startLevel(std::shared_ptr<Level> level, int amountOfPlayers)

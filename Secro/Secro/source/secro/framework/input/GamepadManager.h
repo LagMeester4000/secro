@@ -1,6 +1,7 @@
 #pragma once
 #include "Gamepad.h"
 #include <SFML/Window/Joystick.hpp>
+#include <vector>
 
 namespace secro {
 	class GamepadManager {
@@ -34,6 +35,13 @@ namespace secro {
 
 		//returns wether the gamepad can be used for getting input
 		static bool isConnected(int index);
+
+		//returns the connected gamepads
+		static std::vector<int> debugGetConnectedGamepads();
+
+		//returns a gamepad from pads buffer
+		//please don't use this function 
+		static Gamepad& debugGetGamepad(int rawGamepadIndex);
 
 	private:
 		//find an unused gamepad (in `pads`) and return its id

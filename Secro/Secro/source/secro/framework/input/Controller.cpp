@@ -358,15 +358,15 @@ secro::Controller::Input secro::Controller::readInput() const
 		auto& gamepad = GamepadManager::getGamepad(controllerIndex);
 
 		//buttons
-		i.specialButton = gamepad.getKeyDown(Gamepad::FaceRight);//sf::Joystick::isButtonPressed(controllerIndex, settings.specialButton);
-		i.attackButton = gamepad.getKeyDown(Gamepad::FaceDown);//sf::Joystick::isButtonPressed(controllerIndex, settings.attackButton);
+		i.specialButton = gamepad.getKeyDown(Gamepad::FaceDown);//sf::Joystick::isButtonPressed(controllerIndex, settings.specialButton);
+		i.attackButton = gamepad.getKeyDown(Gamepad::FaceRight);//sf::Joystick::isButtonPressed(controllerIndex, settings.attackButton);
 		i.jumpButton = gamepad.getKeyDown(Gamepad::FaceUp);//sf::Joystick::isButtonPressed(controllerIndex, settings.jumpButton);
 		i.grabButton = gamepad.getKeyDown(Gamepad::RightShoulder);//sf::Joystick::isButtonPressed(controllerIndex, settings.grabButton);
 		i.startButton = gamepad.getKeyDown(Gamepad::SpecialRight);//sf::Joystick::isButtonPressed(controllerIndex, settings.startButton);
 		i.selectButton = gamepad.getKeyDown(Gamepad::SpecialLeft);//sf::Joystick::isButtonPressed(controllerIndex, settings.selectButton);
 
 		//triggers (need to be tested)
-		i.shieldButton = gamepad.getAxis(Gamepad::RightTrigger)/*sf::Joystick::getAxisPosition(controllerIndex, (sf::Joystick::Axis)settings.shieldButton.axis)*/ < (20.f * settings.shieldButton.scale);
+		i.shieldButton = gamepad.getAxis(Gamepad::RightTrigger)/*sf::Joystick::getAxisPosition(controllerIndex, (sf::Joystick::Axis)settings.shieldButton.axis)*/ > (20.f * settings.shieldButton.scale);
 
 		//joysticks
 		i.leftStick.x = gamepad.getAxis(Gamepad::LeftStickX)/*sf::Joystick::getAxisPosition(controllerIndex, (sf::Joystick::Axis)settings.leftStick.x.axis)*/ * settings.leftStick.x.scale;

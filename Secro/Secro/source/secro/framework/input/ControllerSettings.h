@@ -23,7 +23,7 @@ namespace secro {
 		ButtonIndex jumpButton = 3;
 
 		ButtonIndex grabButton = 5;
-		AxisConfig shieldButton = { sf::Joystick::Axis::Z, -1.f };
+		AxisConfig shieldButton = { sf::Joystick::Axis::Z, 1.f };
 
 		ButtonIndex startButton = 8;
 		ButtonIndex selectButton = 9;

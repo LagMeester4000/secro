@@ -158,6 +158,7 @@
     <ClInclude Include="source\secro\framework\detail\VirtualObjectPool.h" />
     <ClInclude Include="source\secro\framework\input\Gamepad.h" />
     <ClInclude Include="source\secro\framework\input\GamepadManager.h" />
+    <ClInclude Include="source\secro\framework\input\InputMappingUI.h" />
     <ClInclude Include="source\secro\framework\math\ray.h" />
     <ClInclude Include="source\secro\framework\physics\RayCastResult.h" />
     <ClInclude Include="source\secro\framework\physics\SecroPhysicsManager.h" />
@@ -274,6 +275,7 @@
     <ClCompile Include="source\secro\framework\input\Gamepad.cpp" />
     <ClCompile Include="source\secro\framework\input\GamepadManager.cpp" />
     <ClCompile Include="source\secro\framework\input\InputManager.cpp" />
+    <ClCompile Include="source\secro\framework\input\InputMappingUI.cpp" />
     <ClCompile Include="source\secro\framework\input\InputTestBot.cpp" />
     <ClCompile Include="source\secro\framework\level\Level.cpp" />
     <ClCompile Include="source\secro\framework\math\Curve.cpp" />
