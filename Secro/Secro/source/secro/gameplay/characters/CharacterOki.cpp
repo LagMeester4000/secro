@@ -275,7 +275,7 @@ void secro::CharacterOki::update(float deltaTime)
 	{
 		auto vel = coll.getVelocity();
 		auto speed = length(vel);
-		std::cout << speed << std::endl;
+		//std::cout << speed << std::endl;
 		particleHitDuration = particleHitDurationMax / (speed / 10.f);
 		if (particleHitDuration > particleHitDurationMax)
 			particleHitDuration = particleHitDurationMax;

@@ -111,7 +111,7 @@ void secro::HitboxCollection::changeHitboxes(std::vector<HitboxChange>& changes)
 	{
 		if (it.index >= hitboxes.size())
 		{
-			std::cout << "nonexistant hitbox referenced" << std::endl;
+			//std::cout << "nonexistant hitbox referenced" << std::endl;
 			return;
 		}
 

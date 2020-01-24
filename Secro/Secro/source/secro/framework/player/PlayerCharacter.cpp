@@ -754,6 +754,7 @@ void secro::PlayerCharacter::updateMovement(float deltaTime)
 					jumpsLeft--;
 					Vector2 jumpVel = { 0.f, -attributes.doubleJumpSpeed };
 					coll.setVelocity(jumpVel);
+					onDoubleJump();
 				}
 			}
 
@@ -1323,6 +1324,7 @@ void secro::PlayerCharacter::tryDoubleJump(float deltaTime)
 		jumpsLeft--;
 		Vector2 jumpVel = { 0.f, -attributes.doubleJumpSpeed };
 		getPhysicsCollider().setVelocity(jumpVel);
+		onDoubleJump();
 		//stateMachine.changeState(this, PlayerState::Jump, 0.01666f);
 	}
 }
@@ -1365,6 +1367,11 @@ void secro::PlayerCharacter::updateState(float deltaTime)
 PlayerState secro::PlayerCharacter::getState()
 {
 	return state;
+}
+
+PlayerState secro::PlayerCharacter::getPreviousState()
+{
+	return previousState;
 }
 
 bool secro::PlayerCharacter::IsStateTimerDone()
@@ -1427,7 +1434,7 @@ void secro::PlayerCharacter::updateAttack(float deltaTime)
 		}
 		else
 		{
-			std::cout << "ERROR, player is in attacking state, but does not have a current hitbox" << std::endl;
+			//std::cout << "ERROR, player is in attacking state, but does not have a current hitbox" << std::endl;
 		}
 	}
 }
@@ -1516,7 +1523,7 @@ void secro::PlayerCharacter::stateStartShield()
 {
 	if (hurtboxFrames.frames.size() < 2)
 	{
-		std::cout << "ERROR: player does not have a shielding state" << std::endl;
+		//std::cout << "ERROR: player does not have a shielding state" << std::endl;
 		return;
 	}
 
@@ -1528,7 +1535,7 @@ void secro::PlayerCharacter::stateEndShield()
 {
 	if (hurtboxFrames.frames.size() < 1)
 	{
-		std::cout << "ERROR: player does not have a hurtbox state" << std::endl;
+		//std::cout << "ERROR: player does not have a hurtbox state" << std::endl;
 		return;
 	}
 
@@ -1842,4 +1849,8 @@ void secro::PlayerCharacter::resetAirDashTimer()
 	canAirDash = false;
 	airDashPreviousDirection = Direction::Neutral;
 	airDashTimer = 0.f;
+}
+
+void secro::PlayerCharacter::onDoubleJump()
+{
 }

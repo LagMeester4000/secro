@@ -49,7 +49,14 @@ void secro::PlayerGraphicsCharacter::setupStates(StateMachine & sm)
 	//animations
 	sm.addSetState(PlayerState::Jump, [&](float f)
 	{
-		animatedSprite.setAnimation(animInAir);
+		if (getPreviousState() == PlayerState::JumpSquat)
+		{
+			animatedSprite.setAnimation(animInAirJump);
+		}
+		else
+		{
+			animatedSprite.setAnimation(animInAir);
+		}
 	});
 	sm.addSetState(PlayerState::JumpSquat, [&](float f)
 	{
@@ -229,7 +236,7 @@ void secro::PlayerGraphicsCharacter::update(float deltaTime)
 	PlayerCharacter::update(deltaTime);
 	auto& coll = getPhysicsCollider();
 
-	if (!isInHitlag())
+	if (!(isInHitlag() && !isInHitstun()))
 		animatedSprite.update(sf::seconds(deltaTime));
 
 	//spawn hit particles
@@ -237,7 +244,7 @@ void secro::PlayerGraphicsCharacter::update(float deltaTime)
 	{
 		auto vel = coll.getVelocity();
 		auto speed = length(vel);
-		std::cout << speed << std::endl;
+		//std::cout << speed << std::endl;
 		particleHitDuration = particleHitDurationMax / (speed / 10.f);
 		if (particleHitDuration > particleHitDurationMax)
 			particleHitDuration = particleHitDurationMax;
@@ -318,6 +325,11 @@ void secro::PlayerGraphicsCharacter::render(sf::RenderWindow & window)
 		shieldSprite.setScale(sf::Vector2f(0.05f * scale, 0.05f * scale));
 		window.draw(shieldSprite);
 	}
+}
+
+void secro::PlayerGraphicsCharacter::onDoubleJump()
+{
+	animatedSprite.setAnimation(animInAirJump);
 }
 
 void secro::PlayerGraphicsCharacter::netSerSave(RawSerializeBuffer & buff)

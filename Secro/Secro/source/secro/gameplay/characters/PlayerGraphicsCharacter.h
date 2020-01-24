@@ -16,6 +16,8 @@ namespace secro {
 		void update(float deltaTime) override;
 		void render(sf::RenderWindow& window) override;
 
+		void onDoubleJump() override;
+
 		void netSerSave(RawSerializeBuffer& buff) override;
 		void netSerLoad(RawSerializeBuffer& buff) override;
 
@@ -29,6 +31,7 @@ namespace secro {
 		Animation animWalk;
 		Animation animJumpSquat;
 		Animation animInAir;
+		Animation animInAirJump;
 		Animation animHitstun;
 		Animation animFreeFall;
 		Animation animLandingLag;

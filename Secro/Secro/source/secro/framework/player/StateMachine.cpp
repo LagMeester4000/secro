@@ -33,6 +33,7 @@ void secro::StateMachine::update(float deltaTime, PlayerCharacter * player)
 		if (it.func(deltaTime))
 		{
 			//set the actual player state
+			player->previousState = player->state;
 			player->state = it.switchTo;
 
 			//call unset functions
@@ -74,6 +75,7 @@ void secro::StateMachine::addUpdateState(PlayerState state, std::function<void(f
 void secro::StateMachine::changeState(PlayerCharacter * player, PlayerState newState, float deltaTime)
 {
 	auto oldState = player->getState();
+	player->previousState = oldState;
 
 	//call unset functions
 	auto& unsetFuncs = unsetState[(int)oldState];
@@ -92,6 +94,7 @@ void secro::StateMachine::changeState(PlayerCharacter * player, PlayerState newS
 void secro::StateMachine::unsafeChangeState(PlayerCharacter * player, PlayerState newState, float deltaTime)
 {
 	auto oldState = player->getState();
+	player->previousState = oldState;
 
 	//call unset functions
 	auto& unsetFuncs = unsetState[(int)oldState];

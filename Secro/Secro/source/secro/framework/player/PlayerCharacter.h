@@ -166,6 +166,9 @@ namespace secro {
 		//the actual state of the player
 		PlayerState state;
 		
+		//the actual state of the player
+		PlayerState previousState;
+		
 		//a frame timer used to update states
 		float stateTimer;
 
@@ -178,6 +181,9 @@ namespace secro {
 	public:
 		//return the current player state
 		PlayerState getState();
+		
+		//return the previous player state
+		PlayerState getPreviousState();
 
 		//check if the state timer of the player is smaller than 0
 		bool IsStateTimerDone();
@@ -351,5 +357,9 @@ namespace secro {
 		void updateAirDashTimer(float deltaTime);
 		void conditionAirDash();
 		void resetAirDashTimer();
+
+	protected: //calls to children
+		virtual void onDoubleJump();
+
 	};
 }
